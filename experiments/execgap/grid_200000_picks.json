@@ -1,0 +1,68 @@
+{
+ "now": {
+  "pick": "DB-K30-b6",
+  "row": {
+   "cagr": 28.68,
+   "excess": 31.22,
+   "max_dd": -51.68,
+   "worst": 6.5,
+   "fresh": {
+    "2017": 17.6,
+    "2019": 17.1,
+    "2021": 8.2,
+    "2023": 6.5
+   },
+   "turnover": 55.8,
+   "hold_days": 3.8,
+   "idle_cash_pct": 0.1,
+   "ir": 2.498984020221967
+  },
+  "best_ir": "DB-K30-b6",
+  "steadiest": "DB-K8-b16",
+  "robust_count": 39
+ },
+ "half": {
+  "pick": "DB-K10-b4",
+  "row": {
+   "cagr": 16.17,
+   "excess": 18.33,
+   "max_dd": -32.18,
+   "worst": 6.5,
+   "fresh": {
+    "2017": 11.7,
+    "2019": 9.9,
+    "2021": 6.5,
+    "2023": 6.8
+   },
+   "turnover": 42.3,
+   "hold_days": 2.6,
+   "idle_cash_pct": 51.4,
+   "ir": 1.024933175025537
+  },
+  "best_ir": "DB-K10-b4",
+  "steadiest": "DB-K8-b16",
+  "robust_count": 33
+ },
+ "close_sell_prev_rank": {
+  "pick": "DB-K30-b4",
+  "row": {
+   "cagr": 24.28,
+   "excess": 27.46,
+   "max_dd": -54.9,
+   "worst": 6.5,
+   "fresh": {
+    "2017": 13.5,
+    "2019": 13.9,
+    "2021": 6.5,
+    "2023": 7.4
+   },
+   "turnover": 50.4,
+   "hold_days": 3.5,
+   "idle_cash_pct": 22.5,
+   "ir": 2.1513408310807276
+  },
+  "best_ir": "DB-K30-b4",
+  "steadiest": "DB-K10-b16",
+  "robust_count": 43
+ }
+}

@@ -1,0 +1,43 @@
+{
+ "rows": 9063605,
+ "codes": 3413,
+ "dates": 3350,
+ "first": "2013-01-04 00:00:00",
+ "last": "2026-10-23 00:00:00",
+ "eligible_rows": 4168201,
+ "eligible_now_rows": 3993934,
+ "eligible_only_by_name_then": 207550,
+ "eligible_only_by_name_now": 33283,
+ "pool_per_day_by_year": {
+  "2013": 205.0,
+  "2014": 763.0,
+  "2015": 1548.0,
+  "2016": 1322.0,
+  "2017": 970.0,
+  "2018": 740.0,
+  "2019": 1018.0,
+  "2020": 1256.0,
+  "2021": 1267.0,
+  "2022": 1495.0,
+  "2023": 1346.0,
+  "2024": 1550.0,
+  "2025": 1999.0,
+  "2026": 1984.0
+ },
+ "calendar_matches": true,
+ "source": "data\\research-2013-2026.duckdb",
+ "seam": {
+  "overlap_daily_rows": 104914,
+  "price_mismatch_rows": 0,
+  "amount_mismatch_rows": 0,
+  "overlap_limit_rows": 104145,
+  "limit_mismatch_rows": 0,
+  "scaled_codes": 4556,
+  "scale_not_one": 3,
+  "scale_inconsistent": 2,
+  "scale_min": 1.0,
+  "scale_max": 433.618,
+  "crossing_without_overlap": 0
+ },
+ "seconds": 242
+}

@@ -1,0 +1,110 @@
+{
+ "20000|DB-K2-b8": {
+  "buy_day_open_to_close": {
+   "n": 2222,
+   "stock": 0.469,
+   "pool": 0.269,
+   "gap": 0.2,
+   "ci": [
+    0.08,
+    0.323
+   ],
+   "up_share": 52.3
+  },
+  "buy_day_close_to_next_open": {
+   "n": 2222,
+   "stock": 0.05,
+   "pool": -0.144,
+   "gap": 0.194,
+   "ci": [
+    0.128,
+    0.257
+   ],
+   "up_share": 44.7
+  },
+  "sell_day_open_to_close": {
+   "n": 2222,
+   "stock": 0.23,
+   "pool": 0.259,
+   "gap": -0.029,
+   "ci": [
+    -0.134,
+    0.076
+   ],
+   "up_share": 48.7
+  },
+  "buy_closes_limit_up": 2.7
+ },
+ "20000|DB-K2-b6": {
+  "buy_day_open_to_close": {
+   "n": 2420,
+   "stock": 0.415,
+   "pool": 0.251,
+   "gap": 0.164,
+   "ci": [
+    0.056,
+    0.279
+   ],
+   "up_share": 52.3
+  },
+  "buy_day_close_to_next_open": {
+   "n": 2420,
+   "stock": 0.048,
+   "pool": -0.152,
+   "gap": 0.2,
+   "ci": [
+    0.14,
+    0.259
+   ],
+   "up_share": 45.3
+  },
+  "sell_day_open_to_close": {
+   "n": 2420,
+   "stock": 0.228,
+   "pool": 0.242,
+   "gap": -0.014,
+   "ci": [
+    -0.121,
+    0.09
+   ],
+   "up_share": 48.4
+  },
+  "buy_closes_limit_up": 2.5
+ },
+ "200000|DB-K30-b6": {
+  "buy_day_open_to_close": {
+   "n": 22163,
+   "stock": 0.352,
+   "pool": 0.241,
+   "gap": 0.111,
+   "ci": [
+    0.061,
+    0.162
+   ],
+   "up_share": 52.0
+  },
+  "buy_day_close_to_next_open": {
+   "n": 22159,
+   "stock": 0.009,
+   "pool": -0.153,
+   "gap": 0.162,
+   "ci": [
+    0.139,
+    0.185
+   ],
+   "up_share": 43.6
+  },
+  "sell_day_open_to_close": {
+   "n": 22163,
+   "stock": 0.184,
+   "pool": 0.234,
+   "gap": -0.05,
+   "ci": [
+    -0.094,
+    -0.006
+   ],
+   "up_share": 48.8
+  },
+  "buy_closes_limit_up": 1.8
+ }
+}

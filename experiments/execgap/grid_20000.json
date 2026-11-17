@@ -1,0 +1,5672 @@
+{
+ "now|DB-K1-b1": {
+  "cagr": 19.51,
+  "excess": 31.76,
+  "max_dd": -76.46,
+  "worst": -0.3,
+  "fresh": {
+   "2017": 5.9,
+   "2019": 2.9,
+   "2021": 1.4,
+   "2023": -0.3
+  },
+  "turnover": 176.8,
+  "hold_days": 1.3
+ },
+ "now|DB-K1-b1.5": {
+  "cagr": 19.51,
+  "excess": 31.76,
+  "max_dd": -76.46,
+  "worst": -0.3,
+  "fresh": {
+   "2017": 5.9,
+   "2019": 2.9,
+   "2021": 1.4,
+   "2023": -0.3
+  },
+  "turnover": 176.8,
+  "hold_days": 1.3
+ },
+ "now|DB-K1-b2": {
+  "cagr": 12.71,
+  "excess": 25.16,
+  "max_dd": -78.06,
+  "worst": -3.2,
+  "fresh": {
+   "2017": 0.3,
+   "2019": -3.2,
+   "2021": -0.0,
+   "2023": 0.8
+  },
+  "turnover": 150.7,
+  "hold_days": 1.6
+ },
+ "now|DB-K1-b3": {
+  "cagr": 20.41,
+  "excess": 31.65,
+  "max_dd": -74.87,
+  "worst": 3.0,
+  "fresh": {
+   "2017": 5.9,
+   "2019": 3.0,
+   "2021": 8.1,
+   "2023": 6.3
+  },
+  "turnover": 132.1,
+  "hold_days": 1.7
+ },
+ "now|DB-K1-b4": {
+  "cagr": 21.89,
+  "excess": 32.73,
+  "max_dd": -74.25,
+  "worst": 5.3,
+  "fresh": {
+   "2017": 6.7,
+   "2019": 5.3,
+   "2021": 13.0,
+   "2023": 10.1
+  },
+  "turnover": 120.6,
+  "hold_days": 1.8
+ },
+ "now|DB-K1-b6": {
+  "cagr": 16.16,
+  "excess": 27.55,
+  "max_dd": -78.53,
+  "worst": -2.1,
+  "fresh": {
+   "2017": 3.2,
+   "2019": -2.1,
+   "2021": 5.5,
+   "2023": 8.3
+  },
+  "turnover": 107.8,
+  "hold_days": 2.1
+ },
+ "now|DB-K1-b8": {
+  "cagr": 14.86,
+  "excess": 26.29,
+  "max_dd": -76.84,
+  "worst": -1.4,
+  "fresh": {
+   "2017": 1.8,
+   "2019": -1.4,
+   "2021": 5.0,
+   "2023": 6.7
+  },
+  "turnover": 102.3,
+  "hold_days": 2.2
+ },
+ "now|DB-K1-b12": {
+  "cagr": 13.75,
+  "excess": 25.24,
+  "max_dd": -72.61,
+  "worst": -1.4,
+  "fresh": {
+   "2017": -1.0,
+   "2019": -1.4,
+   "2021": 8.3,
+   "2023": 3.4
+  },
+  "turnover": 90.3,
+  "hold_days": 2.5
+ },
+ "now|DB-K1-b16": {
+  "cagr": 22.48,
+  "excess": 32.48,
+  "max_dd": -73.83,
+  "worst": 9.0,
+  "fresh": {
+   "2017": 9.0,
+   "2019": 14.3,
+   "2021": 16.2,
+   "2023": 17.9
+  },
+  "turnover": 78.0,
+  "hold_days": 2.7
+ },
+ "now|DB-K2-b1": {
+  "cagr": 21.45,
+  "excess": 29.64,
+  "max_dd": -71.21,
+  "worst": -0.1,
+  "fresh": {
+   "2017": 9.4,
+   "2019": -0.1,
+   "2021": -0.1,
+   "2023": 3.9
+  },
+  "turnover": 168.0,
+  "hold_days": 1.4
+ },
+ "now|DB-K2-b1.5": {
+  "cagr": 19.55,
+  "excess": 27.87,
+  "max_dd": -72.75,
+  "worst": 2.3,
+  "fresh": {
+   "2017": 10.0,
+   "2019": 3.2,
+   "2021": 2.3,
+   "2023": 3.4
+  },
+  "turnover": 149.3,
+  "hold_days": 1.6
+ },
+ "now|DB-K2-b2": {
+  "cagr": 27.85,
+  "excess": 34.63,
+  "max_dd": -72.56,
+  "worst": 5.8,
+  "fresh": {
+   "2017": 16.7,
+   "2019": 9.7,
+   "2021": 6.9,
+   "2023": 5.8
+  },
+  "turnover": 135.1,
+  "hold_days": 1.7
+ },
+ "now|DB-K2-b3": {
+  "cagr": 28.76,
+  "excess": 35.21,
+  "max_dd": -73.91,
+  "worst": 8.6,
+  "fresh": {
+   "2017": 17.5,
+   "2019": 8.6,
+   "2021": 10.9,
+   "2023": 13.5
+  },
+  "turnover": 117.4,
+  "hold_days": 1.9
+ },
+ "now|DB-K2-b4": {
+  "cagr": 31.54,
+  "excess": 37.39,
+  "max_dd": -72.02,
+  "worst": 10.5,
+  "fresh": {
+   "2017": 18.0,
+   "2019": 11.1,
+   "2021": 10.5,
+   "2023": 14.8
+  },
+  "turnover": 107.6,
+  "hold_days": 2.1
+ },
+ "now|DB-K2-b6": {
+  "cagr": 31.53,
+  "excess": 37.16,
+  "max_dd": -70.95,
+  "worst": 14.9,
+  "fresh": {
+   "2017": 17.5,
+   "2019": 14.9,
+   "2021": 17.0,
+   "2023": 27.5
+  },
+  "turnover": 91.3,
+  "hold_days": 2.4
+ },
+ "now|DB-K2-b8": {
+  "cagr": 32.48,
+  "excess": 37.83,
+  "max_dd": -67.43,
+  "worst": 18.1,
+  "fresh": {
+   "2017": 19.0,
+   "2019": 18.1,
+   "2021": 19.9,
+   "2023": 31.8
+  },
+  "turnover": 81.7,
+  "hold_days": 2.6
+ },
+ "now|DB-K2-b12": {
+  "cagr": 21.78,
+  "excess": 29.12,
+  "max_dd": -68.52,
+  "worst": 8.3,
+  "fresh": {
+   "2017": 9.8,
+   "2019": 8.3,
+   "2021": 10.8,
+   "2023": 11.9
+  },
+  "turnover": 72.6,
+  "hold_days": 3.0
+ },
+ "now|DB-K2-b16": {
+  "cagr": 23.66,
+  "excess": 30.41,
+  "max_dd": -65.18,
+  "worst": 11.2,
+  "fresh": {
+   "2017": 11.2,
+   "2019": 12.2,
+   "2021": 12.8,
+   "2023": 16.8
+  },
+  "turnover": 65.3,
+  "hold_days": 3.2
+ },
+ "now|DB-K3-b1": {
+  "cagr": 16.59,
+  "excess": 23.95,
+  "max_dd": -71.54,
+  "worst": -17.2,
+  "fresh": {
+   "2017": 8.6,
+   "2019": -13.3,
+   "2021": -17.2,
+   "2023": -13.6
+  },
+  "turnover": 154.7,
+  "hold_days": 1.5
+ },
+ "now|DB-K3-b1.5": {
+  "cagr": 21.47,
+  "excess": 28.02,
+  "max_dd": -71.09,
+  "worst": -8.2,
+  "fresh": {
+   "2017": 13.1,
+   "2019": -7.7,
+   "2021": -5.8,
+   "2023": -8.2
+  },
+  "turnover": 141.7,
+  "hold_days": 1.6
+ },
+ "now|DB-K3-b2": {
+  "cagr": 22.31,
+  "excess": 28.76,
+  "max_dd": -71.15,
+  "worst": -2.8,
+  "fresh": {
+   "2017": 12.6,
+   "2019": -2.4,
+   "2021": 0.6,
+   "2023": -2.8
+  },
+  "turnover": 122.4,
+  "hold_days": 1.8
+ },
+ "now|DB-K3-b3": {
+  "cagr": 24.87,
+  "excess": 30.61,
+  "max_dd": -67.12,
+  "worst": 0.2,
+  "fresh": {
+   "2017": 11.4,
+   "2019": 4.5,
+   "2021": 2.3,
+   "2023": 0.2
+  },
+  "turnover": 105.7,
+  "hold_days": 2.0
+ },
+ "now|DB-K3-b4": {
+  "cagr": 35.75,
+  "excess": 38.9,
+  "max_dd": -64.6,
+  "worst": 12.0,
+  "fresh": {
+   "2017": 20.2,
+   "2019": 12.0,
+   "2021": 13.0,
+   "2023": 22.9
+  },
+  "turnover": 96.9,
+  "hold_days": 2.2
+ },
+ "now|DB-K3-b6": {
+  "cagr": 27.72,
+  "excess": 32.64,
+  "max_dd": -68.66,
+  "worst": 11.4,
+  "fresh": {
+   "2017": 18.3,
+   "2019": 12.7,
+   "2021": 11.4,
+   "2023": 16.5
+  },
+  "turnover": 86.9,
+  "hold_days": 2.5
+ },
+ "now|DB-K3-b8": {
+  "cagr": 27.88,
+  "excess": 32.65,
+  "max_dd": -65.57,
+  "worst": 13.7,
+  "fresh": {
+   "2017": 19.2,
+   "2019": 13.9,
+   "2021": 13.7,
+   "2023": 16.4
+  },
+  "turnover": 75.6,
+  "hold_days": 2.8
+ },
+ "now|DB-K3-b12": {
+  "cagr": 33.15,
+  "excess": 36.81,
+  "max_dd": -64.21,
+  "worst": 18.1,
+  "fresh": {
+   "2017": 22.8,
+   "2019": 18.1,
+   "2021": 21.8,
+   "2023": 27.6
+  },
+  "turnover": 65.9,
+  "hold_days": 3.1
+ },
+ "now|DB-K3-b16": {
+  "cagr": 27.87,
+  "excess": 32.17,
+  "max_dd": -59.52,
+  "worst": 12.0,
+  "fresh": {
+   "2017": 12.0,
+   "2019": 18.9,
+   "2021": 18.9,
+   "2023": 24.7
+  },
+  "turnover": 59.6,
+  "hold_days": 3.6
+ },
+ "now|DB-K4-b1": {
+  "cagr": 17.85,
+  "excess": 24.38,
+  "max_dd": -65.68,
+  "worst": -35.1,
+  "fresh": {
+   "2017": -6.7,
+   "2019": -35.1,
+   "2021": -25.2,
+   "2023": -21.0
+  },
+  "turnover": 152.3,
+  "hold_days": 1.5
+ },
+ "now|DB-K4-b1.5": {
+  "cagr": 22.29,
+  "excess": 28.07,
+  "max_dd": -65.38,
+  "worst": -34.7,
+  "fresh": {
+   "2017": 10.7,
+   "2019": -34.7,
+   "2021": -17.9,
+   "2023": -12.0
+  },
+  "turnover": 133.1,
+  "hold_days": 1.7
+ },
+ "now|DB-K4-b2": {
+  "cagr": 23.08,
+  "excess": 28.62,
+  "max_dd": -64.66,
+  "worst": -14.9,
+  "fresh": {
+   "2017": 9.7,
+   "2019": -14.9,
+   "2021": -2.4,
+   "2023": -5.3
+  },
+  "turnover": 119.3,
+  "hold_days": 1.8
+ },
+ "now|DB-K4-b3": {
+  "cagr": 26.99,
+  "excess": 31.7,
+  "max_dd": -68.06,
+  "worst": 2.3,
+  "fresh": {
+   "2017": 15.3,
+   "2019": 2.3,
+   "2021": 7.6,
+   "2023": 2.8
+  },
+  "turnover": 100.8,
+  "hold_days": 2.1
+ },
+ "now|DB-K4-b4": {
+  "cagr": 26.59,
+  "excess": 31.36,
+  "max_dd": -69.01,
+  "worst": -6.4,
+  "fresh": {
+   "2017": 14.8,
+   "2019": 10.0,
+   "2021": 3.6,
+   "2023": -6.4
+  },
+  "turnover": 93.4,
+  "hold_days": 2.3
+ },
+ "now|DB-K4-b6": {
+  "cagr": 25.82,
+  "excess": 30.61,
+  "max_dd": -65.46,
+  "worst": 4.3,
+  "fresh": {
+   "2017": 14.1,
+   "2019": 13.8,
+   "2021": 11.3,
+   "2023": 4.3
+  },
+  "turnover": 81.0,
+  "hold_days": 2.7
+ },
+ "now|DB-K4-b8": {
+  "cagr": 28.57,
+  "excess": 32.72,
+  "max_dd": -68.9,
+  "worst": 12.8,
+  "fresh": {
+   "2017": 15.8,
+   "2019": 14.5,
+   "2021": 12.8,
+   "2023": 15.7
+  },
+  "turnover": 72.8,
+  "hold_days": 2.9
+ },
+ "now|DB-K4-b12": {
+  "cagr": 31.54,
+  "excess": 34.72,
+  "max_dd": -58.6,
+  "worst": 16.7,
+  "fresh": {
+   "2017": 19.2,
+   "2019": 16.7,
+   "2021": 18.4,
+   "2023": 25.6
+  },
+  "turnover": 61.2,
+  "hold_days": 3.4
+ },
+ "now|DB-K4-b16": {
+  "cagr": 22.67,
+  "excess": 27.5,
+  "max_dd": -55.65,
+  "worst": 13.0,
+  "fresh": {
+   "2017": 13.0,
+   "2019": 18.3,
+   "2021": 19.6,
+   "2023": 25.3
+  },
+  "turnover": 55.3,
+  "hold_days": 3.8
+ },
+ "now|DB-K6-b1": {
+  "cagr": 18.51,
+  "excess": 24.03,
+  "max_dd": -56.63,
+  "worst": -51.4,
+  "fresh": {
+   "2017": -25.5,
+   "2019": -31.2,
+   "2021": -39.4,
+   "2023": -51.4
+  },
+  "turnover": 152.1,
+  "hold_days": 1.5
+ },
+ "now|DB-K6-b1.5": {
+  "cagr": 21.54,
+  "excess": 26.59,
+  "max_dd": -55.49,
+  "worst": -39.3,
+  "fresh": {
+   "2017": -25.7,
+   "2019": -31.1,
+   "2021": -39.3,
+   "2023": -26.2
+  },
+  "turnover": 130.3,
+  "hold_days": 1.7
+ },
+ "now|DB-K6-b2": {
+  "cagr": 20.07,
+  "excess": 25.23,
+  "max_dd": -59.7,
+  "worst": -40.0,
+  "fresh": {
+   "2017": -25.6,
+   "2019": -31.1,
+   "2021": -40.0,
+   "2023": -21.8
+  },
+  "turnover": 117.5,
+  "hold_days": 1.9
+ },
+ "now|DB-K6-b3": {
+  "cagr": 20.65,
+  "excess": 25.76,
+  "max_dd": -58.89,
+  "worst": -39.1,
+  "fresh": {
+   "2017": -26.1,
+   "2019": -31.1,
+   "2021": -39.1,
+   "2023": -15.0
+  },
+  "turnover": 100.3,
+  "hold_days": 2.2
+ },
+ "now|DB-K6-b4": {
+  "cagr": 22.07,
+  "excess": 26.89,
+  "max_dd": -59.67,
+  "worst": -31.2,
+  "fresh": {
+   "2017": -26.1,
+   "2019": -31.2,
+   "2021": -25.5,
+   "2023": -5.0
+  },
+  "turnover": 88.4,
+  "hold_days": 2.4
+ },
+ "now|DB-K6-b6": {
+  "cagr": 26.5,
+  "excess": 30.23,
+  "max_dd": -57.89,
+  "worst": -2.9,
+  "fresh": {
+   "2017": -1.7,
+   "2019": -2.1,
+   "2021": -2.9,
+   "2023": 7.4
+  },
+  "turnover": 76.9,
+  "hold_days": 2.8
+ },
+ "now|DB-K6-b8": {
+  "cagr": 28.39,
+  "excess": 31.73,
+  "max_dd": -57.0,
+  "worst": 2.1,
+  "fresh": {
+   "2017": 16.4,
+   "2019": 19.5,
+   "2021": 2.1,
+   "2023": 7.5
+  },
+  "turnover": 67.6,
+  "hold_days": 3.1
+ },
+ "now|DB-K6-b12": {
+  "cagr": 25.21,
+  "excess": 29.08,
+  "max_dd": -49.99,
+  "worst": 2.0,
+  "fresh": {
+   "2017": 9.1,
+   "2019": 2.0,
+   "2021": 7.1,
+   "2023": 5.5
+  },
+  "turnover": 58.2,
+  "hold_days": 3.7
+ },
+ "now|DB-K6-b16": {
+  "cagr": 26.08,
+  "excess": 30.05,
+  "max_dd": -50.34,
+  "worst": 8.8,
+  "fresh": {
+   "2017": 8.8,
+   "2019": 12.2,
+   "2021": 10.6,
+   "2023": 11.4
+  },
+  "turnover": 52.1,
+  "hold_days": 4.1
+ },
+ "open_sell_close_buy|DB-K1-b1": {
+  "cagr": -32.69,
+  "excess": -35.73,
+  "max_dd": -99.35,
+  "worst": -49.0,
+  "fresh": {
+   "2017": -41.9,
+   "2019": -49.0,
+   "2021": -16.4,
+   "2023": -8.4
+  },
+  "turnover": 159.3,
+  "hold_days": 1.2
+ },
+ "open_sell_close_buy|DB-K1-b1.5": {
+  "cagr": -32.69,
+  "excess": -35.73,
+  "max_dd": -99.35,
+  "worst": -49.0,
+  "fresh": {
+   "2017": -41.9,
+   "2019": -49.0,
+   "2021": -16.4,
+   "2023": -8.4
+  },
+  "turnover": 159.3,
+  "hold_days": 1.2
+ },
+ "open_sell_close_buy|DB-K1-b2": {
+  "cagr": -33.12,
+  "excess": -35.12,
+  "max_dd": -99.35,
+  "worst": -45.0,
+  "fresh": {
+   "2017": -38.7,
+   "2019": -45.0,
+   "2021": -9.4,
+   "2023": -6.6
+  },
+  "turnover": 146.7,
+  "hold_days": 1.5
+ },
+ "open_sell_close_buy|DB-K1-b3": {
+  "cagr": -32.35,
+  "excess": -33.72,
+  "max_dd": -99.27,
+  "worst": -44.9,
+  "fresh": {
+   "2017": -37.9,
+   "2019": -44.9,
+   "2021": -5.1,
+   "2023": -4.7
+  },
+  "turnover": 138.2,
+  "hold_days": 1.6
+ },
+ "open_sell_close_buy|DB-K1-b4": {
+  "cagr": -32.58,
+  "excess": -33.81,
+  "max_dd": -99.33,
+  "worst": -45.0,
+  "fresh": {
+   "2017": -38.1,
+   "2019": -45.0,
+   "2021": -4.7,
+   "2023": -3.7
+  },
+  "turnover": 134.5,
+  "hold_days": 1.6
+ },
+ "open_sell_close_buy|DB-K1-b6": {
+  "cagr": -32.54,
+  "excess": -34.06,
+  "max_dd": -99.34,
+  "worst": -49.2,
+  "fresh": {
+   "2017": -37.9,
+   "2019": -49.2,
+   "2021": -6.1,
+   "2023": -3.9
+  },
+  "turnover": 116.5,
+  "hold_days": 1.8
+ },
+ "open_sell_close_buy|DB-K1-b8": {
+  "cagr": -33.25,
+  "excess": -35.08,
+  "max_dd": -99.42,
+  "worst": -45.3,
+  "fresh": {
+   "2017": -38.0,
+   "2019": -45.3,
+   "2021": -1.8,
+   "2023": -0.3
+  },
+  "turnover": 111.1,
+  "hold_days": 2.0
+ },
+ "open_sell_close_buy|DB-K1-b12": {
+  "cagr": -33.3,
+  "excess": -34.29,
+  "max_dd": -99.55,
+  "worst": -45.2,
+  "fresh": {
+   "2017": -38.7,
+   "2019": -45.2,
+   "2021": -4.5,
+   "2023": -3.4
+  },
+  "turnover": 108.5,
+  "hold_days": 2.1
+ },
+ "open_sell_close_buy|DB-K1-b16": {
+  "cagr": -32.74,
+  "excess": -33.62,
+  "max_dd": -99.5,
+  "worst": -38.8,
+  "fresh": {
+   "2017": -38.8,
+   "2019": -7.8,
+   "2021": -0.0,
+   "2023": 2.7
+  },
+  "turnover": 102.8,
+  "hold_days": 2.3
+ },
+ "open_sell_close_buy|DB-K2-b1": {
+  "cagr": -28.68,
+  "excess": -30.31,
+  "max_dd": -98.53,
+  "worst": -45.4,
+  "fresh": {
+   "2017": -33.9,
+   "2019": -42.2,
+   "2021": -45.4,
+   "2023": -18.0
+  },
+  "turnover": 149.1,
+  "hold_days": 1.2
+ },
+ "open_sell_close_buy|DB-K2-b1.5": {
+  "cagr": -28.44,
+  "excess": -30.0,
+  "max_dd": -98.53,
+  "worst": -42.2,
+  "fresh": {
+   "2017": -33.4,
+   "2019": -42.2,
+   "2021": -30.0,
+   "2023": -15.2
+  },
+  "turnover": 138.0,
+  "hold_days": 1.4
+ },
+ "open_sell_close_buy|DB-K2-b2": {
+  "cagr": -28.44,
+  "excess": -29.86,
+  "max_dd": -98.53,
+  "worst": -42.2,
+  "fresh": {
+   "2017": -33.8,
+   "2019": -42.2,
+   "2021": -14.2,
+   "2023": -6.9
+  },
+  "turnover": 139.5,
+  "hold_days": 1.4
+ },
+ "open_sell_close_buy|DB-K2-b3": {
+  "cagr": -28.59,
+  "excess": -29.94,
+  "max_dd": -98.62,
+  "worst": -42.6,
+  "fresh": {
+   "2017": -33.3,
+   "2019": -42.6,
+   "2021": -8.5,
+   "2023": -4.5
+  },
+  "turnover": 123.3,
+  "hold_days": 1.6
+ },
+ "open_sell_close_buy|DB-K2-b4": {
+  "cagr": -28.65,
+  "excess": -29.56,
+  "max_dd": -98.71,
+  "worst": -38.5,
+  "fresh": {
+   "2017": -33.8,
+   "2019": -38.5,
+   "2021": -5.1,
+   "2023": -2.8
+  },
+  "turnover": 117.4,
+  "hold_days": 1.9
+ },
+ "open_sell_close_buy|DB-K2-b6": {
+  "cagr": -28.73,
+  "excess": -29.41,
+  "max_dd": -98.86,
+  "worst": -39.3,
+  "fresh": {
+   "2017": -33.5,
+   "2019": -39.3,
+   "2021": -1.8,
+   "2023": 7.8
+  },
+  "turnover": 110.6,
+  "hold_days": 1.9
+ },
+ "open_sell_close_buy|DB-K2-b8": {
+  "cagr": -28.46,
+  "excess": -29.18,
+  "max_dd": -98.84,
+  "worst": -33.8,
+  "fresh": {
+   "2017": -33.8,
+   "2019": -17.8,
+   "2021": -1.2,
+   "2023": 7.8
+  },
+  "turnover": 105.1,
+  "hold_days": 2.0
+ },
+ "open_sell_close_buy|DB-K2-b12": {
+  "cagr": -28.93,
+  "excess": -28.99,
+  "max_dd": -99.01,
+  "worst": -33.8,
+  "fresh": {
+   "2017": -33.8,
+   "2019": -14.9,
+   "2021": -4.6,
+   "2023": -0.3
+  },
+  "turnover": 89.6,
+  "hold_days": 2.5
+ },
+ "open_sell_close_buy|DB-K2-b16": {
+  "cagr": -28.84,
+  "excess": -28.58,
+  "max_dd": -99.02,
+  "worst": -33.8,
+  "fresh": {
+   "2017": -33.8,
+   "2019": -13.8,
+   "2021": -2.1,
+   "2023": 1.1
+  },
+  "turnover": 82.0,
+  "hold_days": 3.0
+ },
+ "open_sell_close_buy|DB-K3-b1": {
+  "cagr": -26.07,
+  "excess": -27.04,
+  "max_dd": -97.51,
+  "worst": -48.0,
+  "fresh": {
+   "2017": -30.8,
+   "2019": -36.7,
+   "2021": -48.0,
+   "2023": -37.7
+  },
+  "turnover": 130.8,
+  "hold_days": 1.2
+ },
+ "open_sell_close_buy|DB-K3-b1.5": {
+  "cagr": -26.12,
+  "excess": -27.05,
+  "max_dd": -97.64,
+  "worst": -46.6,
+  "fresh": {
+   "2017": -30.8,
+   "2019": -36.8,
+   "2021": -46.6,
+   "2023": -27.2
+  },
+  "turnover": 125.4,
+  "hold_days": 1.3
+ },
+ "open_sell_close_buy|DB-K3-b2": {
+  "cagr": -26.09,
+  "excess": -26.85,
+  "max_dd": -97.73,
+  "worst": -43.3,
+  "fresh": {
+   "2017": -30.8,
+   "2019": -37.1,
+   "2021": -43.3,
+   "2023": -23.8
+  },
+  "turnover": 115.0,
+  "hold_days": 1.4
+ },
+ "open_sell_close_buy|DB-K3-b3": {
+  "cagr": -26.07,
+  "excess": -26.57,
+  "max_dd": -98.2,
+  "worst": -38.5,
+  "fresh": {
+   "2017": -30.8,
+   "2019": -38.5,
+   "2021": -20.2,
+   "2023": -9.1
+  },
+  "turnover": 111.5,
+  "hold_days": 1.6
+ },
+ "open_sell_close_buy|DB-K3-b4": {
+  "cagr": -26.15,
+  "excess": -26.74,
+  "max_dd": -98.06,
+  "worst": -38.5,
+  "fresh": {
+   "2017": -30.6,
+   "2019": -38.5,
+   "2021": -18.3,
+   "2023": -5.7
+  },
+  "turnover": 103.9,
+  "hold_days": 1.7
+ },
+ "open_sell_close_buy|DB-K3-b6": {
+  "cagr": -26.17,
+  "excess": -26.5,
+  "max_dd": -98.23,
+  "worst": -38.3,
+  "fresh": {
+   "2017": -30.6,
+   "2019": -38.3,
+   "2021": -12.1,
+   "2023": 2.5
+  },
+  "turnover": 96.1,
+  "hold_days": 2.1
+ },
+ "open_sell_close_buy|DB-K3-b8": {
+  "cagr": -25.97,
+  "excess": -25.97,
+  "max_dd": -98.2,
+  "worst": -37.2,
+  "fresh": {
+   "2017": -30.8,
+   "2019": -37.2,
+   "2021": -7.6,
+   "2023": 5.9
+  },
+  "turnover": 89.2,
+  "hold_days": 2.2
+ },
+ "open_sell_close_buy|DB-K3-b12": {
+  "cagr": -26.0,
+  "excess": -25.2,
+  "max_dd": -98.6,
+  "worst": -30.8,
+  "fresh": {
+   "2017": -30.8,
+   "2019": -23.3,
+   "2021": 6.9,
+   "2023": 17.2
+  },
+  "turnover": 84.2,
+  "hold_days": 2.7
+ },
+ "open_sell_close_buy|DB-K3-b16": {
+  "cagr": -26.25,
+  "excess": -25.52,
+  "max_dd": -98.87,
+  "worst": -30.8,
+  "fresh": {
+   "2017": -30.8,
+   "2019": -8.2,
+   "2021": 7.8,
+   "2023": 17.6
+  },
+  "turnover": 71.9,
+  "hold_days": 3.4
+ },
+ "open_sell_close_buy|DB-K4-b1": {
+  "cagr": -24.14,
+  "excess": -24.64,
+  "max_dd": -96.53,
+  "worst": -53.2,
+  "fresh": {
+   "2017": -28.8,
+   "2019": -34.6,
+   "2021": -44.5,
+   "2023": -53.2
+  },
+  "turnover": 107.7,
+  "hold_days": 1.4
+ },
+ "open_sell_close_buy|DB-K4-b1.5": {
+  "cagr": -24.12,
+  "excess": -24.61,
+  "max_dd": -96.66,
+  "worst": -44.7,
+  "fresh": {
+   "2017": -28.7,
+   "2019": -34.6,
+   "2021": -44.7,
+   "2023": -30.3
+  },
+  "turnover": 99.2,
+  "hold_days": 1.3
+ },
+ "open_sell_close_buy|DB-K4-b2": {
+  "cagr": -24.11,
+  "excess": -24.44,
+  "max_dd": -96.95,
+  "worst": -45.6,
+  "fresh": {
+   "2017": -28.5,
+   "2019": -34.6,
+   "2021": -45.6,
+   "2023": -23.3
+  },
+  "turnover": 101.6,
+  "hold_days": 1.5
+ },
+ "open_sell_close_buy|DB-K4-b3": {
+  "cagr": -24.09,
+  "excess": -24.28,
+  "max_dd": -97.37,
+  "worst": -43.1,
+  "fresh": {
+   "2017": -28.6,
+   "2019": -34.6,
+   "2021": -43.1,
+   "2023": -16.8
+  },
+  "turnover": 99.6,
+  "hold_days": 1.7
+ },
+ "open_sell_close_buy|DB-K4-b4": {
+  "cagr": -24.08,
+  "excess": -24.05,
+  "max_dd": -97.68,
+  "worst": -41.6,
+  "fresh": {
+   "2017": -28.6,
+   "2019": -34.6,
+   "2021": -41.6,
+   "2023": -17.0
+  },
+  "turnover": 96.1,
+  "hold_days": 1.8
+ },
+ "open_sell_close_buy|DB-K4-b6": {
+  "cagr": -24.24,
+  "excess": -24.08,
+  "max_dd": -97.96,
+  "worst": -35.7,
+  "fresh": {
+   "2017": -28.5,
+   "2019": -35.7,
+   "2021": -21.6,
+   "2023": -6.7
+  },
+  "turnover": 90.5,
+  "hold_days": 2.0
+ },
+ "open_sell_close_buy|DB-K4-b8": {
+  "cagr": -24.21,
+  "excess": -23.84,
+  "max_dd": -98.02,
+  "worst": -34.4,
+  "fresh": {
+   "2017": -28.6,
+   "2019": -34.4,
+   "2021": -8.8,
+   "2023": 3.9
+  },
+  "turnover": 83.1,
+  "hold_days": 2.5
+ },
+ "open_sell_close_buy|DB-K4-b12": {
+  "cagr": -24.36,
+  "excess": -23.42,
+  "max_dd": -98.41,
+  "worst": -28.6,
+  "fresh": {
+   "2017": -28.6,
+   "2019": -25.6,
+   "2021": -5.3,
+   "2023": 11.2
+  },
+  "turnover": 78.2,
+  "hold_days": 2.8
+ },
+ "open_sell_close_buy|DB-K4-b16": {
+  "cagr": -24.28,
+  "excess": -23.38,
+  "max_dd": -98.32,
+  "worst": -34.1,
+  "fresh": {
+   "2017": -28.7,
+   "2019": -34.1,
+   "2021": 1.9,
+   "2023": 11.8
+  },
+  "turnover": 68.3,
+  "hold_days": 3.1
+ },
+ "open_sell_close_buy|DB-K6-b1": {
+  "cagr": -21.58,
+  "excess": -21.47,
+  "max_dd": -94.76,
+  "worst": -53.1,
+  "fresh": {
+   "2017": -25.7,
+   "2019": -31.0,
+   "2021": -40.1,
+   "2023": -53.1
+  },
+  "turnover": 85.5,
+  "hold_days": 1.3
+ },
+ "open_sell_close_buy|DB-K6-b1.5": {
+  "cagr": -21.56,
+  "excess": -21.33,
+  "max_dd": -95.11,
+  "worst": -52.1,
+  "fresh": {
+   "2017": -25.5,
+   "2019": -31.0,
+   "2021": -40.0,
+   "2023": -52.1
+  },
+  "turnover": 83.1,
+  "hold_days": 1.4
+ },
+ "open_sell_close_buy|DB-K6-b2": {
+  "cagr": -21.62,
+  "excess": -21.34,
+  "max_dd": -95.32,
+  "worst": -51.7,
+  "fresh": {
+   "2017": -25.5,
+   "2019": -31.0,
+   "2021": -40.3,
+   "2023": -51.7
+  },
+  "turnover": 81.0,
+  "hold_days": 1.5
+ },
+ "open_sell_close_buy|DB-K6-b3": {
+  "cagr": -21.63,
+  "excess": -21.22,
+  "max_dd": -95.68,
+  "worst": -40.2,
+  "fresh": {
+   "2017": -25.5,
+   "2019": -31.0,
+   "2021": -40.2,
+   "2023": -38.1
+  },
+  "turnover": 79.7,
+  "hold_days": 1.7
+ },
+ "open_sell_close_buy|DB-K6-b4": {
+  "cagr": -21.58,
+  "excess": -21.17,
+  "max_dd": -95.93,
+  "worst": -39.8,
+  "fresh": {
+   "2017": -25.6,
+   "2019": -30.9,
+   "2021": -39.8,
+   "2023": -24.2
+  },
+  "turnover": 73.0,
+  "hold_days": 1.7
+ },
+ "open_sell_close_buy|DB-K6-b6": {
+  "cagr": -21.59,
+  "excess": -20.94,
+  "max_dd": -96.3,
+  "worst": -40.4,
+  "fresh": {
+   "2017": -25.7,
+   "2019": -31.0,
+   "2021": -40.4,
+   "2023": -12.4
+  },
+  "turnover": 72.1,
+  "hold_days": 2.1
+ },
+ "open_sell_close_buy|DB-K6-b8": {
+  "cagr": -21.7,
+  "excess": -20.99,
+  "max_dd": -96.9,
+  "worst": -39.0,
+  "fresh": {
+   "2017": -25.6,
+   "2019": -30.9,
+   "2021": -39.0,
+   "2023": -7.7
+  },
+  "turnover": 73.2,
+  "hold_days": 2.4
+ },
+ "open_sell_close_buy|DB-K6-b12": {
+  "cagr": -21.62,
+  "excess": -20.4,
+  "max_dd": -97.23,
+  "worst": -31.7,
+  "fresh": {
+   "2017": -25.6,
+   "2019": -31.7,
+   "2021": -14.1,
+   "2023": -3.3
+  },
+  "turnover": 67.1,
+  "hold_days": 3.1
+ },
+ "open_sell_close_buy|DB-K6-b16": {
+  "cagr": -21.9,
+  "excess": -20.63,
+  "max_dd": -97.37,
+  "worst": -31.8,
+  "fresh": {
+   "2017": -25.6,
+   "2019": -31.8,
+   "2021": -14.0,
+   "2023": -7.3
+  },
+  "turnover": 62.9,
+  "hold_days": 3.3
+ },
+ "close_sell_prev_rank|DB-K1-b1": {
+  "cagr": 19.99,
+  "excess": 31.18,
+  "max_dd": -80.77,
+  "worst": -7.2,
+  "fresh": {
+   "2017": -0.3,
+   "2019": -7.2,
+   "2021": 13.7,
+   "2023": 1.4
+  },
+  "turnover": 98.5,
+  "hold_days": 1.4
+ },
+ "close_sell_prev_rank|DB-K1-b1.5": {
+  "cagr": 19.99,
+  "excess": 31.18,
+  "max_dd": -80.77,
+  "worst": -7.2,
+  "fresh": {
+   "2017": -0.3,
+   "2019": -7.2,
+   "2021": 13.7,
+   "2023": 1.4
+  },
+  "turnover": 98.5,
+  "hold_days": 1.4
+ },
+ "close_sell_prev_rank|DB-K1-b2": {
+  "cagr": 22.25,
+  "excess": 32.81,
+  "max_dd": -79.11,
+  "worst": -1.4,
+  "fresh": {
+   "2017": 3.7,
+   "2019": -1.4,
+   "2021": 27.3,
+   "2023": 19.9
+  },
+  "turnover": 86.2,
+  "hold_days": 1.7
+ },
+ "close_sell_prev_rank|DB-K1-b3": {
+  "cagr": 24.5,
+  "excess": 34.63,
+  "max_dd": -77.67,
+  "worst": 1.4,
+  "fresh": {
+   "2017": 7.6,
+   "2019": 1.4,
+   "2021": 29.6,
+   "2023": 24.6
+  },
+  "turnover": 79.6,
+  "hold_days": 1.9
+ },
+ "close_sell_prev_rank|DB-K1-b4": {
+  "cagr": 24.66,
+  "excess": 34.89,
+  "max_dd": -71.33,
+  "worst": 5.1,
+  "fresh": {
+   "2017": 7.7,
+   "2019": 5.1,
+   "2021": 20.4,
+   "2023": 21.9
+  },
+  "turnover": 74.7,
+  "hold_days": 2.1
+ },
+ "close_sell_prev_rank|DB-K1-b6": {
+  "cagr": 24.07,
+  "excess": 34.54,
+  "max_dd": -75.58,
+  "worst": 5.1,
+  "fresh": {
+   "2017": 5.1,
+   "2019": 5.4,
+   "2021": 15.9,
+   "2023": 19.1
+  },
+  "turnover": 67.0,
+  "hold_days": 2.4
+ },
+ "close_sell_prev_rank|DB-K1-b8": {
+  "cagr": 19.88,
+  "excess": 30.84,
+  "max_dd": -79.84,
+  "worst": 2.3,
+  "fresh": {
+   "2017": 4.0,
+   "2019": 2.3,
+   "2021": 13.9,
+   "2023": 17.1
+  },
+  "turnover": 64.8,
+  "hold_days": 2.5
+ },
+ "close_sell_prev_rank|DB-K1-b12": {
+  "cagr": 11.84,
+  "excess": 23.56,
+  "max_dd": -83.04,
+  "worst": -2.1,
+  "fresh": {
+   "2017": -2.1,
+   "2019": -0.5,
+   "2021": 13.8,
+   "2023": 18.9
+  },
+  "turnover": 60.7,
+  "hold_days": 2.8
+ },
+ "close_sell_prev_rank|DB-K1-b16": {
+  "cagr": 7.52,
+  "excess": 19.43,
+  "max_dd": -90.56,
+  "worst": -11.2,
+  "fresh": {
+   "2017": -11.2,
+   "2019": -8.3,
+   "2021": 8.7,
+   "2023": 14.5
+  },
+  "turnover": 60.7,
+  "hold_days": 3.1
+ },
+ "close_sell_prev_rank|DB-K2-b1": {
+  "cagr": 18.84,
+  "excess": 26.37,
+  "max_dd": -67.44,
+  "worst": -2.4,
+  "fresh": {
+   "2017": 1.7,
+   "2019": -2.4,
+   "2021": 10.9,
+   "2023": 6.1
+  },
+  "turnover": 93.5,
+  "hold_days": 1.5
+ },
+ "close_sell_prev_rank|DB-K2-b1.5": {
+  "cagr": 19.97,
+  "excess": 27.36,
+  "max_dd": -71.16,
+  "worst": -7.0,
+  "fresh": {
+   "2017": 2.7,
+   "2019": -7.0,
+   "2021": 9.2,
+   "2023": 8.8
+  },
+  "turnover": 86.9,
+  "hold_days": 1.7
+ },
+ "close_sell_prev_rank|DB-K2-b2": {
+  "cagr": 25.28,
+  "excess": 31.99,
+  "max_dd": -68.64,
+  "worst": -4.1,
+  "fresh": {
+   "2017": 3.9,
+   "2019": -4.1,
+   "2021": 18.1,
+   "2023": 18.2
+  },
+  "turnover": 80.9,
+  "hold_days": 1.9
+ },
+ "close_sell_prev_rank|DB-K2-b3": {
+  "cagr": 27.04,
+  "excess": 33.61,
+  "max_dd": -73.39,
+  "worst": -0.6,
+  "fresh": {
+   "2017": 9.4,
+   "2019": -0.6,
+   "2021": 16.4,
+   "2023": 18.1
+  },
+  "turnover": 73.0,
+  "hold_days": 2.1
+ },
+ "close_sell_prev_rank|DB-K2-b4": {
+  "cagr": 30.74,
+  "excess": 36.34,
+  "max_dd": -72.25,
+  "worst": -1.6,
+  "fresh": {
+   "2017": 11.4,
+   "2019": -1.6,
+   "2021": 20.0,
+   "2023": 20.0
+  },
+  "turnover": 67.6,
+  "hold_days": 2.3
+ },
+ "close_sell_prev_rank|DB-K2-b6": {
+  "cagr": 29.04,
+  "excess": 34.58,
+  "max_dd": -70.58,
+  "worst": 14.1,
+  "fresh": {
+   "2017": 16.5,
+   "2019": 14.1,
+   "2021": 18.1,
+   "2023": 21.4
+  },
+  "turnover": 60.6,
+  "hold_days": 2.6
+ },
+ "close_sell_prev_rank|DB-K2-b8": {
+  "cagr": 21.22,
+  "excess": 28.29,
+  "max_dd": -67.57,
+  "worst": 8.6,
+  "fresh": {
+   "2017": 8.6,
+   "2019": 10.9,
+   "2021": 15.5,
+   "2023": 17.6
+  },
+  "turnover": 59.3,
+  "hold_days": 2.8
+ },
+ "close_sell_prev_rank|DB-K2-b12": {
+  "cagr": 20.14,
+  "excess": 27.44,
+  "max_dd": -73.39,
+  "worst": 3.4,
+  "fresh": {
+   "2017": 6.4,
+   "2019": 3.4,
+   "2021": 12.1,
+   "2023": 25.2
+  },
+  "turnover": 54.3,
+  "hold_days": 3.2
+ },
+ "close_sell_prev_rank|DB-K2-b16": {
+  "cagr": 23.47,
+  "excess": 30.09,
+  "max_dd": -65.41,
+  "worst": -0.2,
+  "fresh": {
+   "2017": -0.2,
+   "2019": -0.2,
+   "2021": 13.2,
+   "2023": 20.8
+  },
+  "turnover": 50.0,
+  "hold_days": 3.5
+ },
+ "close_sell_prev_rank|DB-K3-b1": {
+  "cagr": 17.33,
+  "excess": 24.25,
+  "max_dd": -69.97,
+  "worst": -35.5,
+  "fresh": {
+   "2017": 6.7,
+   "2019": -35.5,
+   "2021": 9.5,
+   "2023": 10.1
+  },
+  "turnover": 91.5,
+  "hold_days": 1.6
+ },
+ "close_sell_prev_rank|DB-K3-b1.5": {
+  "cagr": 24.85,
+  "excess": 30.48,
+  "max_dd": -68.19,
+  "worst": -39.3,
+  "fresh": {
+   "2017": 8.7,
+   "2019": -39.3,
+   "2021": 11.7,
+   "2023": 19.9
+  },
+  "turnover": 85.4,
+  "hold_days": 1.7
+ },
+ "close_sell_prev_rank|DB-K3-b2": {
+  "cagr": 23.42,
+  "excess": 29.45,
+  "max_dd": -68.92,
+  "worst": -10.3,
+  "fresh": {
+   "2017": 6.4,
+   "2019": -10.3,
+   "2021": 13.1,
+   "2023": 19.0
+  },
+  "turnover": 78.6,
+  "hold_days": 2.0
+ },
+ "close_sell_prev_rank|DB-K3-b3": {
+  "cagr": 24.07,
+  "excess": 29.9,
+  "max_dd": -72.74,
+  "worst": 2.2,
+  "fresh": {
+   "2017": 10.9,
+   "2019": 2.2,
+   "2021": 19.4,
+   "2023": 23.3
+  },
+  "turnover": 71.8,
+  "hold_days": 2.2
+ },
+ "close_sell_prev_rank|DB-K3-b4": {
+  "cagr": 29.33,
+  "excess": 33.94,
+  "max_dd": -67.23,
+  "worst": 5.4,
+  "fresh": {
+   "2017": 13.5,
+   "2019": 5.4,
+   "2021": 15.4,
+   "2023": 17.1
+  },
+  "turnover": 64.6,
+  "hold_days": 2.5
+ },
+ "close_sell_prev_rank|DB-K3-b6": {
+  "cagr": 21.66,
+  "excess": 27.74,
+  "max_dd": -67.41,
+  "worst": 5.7,
+  "fresh": {
+   "2017": 8.0,
+   "2019": 5.7,
+   "2021": 9.5,
+   "2023": 18.2
+  },
+  "turnover": 61.4,
+  "hold_days": 2.7
+ },
+ "close_sell_prev_rank|DB-K3-b8": {
+  "cagr": 24.99,
+  "excess": 30.48,
+  "max_dd": -66.4,
+  "worst": 6.5,
+  "fresh": {
+   "2017": 6.5,
+   "2019": 10.7,
+   "2021": 14.6,
+   "2023": 21.2
+  },
+  "turnover": 55.9,
+  "hold_days": 3.0
+ },
+ "close_sell_prev_rank|DB-K3-b12": {
+  "cagr": 20.77,
+  "excess": 26.92,
+  "max_dd": -66.36,
+  "worst": -0.4,
+  "fresh": {
+   "2017": 10.8,
+   "2019": -0.4,
+   "2021": 14.4,
+   "2023": 12.6
+  },
+  "turnover": 50.3,
+  "hold_days": 3.5
+ },
+ "close_sell_prev_rank|DB-K3-b16": {
+  "cagr": 26.64,
+  "excess": 31.62,
+  "max_dd": -66.67,
+  "worst": 5.1,
+  "fresh": {
+   "2017": 10.8,
+   "2019": 5.1,
+   "2021": 7.3,
+   "2023": 15.0
+  },
+  "turnover": 46.2,
+  "hold_days": 3.9
+ },
+ "close_sell_prev_rank|DB-K4-b1": {
+  "cagr": 22.46,
+  "excess": 27.89,
+  "max_dd": -64.21,
+  "worst": -35.3,
+  "fresh": {
+   "2017": -17.7,
+   "2019": -35.3,
+   "2021": 12.9,
+   "2023": 13.8
+  },
+  "turnover": 89.4,
+  "hold_days": 1.6
+ },
+ "close_sell_prev_rank|DB-K4-b1.5": {
+  "cagr": 24.38,
+  "excess": 29.49,
+  "max_dd": -66.98,
+  "worst": -33.7,
+  "fresh": {
+   "2017": -4.5,
+   "2019": -33.7,
+   "2021": 11.8,
+   "2023": 15.2
+  },
+  "turnover": 82.0,
+  "hold_days": 1.8
+ },
+ "close_sell_prev_rank|DB-K4-b2": {
+  "cagr": 25.71,
+  "excess": 30.46,
+  "max_dd": -68.39,
+  "worst": -2.3,
+  "fresh": {
+   "2017": 2.0,
+   "2019": -2.3,
+   "2021": 12.3,
+   "2023": 14.9
+  },
+  "turnover": 75.5,
+  "hold_days": 2.1
+ },
+ "close_sell_prev_rank|DB-K4-b3": {
+  "cagr": 26.26,
+  "excess": 31.0,
+  "max_dd": -69.37,
+  "worst": -0.7,
+  "fresh": {
+   "2017": 9.3,
+   "2019": -0.7,
+   "2021": 1.9,
+   "2023": 8.3
+  },
+  "turnover": 69.2,
+  "hold_days": 2.3
+ },
+ "close_sell_prev_rank|DB-K4-b4": {
+  "cagr": 24.36,
+  "excess": 29.45,
+  "max_dd": -65.5,
+  "worst": 3.1,
+  "fresh": {
+   "2017": 3.1,
+   "2019": 3.1,
+   "2021": 5.5,
+   "2023": 17.9
+  },
+  "turnover": 65.2,
+  "hold_days": 2.5
+ },
+ "close_sell_prev_rank|DB-K4-b6": {
+  "cagr": 24.07,
+  "excess": 29.2,
+  "max_dd": -64.93,
+  "worst": 3.6,
+  "fresh": {
+   "2017": 5.8,
+   "2019": 3.6,
+   "2021": 3.8,
+   "2023": 10.0
+  },
+  "turnover": 58.1,
+  "hold_days": 2.9
+ },
+ "close_sell_prev_rank|DB-K4-b8": {
+  "cagr": 24.19,
+  "excess": 29.33,
+  "max_dd": -61.53,
+  "worst": -2.4,
+  "fresh": {
+   "2017": -2.4,
+   "2019": -0.7,
+   "2021": 6.3,
+   "2023": 10.6
+  },
+  "turnover": 55.2,
+  "hold_days": 3.1
+ },
+ "close_sell_prev_rank|DB-K4-b12": {
+  "cagr": 15.96,
+  "excess": 21.98,
+  "max_dd": -62.7,
+  "worst": -4.8,
+  "fresh": {
+   "2017": -3.3,
+   "2019": -4.8,
+   "2021": 3.6,
+   "2023": 9.0
+  },
+  "turnover": 49.6,
+  "hold_days": 3.7
+ },
+ "close_sell_prev_rank|DB-K4-b16": {
+  "cagr": 20.38,
+  "excess": 25.69,
+  "max_dd": -68.7,
+  "worst": -6.8,
+  "fresh": {
+   "2017": -6.8,
+   "2019": -1.8,
+   "2021": 8.3,
+   "2023": 15.0
+  },
+  "turnover": 45.9,
+  "hold_days": 4.0
+ },
+ "close_sell_prev_rank|DB-K6-b1": {
+  "cagr": 20.41,
+  "excess": 25.55,
+  "max_dd": -62.46,
+  "worst": -31.2,
+  "fresh": {
+   "2017": -26.4,
+   "2019": -31.2,
+   "2021": -4.4,
+   "2023": -7.4
+  },
+  "turnover": 86.3,
+  "hold_days": 1.7
+ },
+ "close_sell_prev_rank|DB-K6-b1.5": {
+  "cagr": 21.62,
+  "excess": 26.46,
+  "max_dd": -61.85,
+  "worst": -31.5,
+  "fresh": {
+   "2017": -25.1,
+   "2019": -31.5,
+   "2021": -14.8,
+   "2023": -8.1
+  },
+  "turnover": 78.4,
+  "hold_days": 1.9
+ },
+ "close_sell_prev_rank|DB-K6-b2": {
+  "cagr": 19.98,
+  "excess": 25.04,
+  "max_dd": -63.53,
+  "worst": -31.2,
+  "fresh": {
+   "2017": -25.3,
+   "2019": -31.2,
+   "2021": -14.6,
+   "2023": -4.2
+  },
+  "turnover": 73.5,
+  "hold_days": 2.1
+ },
+ "close_sell_prev_rank|DB-K6-b3": {
+  "cagr": 18.76,
+  "excess": 24.15,
+  "max_dd": -65.92,
+  "worst": -30.2,
+  "fresh": {
+   "2017": -25.0,
+   "2019": -30.2,
+   "2021": -4.8,
+   "2023": 1.9
+  },
+  "turnover": 67.2,
+  "hold_days": 2.4
+ },
+ "close_sell_prev_rank|DB-K6-b4": {
+  "cagr": 23.27,
+  "excess": 27.98,
+  "max_dd": -61.3,
+  "worst": -24.8,
+  "fresh": {
+   "2017": -24.8,
+   "2019": -6.2,
+   "2021": 1.0,
+   "2023": 5.3
+  },
+  "turnover": 61.3,
+  "hold_days": 2.7
+ },
+ "close_sell_prev_rank|DB-K6-b6": {
+  "cagr": 24.41,
+  "excess": 28.81,
+  "max_dd": -58.74,
+  "worst": -30.1,
+  "fresh": {
+   "2017": -8.0,
+   "2019": -30.1,
+   "2021": -1.1,
+   "2023": 4.5
+  },
+  "turnover": 55.5,
+  "hold_days": 3.1
+ },
+ "close_sell_prev_rank|DB-K6-b8": {
+  "cagr": 23.39,
+  "excess": 27.65,
+  "max_dd": -58.09,
+  "worst": -6.1,
+  "fresh": {
+   "2017": -6.1,
+   "2019": -3.4,
+   "2021": 3.7,
+   "2023": 5.5
+  },
+  "turnover": 51.1,
+  "hold_days": 3.4
+ },
+ "close_sell_prev_rank|DB-K6-b12": {
+  "cagr": 25.22,
+  "excess": 29.25,
+  "max_dd": -53.27,
+  "worst": -11.7,
+  "fresh": {
+   "2017": -11.7,
+   "2019": -8.8,
+   "2021": -0.1,
+   "2023": 3.7
+  },
+  "turnover": 45.6,
+  "hold_days": 3.9
+ },
+ "close_sell_prev_rank|DB-K6-b16": {
+  "cagr": 22.48,
+  "excess": 26.89,
+  "max_dd": -50.95,
+  "worst": 0.2,
+  "fresh": {
+   "2017": 5.1,
+   "2019": 1.3,
+   "2021": 0.2,
+   "2023": 3.0
+  },
+  "turnover": 41.6,
+  "hold_days": 4.4
+ },
+ "close_sell_same_day|DB-K1-b1": {
+  "cagr": 0.95,
+  "excess": 12.96,
+  "max_dd": -80.23,
+  "worst": -13.6,
+  "fresh": {
+   "2017": -12.2,
+   "2019": -13.6,
+   "2021": -9.0,
+   "2023": -6.5
+  },
+  "turnover": 103.8,
+  "hold_days": 1.3
+ },
+ "close_sell_same_day|DB-K1-b1.5": {
+  "cagr": 0.95,
+  "excess": 12.96,
+  "max_dd": -80.23,
+  "worst": -13.6,
+  "fresh": {
+   "2017": -12.2,
+   "2019": -13.6,
+   "2021": -9.0,
+   "2023": -6.5
+  },
+  "turnover": 103.8,
+  "hold_days": 1.3
+ },
+ "close_sell_same_day|DB-K1-b2": {
+  "cagr": 3.36,
+  "excess": 15.65,
+  "max_dd": -84.59,
+  "worst": -11.0,
+  "fresh": {
+   "2017": -11.0,
+   "2019": -9.9,
+   "2021": -7.2,
+   "2023": -2.5
+  },
+  "turnover": 96.8,
+  "hold_days": 1.5
+ },
+ "close_sell_same_day|DB-K1-b3": {
+  "cagr": 8.64,
+  "excess": 20.47,
+  "max_dd": -71.66,
+  "worst": -1.7,
+  "fresh": {
+   "2017": -1.7,
+   "2019": 1.3,
+   "2021": 6.7,
+   "2023": 5.9
+  },
+  "turnover": 89.4,
+  "hold_days": 1.6
+ },
+ "close_sell_same_day|DB-K1-b4": {
+  "cagr": 16.87,
+  "excess": 28.13,
+  "max_dd": -69.29,
+  "worst": 8.0,
+  "fresh": {
+   "2017": 8.5,
+   "2019": 8.0,
+   "2021": 15.9,
+   "2023": 9.2
+  },
+  "turnover": 83.5,
+  "hold_days": 1.7
+ },
+ "close_sell_same_day|DB-K1-b6": {
+  "cagr": 21.26,
+  "excess": 31.64,
+  "max_dd": -69.15,
+  "worst": 4.6,
+  "fresh": {
+   "2017": 9.9,
+   "2019": 4.6,
+   "2021": 7.8,
+   "2023": 7.6
+  },
+  "turnover": 77.8,
+  "hold_days": 1.9
+ },
+ "close_sell_same_day|DB-K1-b8": {
+  "cagr": 11.29,
+  "excess": 22.81,
+  "max_dd": -72.68,
+  "worst": -7.2,
+  "fresh": {
+   "2017": 2.6,
+   "2019": -7.2,
+   "2021": -5.2,
+   "2023": 6.8
+  },
+  "turnover": 78.6,
+  "hold_days": 2.0
+ },
+ "close_sell_same_day|DB-K1-b12": {
+  "cagr": 15.11,
+  "excess": 26.42,
+  "max_dd": -69.89,
+  "worst": -2.2,
+  "fresh": {
+   "2017": 3.3,
+   "2019": -2.2,
+   "2021": 5.1,
+   "2023": 9.2
+  },
+  "turnover": 70.2,
+  "hold_days": 2.3
+ },
+ "close_sell_same_day|DB-K1-b16": {
+  "cagr": 29.3,
+  "excess": 37.84,
+  "max_dd": -68.33,
+  "worst": 9.9,
+  "fresh": {
+   "2017": 13.8,
+   "2019": 9.9,
+   "2021": 20.4,
+   "2023": 17.5
+  },
+  "turnover": 60.1,
+  "hold_days": 2.5
+ },
+ "close_sell_same_day|DB-K2-b1": {
+  "cagr": 16.82,
+  "excess": 24.88,
+  "max_dd": -70.4,
+  "worst": -26.7,
+  "fresh": {
+   "2017": 4.5,
+   "2019": -26.7,
+   "2021": 0.4,
+   "2023": 5.8
+  },
+  "turnover": 101.3,
+  "hold_days": 1.4
+ },
+ "close_sell_same_day|DB-K2-b1.5": {
+  "cagr": 28.68,
+  "excess": 34.51,
+  "max_dd": -70.9,
+  "worst": 1.5,
+  "fresh": {
+   "2017": 15.4,
+   "2019": 1.5,
+   "2021": 6.6,
+   "2023": 11.3
+  },
+  "turnover": 93.8,
+  "hold_days": 1.5
+ },
+ "close_sell_same_day|DB-K2-b2": {
+  "cagr": 31.26,
+  "excess": 36.48,
+  "max_dd": -70.71,
+  "worst": 4.5,
+  "fresh": {
+   "2017": 17.4,
+   "2019": 4.5,
+   "2021": 4.7,
+   "2023": 7.7
+  },
+  "turnover": 88.8,
+  "hold_days": 1.6
+ },
+ "close_sell_same_day|DB-K2-b3": {
+  "cagr": 23.33,
+  "excess": 30.07,
+  "max_dd": -69.67,
+  "worst": 3.8,
+  "fresh": {
+   "2017": 12.4,
+   "2019": 3.8,
+   "2021": 4.7,
+   "2023": 7.8
+  },
+  "turnover": 83.0,
+  "hold_days": 1.8
+ },
+ "close_sell_same_day|DB-K2-b4": {
+  "cagr": 23.63,
+  "excess": 30.14,
+  "max_dd": -61.97,
+  "worst": 2.2,
+  "fresh": {
+   "2017": 11.6,
+   "2019": 2.2,
+   "2021": 9.7,
+   "2023": 13.0
+  },
+  "turnover": 79.1,
+  "hold_days": 1.9
+ },
+ "close_sell_same_day|DB-K2-b6": {
+  "cagr": 27.68,
+  "excess": 33.4,
+  "max_dd": -68.75,
+  "worst": 5.7,
+  "fresh": {
+   "2017": 9.9,
+   "2019": 5.7,
+   "2021": 7.7,
+   "2023": 16.4
+  },
+  "turnover": 70.7,
+  "hold_days": 2.2
+ },
+ "close_sell_same_day|DB-K2-b8": {
+  "cagr": 36.63,
+  "excess": 40.25,
+  "max_dd": -67.32,
+  "worst": 15.8,
+  "fresh": {
+   "2017": 21.4,
+   "2019": 15.8,
+   "2021": 19.7,
+   "2023": 21.3
+  },
+  "turnover": 64.7,
+  "hold_days": 2.4
+ },
+ "close_sell_same_day|DB-K2-b12": {
+  "cagr": 35.4,
+  "excess": 39.21,
+  "max_dd": -67.83,
+  "worst": 7.1,
+  "fresh": {
+   "2017": 20.3,
+   "2019": 14.1,
+   "2021": 17.6,
+   "2023": 7.1
+  },
+  "turnover": 57.9,
+  "hold_days": 2.7
+ },
+ "close_sell_same_day|DB-K2-b16": {
+  "cagr": 28.48,
+  "excess": 33.72,
+  "max_dd": -68.91,
+  "worst": 13.4,
+  "fresh": {
+   "2017": 17.1,
+   "2019": 15.1,
+   "2021": 17.8,
+   "2023": 13.4
+  },
+  "turnover": 52.5,
+  "hold_days": 3.0
+ },
+ "close_sell_same_day|DB-K3-b1": {
+  "cagr": 27.0,
+  "excess": 32.08,
+  "max_dd": -68.9,
+  "worst": 2.2,
+  "fresh": {
+   "2017": 11.4,
+   "2019": 2.2,
+   "2021": 8.5,
+   "2023": 8.3
+  },
+  "turnover": 97.9,
+  "hold_days": 1.4
+ },
+ "close_sell_same_day|DB-K3-b1.5": {
+  "cagr": 27.31,
+  "excess": 32.42,
+  "max_dd": -67.82,
+  "worst": -3.1,
+  "fresh": {
+   "2017": 13.0,
+   "2019": -3.1,
+   "2021": 5.3,
+   "2023": 5.0
+  },
+  "turnover": 93.6,
+  "hold_days": 1.5
+ },
+ "close_sell_same_day|DB-K3-b2": {
+  "cagr": 23.1,
+  "excess": 28.95,
+  "max_dd": -69.45,
+  "worst": 1.6,
+  "fresh": {
+   "2017": 10.1,
+   "2019": 1.6,
+   "2021": 4.0,
+   "2023": 2.6
+  },
+  "turnover": 86.7,
+  "hold_days": 1.7
+ },
+ "close_sell_same_day|DB-K3-b3": {
+  "cagr": 31.41,
+  "excess": 35.46,
+  "max_dd": -66.32,
+  "worst": 4.6,
+  "fresh": {
+   "2017": 14.5,
+   "2019": 4.6,
+   "2021": 13.7,
+   "2023": 8.7
+  },
+  "turnover": 78.4,
+  "hold_days": 1.9
+ },
+ "close_sell_same_day|DB-K3-b4": {
+  "cagr": 28.26,
+  "excess": 32.92,
+  "max_dd": -66.26,
+  "worst": 3.9,
+  "fresh": {
+   "2017": 9.5,
+   "2019": 3.9,
+   "2021": 12.6,
+   "2023": 10.7
+  },
+  "turnover": 73.4,
+  "hold_days": 2.1
+ },
+ "close_sell_same_day|DB-K3-b6": {
+  "cagr": 33.43,
+  "excess": 36.73,
+  "max_dd": -63.68,
+  "worst": 10.2,
+  "fresh": {
+   "2017": 18.9,
+   "2019": 10.2,
+   "2021": 21.5,
+   "2023": 14.4
+  },
+  "turnover": 66.5,
+  "hold_days": 2.3
+ },
+ "close_sell_same_day|DB-K3-b8": {
+  "cagr": 27.98,
+  "excess": 32.51,
+  "max_dd": -64.46,
+  "worst": 9.5,
+  "fresh": {
+   "2017": 14.6,
+   "2019": 11.3,
+   "2021": 20.3,
+   "2023": 9.5
+  },
+  "turnover": 61.1,
+  "hold_days": 2.6
+ },
+ "close_sell_same_day|DB-K3-b12": {
+  "cagr": 32.23,
+  "excess": 35.78,
+  "max_dd": -64.04,
+  "worst": 14.9,
+  "fresh": {
+   "2017": 19.9,
+   "2019": 14.9,
+   "2021": 22.2,
+   "2023": 22.9
+  },
+  "turnover": 55.5,
+  "hold_days": 2.9
+ },
+ "close_sell_same_day|DB-K3-b16": {
+  "cagr": 29.66,
+  "excess": 33.75,
+  "max_dd": -63.19,
+  "worst": 13.4,
+  "fresh": {
+   "2017": 13.4,
+   "2019": 19.6,
+   "2021": 22.6,
+   "2023": 19.8
+  },
+  "turnover": 49.5,
+  "hold_days": 3.3
+ },
+ "close_sell_same_day|DB-K4-b1": {
+  "cagr": 19.36,
+  "excess": 25.23,
+  "max_dd": -68.44,
+  "worst": -11.5,
+  "fresh": {
+   "2017": 3.9,
+   "2019": -11.5,
+   "2021": 4.5,
+   "2023": -10.7
+  },
+  "turnover": 93.3,
+  "hold_days": 1.5
+ },
+ "close_sell_same_day|DB-K4-b1.5": {
+  "cagr": 14.05,
+  "excess": 20.61,
+  "max_dd": -69.33,
+  "worst": -7.4,
+  "fresh": {
+   "2017": 4.6,
+   "2019": -7.4,
+   "2021": -3.4,
+   "2023": -4.7
+  },
+  "turnover": 87.5,
+  "hold_days": 1.6
+ },
+ "close_sell_same_day|DB-K4-b2": {
+  "cagr": 20.61,
+  "excess": 26.21,
+  "max_dd": -69.74,
+  "worst": -1.6,
+  "fresh": {
+   "2017": 6.4,
+   "2019": -1.6,
+   "2021": 3.1,
+   "2023": 0.7
+  },
+  "turnover": 82.1,
+  "hold_days": 1.8
+ },
+ "close_sell_same_day|DB-K4-b3": {
+  "cagr": 27.26,
+  "excess": 31.5,
+  "max_dd": -68.54,
+  "worst": 7.3,
+  "fresh": {
+   "2017": 9.7,
+   "2019": 7.3,
+   "2021": 15.5,
+   "2023": 11.7
+  },
+  "turnover": 76.7,
+  "hold_days": 1.9
+ },
+ "close_sell_same_day|DB-K4-b4": {
+  "cagr": 31.42,
+  "excess": 34.71,
+  "max_dd": -68.59,
+  "worst": 9.4,
+  "fresh": {
+   "2017": 18.1,
+   "2019": 10.2,
+   "2021": 13.2,
+   "2023": 9.4
+  },
+  "turnover": 68.1,
+  "hold_days": 2.1
+ },
+ "close_sell_same_day|DB-K4-b6": {
+  "cagr": 20.38,
+  "excess": 25.89,
+  "max_dd": -67.62,
+  "worst": -3.0,
+  "fresh": {
+   "2017": 8.8,
+   "2019": 4.4,
+   "2021": 9.1,
+   "2023": -3.0
+  },
+  "turnover": 63.7,
+  "hold_days": 2.4
+ },
+ "close_sell_same_day|DB-K4-b8": {
+  "cagr": 24.29,
+  "excess": 29.1,
+  "max_dd": -68.23,
+  "worst": 4.4,
+  "fresh": {
+   "2017": 13.1,
+   "2019": 4.7,
+   "2021": 13.5,
+   "2023": 4.4
+  },
+  "turnover": 59.2,
+  "hold_days": 2.7
+ },
+ "close_sell_same_day|DB-K4-b12": {
+  "cagr": 28.99,
+  "excess": 32.76,
+  "max_dd": -60.49,
+  "worst": 6.7,
+  "fresh": {
+   "2017": 11.3,
+   "2019": 9.0,
+   "2021": 19.5,
+   "2023": 6.7
+  },
+  "turnover": 50.3,
+  "hold_days": 3.1
+ },
+ "close_sell_same_day|DB-K4-b16": {
+  "cagr": 19.87,
+  "excess": 25.29,
+  "max_dd": -59.81,
+  "worst": 7.7,
+  "fresh": {
+   "2017": 7.7,
+   "2019": 11.2,
+   "2021": 19.7,
+   "2023": 10.5
+  },
+  "turnover": 46.5,
+  "hold_days": 3.5
+ },
+ "close_sell_same_day|DB-K6-b1": {
+  "cagr": 19.55,
+  "excess": 24.67,
+  "max_dd": -57.49,
+  "worst": -36.9,
+  "fresh": {
+   "2017": -17.9,
+   "2019": -31.9,
+   "2021": -36.9,
+   "2023": -32.9
+  },
+  "turnover": 92.2,
+  "hold_days": 1.5
+ },
+ "close_sell_same_day|DB-K6-b1.5": {
+  "cagr": 21.04,
+  "excess": 25.97,
+  "max_dd": -62.72,
+  "worst": -22.3,
+  "fresh": {
+   "2017": 4.2,
+   "2019": -22.3,
+   "2021": -19.8,
+   "2023": -15.1
+  },
+  "turnover": 85.7,
+  "hold_days": 1.7
+ },
+ "close_sell_same_day|DB-K6-b2": {
+  "cagr": 20.94,
+  "excess": 25.87,
+  "max_dd": -64.07,
+  "worst": -14.6,
+  "fresh": {
+   "2017": -3.9,
+   "2019": -7.8,
+   "2021": -13.0,
+   "2023": -14.6
+  },
+  "turnover": 80.7,
+  "hold_days": 1.8
+ },
+ "close_sell_same_day|DB-K6-b3": {
+  "cagr": 30.69,
+  "excess": 33.72,
+  "max_dd": -61.42,
+  "worst": -17.4,
+  "fresh": {
+   "2017": 10.6,
+   "2019": -17.4,
+   "2021": -5.2,
+   "2023": -8.7
+  },
+  "turnover": 72.2,
+  "hold_days": 2.1
+ },
+ "close_sell_same_day|DB-K6-b4": {
+  "cagr": 27.74,
+  "excess": 31.34,
+  "max_dd": -63.89,
+  "worst": -12.6,
+  "fresh": {
+   "2017": 8.8,
+   "2019": -6.3,
+   "2021": -12.6,
+   "2023": -7.6
+  },
+  "turnover": 67.8,
+  "hold_days": 2.2
+ },
+ "close_sell_same_day|DB-K6-b6": {
+  "cagr": 27.95,
+  "excess": 31.51,
+  "max_dd": -61.79,
+  "worst": -7.5,
+  "fresh": {
+   "2017": 18.1,
+   "2019": -7.5,
+   "2021": -0.7,
+   "2023": -2.4
+  },
+  "turnover": 61.3,
+  "hold_days": 2.5
+ },
+ "close_sell_same_day|DB-K6-b8": {
+  "cagr": 27.39,
+  "excess": 31.0,
+  "max_dd": -64.02,
+  "worst": 4.6,
+  "fresh": {
+   "2017": 18.0,
+   "2019": 15.5,
+   "2021": 9.0,
+   "2023": 4.6
+  },
+  "turnover": 54.6,
+  "hold_days": 2.9
+ },
+ "close_sell_same_day|DB-K6-b12": {
+  "cagr": 25.47,
+  "excess": 29.49,
+  "max_dd": -63.9,
+  "worst": 7.7,
+  "fresh": {
+   "2017": 13.1,
+   "2019": 7.7,
+   "2021": 13.7,
+   "2023": 7.9
+  },
+  "turnover": 47.9,
+  "hold_days": 3.4
+ },
+ "close_sell_same_day|DB-K6-b16": {
+  "cagr": 25.9,
+  "excess": 29.76,
+  "max_dd": -60.07,
+  "worst": 8.2,
+  "fresh": {
+   "2017": 11.1,
+   "2019": 16.5,
+   "2021": 15.8,
+   "2023": 8.2
+  },
+  "turnover": 45.2,
+  "hold_days": 3.7
+ },
+ "now+0.2%|DB-K1-b1": {
+  "cagr": -32.22,
+  "excess": -26.28,
+  "max_dd": -99.8,
+  "worst": -45.5,
+  "fresh": {
+   "2017": -38.9,
+   "2019": -45.5,
+   "2021": -31.0,
+   "2023": -28.1
+  },
+  "turnover": 182.6,
+  "hold_days": 1.3
+ },
+ "now+0.2%|DB-K1-b1.5": {
+  "cagr": -32.22,
+  "excess": -26.28,
+  "max_dd": -99.8,
+  "worst": -45.5,
+  "fresh": {
+   "2017": -38.9,
+   "2019": -45.5,
+   "2021": -31.0,
+   "2023": -28.1
+  },
+  "turnover": 182.6,
+  "hold_days": 1.3
+ },
+ "now+0.2%|DB-K1-b2": {
+  "cagr": -32.23,
+  "excess": -26.68,
+  "max_dd": -99.81,
+  "worst": -44.7,
+  "fresh": {
+   "2017": -38.3,
+   "2019": -44.7,
+   "2021": -30.6,
+   "2023": -22.2
+  },
+  "turnover": 160.4,
+  "hold_days": 1.5
+ },
+ "now+0.2%|DB-K1-b3": {
+  "cagr": -11.13,
+  "excess": 0.42,
+  "max_dd": -95.49,
+  "worst": -27.5,
+  "fresh": {
+   "2017": -27.5,
+   "2019": -24.4,
+   "2021": -14.4,
+   "2023": -13.9
+  },
+  "turnover": 146.1,
+  "hold_days": 1.7
+ },
+ "now+0.2%|DB-K1-b4": {
+  "cagr": -7.34,
+  "excess": 4.58,
+  "max_dd": -93.75,
+  "worst": -41.5,
+  "fresh": {
+   "2017": -41.5,
+   "2019": -17.5,
+   "2021": -10.1,
+   "2023": -10.5
+  },
+  "turnover": 137.7,
+  "hold_days": 1.8
+ },
+ "now+0.2%|DB-K1-b6": {
+  "cagr": -7.73,
+  "excess": 3.85,
+  "max_dd": -93.24,
+  "worst": -37.4,
+  "fresh": {
+   "2017": -37.4,
+   "2019": -28.1,
+   "2021": -12.8,
+   "2023": -10.2
+  },
+  "turnover": 120.9,
+  "hold_days": 2.1
+ },
+ "now+0.2%|DB-K1-b8": {
+  "cagr": -8.08,
+  "excess": 3.34,
+  "max_dd": -93.4,
+  "worst": -18.1,
+  "fresh": {
+   "2017": -18.1,
+   "2019": -14.6,
+   "2021": -15.5,
+   "2023": -9.2
+  },
+  "turnover": 113.6,
+  "hold_days": 2.2
+ },
+ "now+0.2%|DB-K1-b12": {
+  "cagr": -6.81,
+  "excess": 4.81,
+  "max_dd": -93.27,
+  "worst": -41.6,
+  "fresh": {
+   "2017": -41.6,
+   "2019": -14.2,
+   "2021": -8.0,
+   "2023": -10.2
+  },
+  "turnover": 104.1,
+  "hold_days": 2.5
+ },
+ "now+0.2%|DB-K1-b16": {
+  "cagr": 2.72,
+  "excess": 14.54,
+  "max_dd": -85.59,
+  "worst": -4.2,
+  "fresh": {
+   "2017": -4.2,
+   "2019": -1.8,
+   "2021": 0.2,
+   "2023": 2.7
+  },
+  "turnover": 90.5,
+  "hold_days": 2.7
+ },
+ "now+0.2%|DB-K2-b1": {
+  "cagr": -25.54,
+  "excess": -20.21,
+  "max_dd": -99.2,
+  "worst": -46.7,
+  "fresh": {
+   "2017": -35.0,
+   "2019": -41.8,
+   "2021": -46.7,
+   "2023": -36.6
+  },
+  "turnover": 176.5,
+  "hold_days": 1.4
+ },
+ "now+0.2%|DB-K2-b1.5": {
+  "cagr": -26.93,
+  "excess": -21.75,
+  "max_dd": -99.33,
+  "worst": -49.0,
+  "fresh": {
+   "2017": -35.8,
+   "2019": -40.0,
+   "2021": -49.0,
+   "2023": -22.2
+  },
+  "turnover": 160.7,
+  "hold_days": 1.5
+ },
+ "now+0.2%|DB-K2-b2": {
+  "cagr": -4.18,
+  "excess": 5.5,
+  "max_dd": -86.76,
+  "worst": -44.4,
+  "fresh": {
+   "2017": -32.9,
+   "2019": -44.4,
+   "2021": -29.5,
+   "2023": -16.8
+  },
+  "turnover": 147.8,
+  "hold_days": 1.7
+ },
+ "now+0.2%|DB-K2-b3": {
+  "cagr": -0.81,
+  "excess": 8.86,
+  "max_dd": -82.73,
+  "worst": -39.9,
+  "fresh": {
+   "2017": -14.0,
+   "2019": -39.9,
+   "2021": -21.2,
+   "2023": -8.4
+  },
+  "turnover": 129.6,
+  "hold_days": 1.9
+ },
+ "now+0.2%|DB-K2-b4": {
+  "cagr": 3.41,
+  "excess": 13.05,
+  "max_dd": -79.47,
+  "worst": -25.7,
+  "fresh": {
+   "2017": -6.3,
+   "2019": -25.7,
+   "2021": -10.9,
+   "2023": -6.9
+  },
+  "turnover": 118.6,
+  "hold_days": 2.1
+ },
+ "now+0.2%|DB-K2-b6": {
+  "cagr": 5.94,
+  "excess": 15.28,
+  "max_dd": -81.8,
+  "worst": -16.9,
+  "fresh": {
+   "2017": -4.9,
+   "2019": -16.9,
+   "2021": -5.3,
+   "2023": 7.6
+  },
+  "turnover": 103.2,
+  "hold_days": 2.4
+ },
+ "now+0.2%|DB-K2-b8": {
+  "cagr": 9.74,
+  "excess": 18.79,
+  "max_dd": -75.03,
+  "worst": -1.9,
+  "fresh": {
+   "2017": 0.5,
+   "2019": -1.9,
+   "2021": 0.2,
+   "2023": 14.3
+  },
+  "turnover": 91.1,
+  "hold_days": 2.6
+ },
+ "now+0.2%|DB-K2-b12": {
+  "cagr": 3.38,
+  "excess": 12.53,
+  "max_dd": -76.11,
+  "worst": -7.0,
+  "fresh": {
+   "2017": -5.6,
+   "2019": -7.0,
+   "2021": -3.5,
+   "2023": -0.2
+  },
+  "turnover": 80.2,
+  "hold_days": 3.0
+ },
+ "now+0.2%|DB-K2-b16": {
+  "cagr": 2.89,
+  "excess": 11.8,
+  "max_dd": -78.84,
+  "worst": -8.3,
+  "fresh": {
+   "2017": -8.3,
+   "2019": -5.8,
+   "2021": -1.9,
+   "2023": 3.8
+  },
+  "turnover": 73.9,
+  "hold_days": 3.2
+ },
+ "now+0.2%|DB-K3-b1": {
+  "cagr": -27.43,
+  "excess": -24.72,
+  "max_dd": -99.16,
+  "worst": -52.0,
+  "fresh": {
+   "2017": -31.7,
+   "2019": -36.7,
+   "2021": -47.3,
+   "2023": -52.0
+  },
+  "turnover": 169.7,
+  "hold_days": 1.4
+ },
+ "now+0.2%|DB-K3-b1.5": {
+  "cagr": -26.1,
+  "excess": -22.52,
+  "max_dd": -99.06,
+  "worst": -46.1,
+  "fresh": {
+   "2017": -31.4,
+   "2019": -37.9,
+   "2021": -46.1,
+   "2023": -43.4
+  },
+  "turnover": 158.7,
+  "hold_days": 1.5
+ },
+ "now+0.2%|DB-K3-b2": {
+  "cagr": -23.82,
+  "excess": -19.32,
+  "max_dd": -98.68,
+  "worst": -45.3,
+  "fresh": {
+   "2017": -31.6,
+   "2019": -37.8,
+   "2021": -45.3,
+   "2023": -28.3
+  },
+  "turnover": 140.9,
+  "hold_days": 1.8
+ },
+ "now+0.2%|DB-K3-b3": {
+  "cagr": -4.77,
+  "excess": 3.16,
+  "max_dd": -85.41,
+  "worst": -38.0,
+  "fresh": {
+   "2017": -31.7,
+   "2019": -38.0,
+   "2021": -31.6,
+   "2023": -14.8
+  },
+  "turnover": 120.2,
+  "hold_days": 2.0
+ },
+ "now+0.2%|DB-K3-b4": {
+  "cagr": 7.02,
+  "excess": 14.88,
+  "max_dd": -71.37,
+  "worst": -37.8,
+  "fresh": {
+   "2017": -31.4,
+   "2019": -37.8,
+   "2021": -23.9,
+   "2023": -11.7
+  },
+  "turnover": 107.0,
+  "hold_days": 2.2
+ },
+ "now+0.2%|DB-K3-b6": {
+  "cagr": 2.75,
+  "excess": 10.61,
+  "max_dd": -71.47,
+  "worst": -38.8,
+  "fresh": {
+   "2017": -10.8,
+   "2019": -38.8,
+   "2021": -17.5,
+   "2023": -1.0
+  },
+  "turnover": 94.8,
+  "hold_days": 2.6
+ },
+ "now+0.2%|DB-K3-b8": {
+  "cagr": 7.16,
+  "excess": 14.81,
+  "max_dd": -67.64,
+  "worst": -13.4,
+  "fresh": {
+   "2017": -3.1,
+   "2019": -13.4,
+   "2021": -6.6,
+   "2023": 2.2
+  },
+  "turnover": 84.3,
+  "hold_days": 2.8
+ },
+ "now+0.2%|DB-K3-b12": {
+  "cagr": 12.6,
+  "excess": 19.95,
+  "max_dd": -65.94,
+  "worst": -7.4,
+  "fresh": {
+   "2017": 7.6,
+   "2019": -7.4,
+   "2021": 7.6,
+   "2023": 16.3
+  },
+  "turnover": 73.6,
+  "hold_days": 3.1
+ },
+ "now+0.2%|DB-K3-b16": {
+  "cagr": 10.96,
+  "excess": 17.89,
+  "max_dd": -73.16,
+  "worst": -31.4,
+  "fresh": {
+   "2017": -31.4,
+   "2019": 4.9,
+   "2021": 5.4,
+   "2023": 14.7
+  },
+  "turnover": 64.7,
+  "hold_days": 3.6
+ },
+ "now+0.2%|DB-K4-b1": {
+  "cagr": -24.45,
+  "excess": -22.04,
+  "max_dd": -98.34,
+  "worst": -54.0,
+  "fresh": {
+   "2017": -28.7,
+   "2019": -35.3,
+   "2021": -44.0,
+   "2023": -54.0
+  },
+  "turnover": 157.6,
+  "hold_days": 1.4
+ },
+ "now+0.2%|DB-K4-b1.5": {
+  "cagr": -25.1,
+  "excess": -22.21,
+  "max_dd": -98.65,
+  "worst": -53.1,
+  "fresh": {
+   "2017": -28.6,
+   "2019": -35.2,
+   "2021": -45.0,
+   "2023": -53.1
+  },
+  "turnover": 151.5,
+  "hold_days": 1.5
+ },
+ "now+0.2%|DB-K4-b2": {
+  "cagr": -25.02,
+  "excess": -22.02,
+  "max_dd": -98.77,
+  "worst": -44.8,
+  "fresh": {
+   "2017": -28.5,
+   "2019": -35.2,
+   "2021": -44.8,
+   "2023": -34.8
+  },
+  "turnover": 136.1,
+  "hold_days": 1.7
+ },
+ "now+0.2%|DB-K4-b3": {
+  "cagr": -12.15,
+  "excess": -5.53,
+  "max_dd": -92.99,
+  "worst": -41.4,
+  "fresh": {
+   "2017": -29.2,
+   "2019": -35.0,
+   "2021": -41.4,
+   "2023": -23.0
+  },
+  "turnover": 117.6,
+  "hold_days": 2.1
+ },
+ "now+0.2%|DB-K4-b4": {
+  "cagr": -9.36,
+  "excess": -2.46,
+  "max_dd": -90.51,
+  "worst": -35.9,
+  "fresh": {
+   "2017": -29.2,
+   "2019": -35.9,
+   "2021": -33.4,
+   "2023": -25.7
+  },
+  "turnover": 105.8,
+  "hold_days": 2.3
+ },
+ "now+0.2%|DB-K4-b6": {
+  "cagr": 3.94,
+  "excess": 11.38,
+  "max_dd": -66.96,
+  "worst": -29.0,
+  "fresh": {
+   "2017": -29.0,
+   "2019": -19.4,
+   "2021": -11.8,
+   "2023": -12.2
+  },
+  "turnover": 89.2,
+  "hold_days": 2.6
+ },
+ "now+0.2%|DB-K4-b8": {
+  "cagr": 8.37,
+  "excess": 15.51,
+  "max_dd": -70.72,
+  "worst": -21.5,
+  "fresh": {
+   "2017": -21.5,
+   "2019": -10.3,
+   "2021": -11.8,
+   "2023": -2.8
+  },
+  "turnover": 80.2,
+  "hold_days": 2.9
+ },
+ "now+0.2%|DB-K4-b12": {
+  "cagr": 13.01,
+  "excess": 19.38,
+  "max_dd": -60.04,
+  "worst": -28.0,
+  "fresh": {
+   "2017": -28.0,
+   "2019": -6.5,
+   "2021": 0.1,
+   "2023": 11.2
+  },
+  "turnover": 66.0,
+  "hold_days": 3.4
+ },
+ "now+0.2%|DB-K4-b16": {
+  "cagr": 8.32,
+  "excess": 14.96,
+  "max_dd": -68.34,
+  "worst": -29.1,
+  "fresh": {
+   "2017": -29.1,
+   "2019": -6.8,
+   "2021": 0.5,
+   "2023": 11.0
+  },
+  "turnover": 60.4,
+  "hold_days": 3.8
+ },
+ "now+0.2%|DB-K6-b1": {
+  "cagr": -21.75,
+  "excess": -19.57,
+  "max_dd": -97.63,
+  "worst": -53.8,
+  "fresh": {
+   "2017": -25.4,
+   "2019": -31.4,
+   "2021": -39.4,
+   "2023": -53.8
+  },
+  "turnover": 142.6,
+  "hold_days": 1.5
+ },
+ "now+0.2%|DB-K6-b1.5": {
+  "cagr": -21.74,
+  "excess": -19.04,
+  "max_dd": -97.81,
+  "worst": -52.6,
+  "fresh": {
+   "2017": -25.5,
+   "2019": -31.2,
+   "2021": -39.4,
+   "2023": -52.6
+  },
+  "turnover": 136.1,
+  "hold_days": 1.6
+ },
+ "now+0.2%|DB-K6-b2": {
+  "cagr": -22.0,
+  "excess": -19.67,
+  "max_dd": -97.94,
+  "worst": -51.3,
+  "fresh": {
+   "2017": -25.4,
+   "2019": -31.2,
+   "2021": -39.4,
+   "2023": -51.3
+  },
+  "turnover": 122.7,
+  "hold_days": 1.7
+ },
+ "now+0.2%|DB-K6-b3": {
+  "cagr": -21.87,
+  "excess": -19.15,
+  "max_dd": -97.96,
+  "worst": -50.4,
+  "fresh": {
+   "2017": -25.7,
+   "2019": -31.2,
+   "2021": -39.4,
+   "2023": -50.4
+  },
+  "turnover": 111.6,
+  "hold_days": 1.9
+ },
+ "now+0.2%|DB-K6-b4": {
+  "cagr": -21.91,
+  "excess": -19.05,
+  "max_dd": -98.02,
+  "worst": -39.6,
+  "fresh": {
+   "2017": -25.5,
+   "2019": -31.2,
+   "2021": -39.6,
+   "2023": -33.9
+  },
+  "turnover": 105.1,
+  "hold_days": 2.1
+ },
+ "now+0.2%|DB-K6-b6": {
+  "cagr": -7.23,
+  "excess": -1.04,
+  "max_dd": -84.93,
+  "worst": -38.9,
+  "fresh": {
+   "2017": -25.8,
+   "2019": -31.3,
+   "2021": -38.9,
+   "2023": -18.2
+  },
+  "turnover": 88.6,
+  "hold_days": 2.8
+ },
+ "now+0.2%|DB-K6-b8": {
+  "cagr": 4.39,
+  "excess": 10.81,
+  "max_dd": -61.51,
+  "worst": -31.6,
+  "fresh": {
+   "2017": -25.8,
+   "2019": -31.6,
+   "2021": -27.4,
+   "2023": -6.4
+  },
+  "turnover": 75.7,
+  "hold_days": 3.1
+ },
+ "now+0.2%|DB-K6-b12": {
+  "cagr": 8.67,
+  "excess": 14.83,
+  "max_dd": -55.97,
+  "worst": -31.0,
+  "fresh": {
+   "2017": -25.7,
+   "2019": -31.0,
+   "2021": -15.7,
+   "2023": -6.2
+  },
+  "turnover": 63.3,
+  "hold_days": 3.6
+ },
+ "now+0.2%|DB-K6-b16": {
+  "cagr": 8.02,
+  "excess": 14.49,
+  "max_dd": -58.29,
+  "worst": -29.4,
+  "fresh": {
+   "2017": -25.7,
+   "2019": -29.4,
+   "2021": -6.3,
+   "2023": -2.1
+  },
+  "turnover": 57.4,
+  "hold_days": 4.0
+ },
+ "now+0.5%|DB-K1-b1": {
+  "cagr": -32.64,
+  "excess": -30.86,
+  "max_dd": -99.76,
+  "worst": -70.3,
+  "fresh": {
+   "2017": -39.0,
+   "2019": -45.3,
+   "2021": -59.9,
+   "2023": -70.3
+  },
+  "turnover": 176.9,
+  "hold_days": 1.3
+ },
+ "now+0.5%|DB-K1-b1.5": {
+  "cagr": -32.64,
+  "excess": -30.86,
+  "max_dd": -99.76,
+  "worst": -70.3,
+  "fresh": {
+   "2017": -39.0,
+   "2019": -45.3,
+   "2021": -59.9,
+   "2023": -70.3
+  },
+  "turnover": 176.9,
+  "hold_days": 1.3
+ },
+ "now+0.5%|DB-K1-b2": {
+  "cagr": -32.52,
+  "excess": -30.68,
+  "max_dd": -99.77,
+  "worst": -65.9,
+  "fresh": {
+   "2017": -38.8,
+   "2019": -45.0,
+   "2021": -65.9,
+   "2023": -52.8
+  },
+  "turnover": 160.4,
+  "hold_days": 1.5
+ },
+ "now+0.5%|DB-K1-b3": {
+  "cagr": -33.64,
+  "excess": -32.07,
+  "max_dd": -99.8,
+  "worst": -55.1,
+  "fresh": {
+   "2017": -38.0,
+   "2019": -45.2,
+   "2021": -55.1,
+   "2023": -42.4
+  },
+  "turnover": 150.9,
+  "hold_days": 1.5
+ },
+ "now+0.5%|DB-K1-b4": {
+  "cagr": -33.41,
+  "excess": -31.65,
+  "max_dd": -99.79,
+  "worst": -55.0,
+  "fresh": {
+   "2017": -39.1,
+   "2019": -45.2,
+   "2021": -55.0,
+   "2023": -32.4
+  },
+  "turnover": 144.8,
+  "hold_days": 1.6
+ },
+ "now+0.5%|DB-K1-b6": {
+  "cagr": -32.91,
+  "excess": -30.86,
+  "max_dd": -99.78,
+  "worst": -45.2,
+  "fresh": {
+   "2017": -38.1,
+   "2019": -45.2,
+   "2021": -39.1,
+   "2023": -29.7
+  },
+  "turnover": 128.6,
+  "hold_days": 1.8
+ },
+ "now+0.5%|DB-K1-b8": {
+  "cagr": -32.8,
+  "excess": -30.65,
+  "max_dd": -99.76,
+  "worst": -49.5,
+  "fresh": {
+   "2017": -38.1,
+   "2019": -49.5,
+   "2021": -36.5,
+   "2023": -27.7
+  },
+  "turnover": 121.9,
+  "hold_days": 2.0
+ },
+ "now+0.5%|DB-K1-b12": {
+  "cagr": -32.75,
+  "excess": -30.32,
+  "max_dd": -99.79,
+  "worst": -49.0,
+  "fresh": {
+   "2017": -38.2,
+   "2019": -49.0,
+   "2021": -25.0,
+   "2023": -23.7
+  },
+  "turnover": 114.3,
+  "hold_days": 2.2
+ },
+ "now+0.5%|DB-K1-b16": {
+  "cagr": -32.65,
+  "excess": -29.79,
+  "max_dd": -99.79,
+  "worst": -41.9,
+  "fresh": {
+   "2017": -41.9,
+   "2019": -22.6,
+   "2021": -12.6,
+   "2023": -13.8
+  },
+  "turnover": 106.0,
+  "hold_days": 2.4
+ },
+ "now+0.5%|DB-K2-b1": {
+  "cagr": -28.91,
+  "excess": -27.33,
+  "max_dd": -99.41,
+  "worst": -64.5,
+  "fresh": {
+   "2017": -33.3,
+   "2019": -40.0,
+   "2021": -49.7,
+   "2023": -64.5
+  },
+  "turnover": 168.4,
+  "hold_days": 1.3
+ },
+ "now+0.5%|DB-K2-b1.5": {
+  "cagr": -28.87,
+  "excess": -27.29,
+  "max_dd": -99.41,
+  "worst": -64.1,
+  "fresh": {
+   "2017": -33.5,
+   "2019": -40.5,
+   "2021": -51.6,
+   "2023": -64.1
+  },
+  "turnover": 157.4,
+  "hold_days": 1.4
+ },
+ "now+0.5%|DB-K2-b2": {
+  "cagr": -29.07,
+  "excess": -27.22,
+  "max_dd": -99.48,
+  "worst": -64.1,
+  "fresh": {
+   "2017": -33.8,
+   "2019": -40.1,
+   "2021": -50.1,
+   "2023": -64.1
+  },
+  "turnover": 150.5,
+  "hold_days": 1.5
+ },
+ "now+0.5%|DB-K2-b3": {
+  "cagr": -29.05,
+  "excess": -26.89,
+  "max_dd": -99.47,
+  "worst": -50.6,
+  "fresh": {
+   "2017": -33.7,
+   "2019": -40.0,
+   "2021": -50.6,
+   "2023": -49.0
+  },
+  "turnover": 136.2,
+  "hold_days": 1.7
+ },
+ "now+0.5%|DB-K2-b4": {
+  "cagr": -28.69,
+  "excess": -26.1,
+  "max_dd": -99.52,
+  "worst": -48.0,
+  "fresh": {
+   "2017": -33.5,
+   "2019": -40.1,
+   "2021": -48.0,
+   "2023": -36.5
+  },
+  "turnover": 128.9,
+  "hold_days": 1.8
+ },
+ "now+0.5%|DB-K2-b6": {
+  "cagr": -28.83,
+  "excess": -26.35,
+  "max_dd": -99.52,
+  "worst": -44.1,
+  "fresh": {
+   "2017": -33.7,
+   "2019": -41.7,
+   "2021": -44.1,
+   "2023": -13.8
+  },
+  "turnover": 115.7,
+  "hold_days": 2.1
+ },
+ "now+0.5%|DB-K2-b8": {
+  "cagr": -30.22,
+  "excess": -28.21,
+  "max_dd": -99.61,
+  "worst": -40.3,
+  "fresh": {
+   "2017": -33.5,
+   "2019": -40.3,
+   "2021": -31.1,
+   "2023": -9.7
+  },
+  "turnover": 106.6,
+  "hold_days": 2.3
+ },
+ "now+0.5%|DB-K2-b12": {
+  "cagr": -30.33,
+  "excess": -28.47,
+  "max_dd": -99.6,
+  "worst": -40.0,
+  "fresh": {
+   "2017": -33.4,
+   "2019": -40.0,
+   "2021": -26.2,
+   "2023": -15.1
+  },
+  "turnover": 92.9,
+  "hold_days": 2.7
+ },
+ "now+0.5%|DB-K2-b16": {
+  "cagr": -30.9,
+  "excess": -29.27,
+  "max_dd": -99.62,
+  "worst": -40.7,
+  "fresh": {
+   "2017": -35.2,
+   "2019": -40.7,
+   "2021": -19.7,
+   "2023": -12.2
+  },
+  "turnover": 85.1,
+  "hold_days": 3.0
+ },
+ "now+0.5%|DB-K3-b1": {
+  "cagr": -26.59,
+  "excess": -25.92,
+  "max_dd": -98.84,
+  "worst": -59.6,
+  "fresh": {
+   "2017": -30.5,
+   "2019": -36.8,
+   "2021": -47.2,
+   "2023": -59.6
+  },
+  "turnover": 148.9,
+  "hold_days": 1.4
+ },
+ "now+0.5%|DB-K3-b1.5": {
+  "cagr": -27.03,
+  "excess": -26.35,
+  "max_dd": -99.0,
+  "worst": -57.6,
+  "fresh": {
+   "2017": -30.8,
+   "2019": -36.8,
+   "2021": -47.3,
+   "2023": -57.6
+  },
+  "turnover": 143.8,
+  "hold_days": 1.4
+ },
+ "now+0.5%|DB-K3-b2": {
+  "cagr": -26.85,
+  "excess": -25.52,
+  "max_dd": -99.01,
+  "worst": -55.8,
+  "fresh": {
+   "2017": -30.7,
+   "2019": -36.7,
+   "2021": -47.3,
+   "2023": -55.8
+  },
+  "turnover": 132.4,
+  "hold_days": 1.6
+ },
+ "now+0.5%|DB-K3-b3": {
+  "cagr": -26.41,
+  "excess": -24.58,
+  "max_dd": -99.1,
+  "worst": -47.5,
+  "fresh": {
+   "2017": -30.7,
+   "2019": -36.8,
+   "2021": -47.5,
+   "2023": -44.4
+  },
+  "turnover": 126.0,
+  "hold_days": 1.8
+ },
+ "now+0.5%|DB-K3-b4": {
+  "cagr": -26.37,
+  "excess": -24.28,
+  "max_dd": -99.08,
+  "worst": -48.7,
+  "fresh": {
+   "2017": -30.5,
+   "2019": -38.1,
+   "2021": -48.7,
+   "2023": -34.6
+  },
+  "turnover": 116.5,
+  "hold_days": 1.9
+ },
+ "now+0.5%|DB-K3-b6": {
+  "cagr": -26.36,
+  "excess": -24.34,
+  "max_dd": -99.11,
+  "worst": -45.8,
+  "fresh": {
+   "2017": -31.7,
+   "2019": -38.1,
+   "2021": -45.8,
+   "2023": -30.5
+  },
+  "turnover": 102.9,
+  "hold_days": 2.2
+ },
+ "now+0.5%|DB-K3-b8": {
+  "cagr": -26.31,
+  "excess": -24.15,
+  "max_dd": -99.05,
+  "worst": -40.2,
+  "fresh": {
+   "2017": -30.5,
+   "2019": -37.9,
+   "2021": -40.2,
+   "2023": -23.1
+  },
+  "turnover": 95.3,
+  "hold_days": 2.4
+ },
+ "now+0.5%|DB-K3-b12": {
+  "cagr": -28.37,
+  "excess": -26.19,
+  "max_dd": -99.4,
+  "worst": -37.7,
+  "fresh": {
+   "2017": -31.6,
+   "2019": -37.7,
+   "2021": -17.9,
+   "2023": -4.0
+  },
+  "turnover": 86.8,
+  "hold_days": 2.9
+ },
+ "now+0.5%|DB-K3-b16": {
+  "cagr": -25.94,
+  "excess": -22.99,
+  "max_dd": -99.24,
+  "worst": -37.8,
+  "fresh": {
+   "2017": -31.7,
+   "2019": -37.8,
+   "2021": -16.2,
+   "2023": -4.5
+  },
+  "turnover": 72.1,
+  "hold_days": 3.6
+ },
+ "now+0.5%|DB-K4-b1": {
+  "cagr": -24.77,
+  "excess": -23.84,
+  "max_dd": -98.01,
+  "worst": -58.3,
+  "fresh": {
+   "2017": -28.8,
+   "2019": -34.4,
+   "2021": -44.0,
+   "2023": -58.3
+  },
+  "turnover": 131.3,
+  "hold_days": 1.3
+ },
+ "now+0.5%|DB-K4-b1.5": {
+  "cagr": -24.8,
+  "excess": -23.7,
+  "max_dd": -98.26,
+  "worst": -57.1,
+  "fresh": {
+   "2017": -28.9,
+   "2019": -34.4,
+   "2021": -44.1,
+   "2023": -57.1
+  },
+  "turnover": 131.8,
+  "hold_days": 1.5
+ },
+ "now+0.5%|DB-K4-b2": {
+  "cagr": -24.69,
+  "excess": -23.43,
+  "max_dd": -98.32,
+  "worst": -55.9,
+  "fresh": {
+   "2017": -28.5,
+   "2019": -34.4,
+   "2021": -44.1,
+   "2023": -55.9
+  },
+  "turnover": 122.4,
+  "hold_days": 1.6
+ },
+ "now+0.5%|DB-K4-b3": {
+  "cagr": -24.68,
+  "excess": -23.22,
+  "max_dd": -98.54,
+  "worst": -54.3,
+  "fresh": {
+   "2017": -28.7,
+   "2019": -34.3,
+   "2021": -44.0,
+   "2023": -54.3
+  },
+  "turnover": 113.7,
+  "hold_days": 1.9
+ },
+ "now+0.5%|DB-K4-b4": {
+  "cagr": -24.65,
+  "excess": -23.1,
+  "max_dd": -98.67,
+  "worst": -50.3,
+  "fresh": {
+   "2017": -28.5,
+   "2019": -34.3,
+   "2021": -44.2,
+   "2023": -50.3
+  },
+  "turnover": 103.0,
+  "hold_days": 2.1
+ },
+ "now+0.5%|DB-K4-b6": {
+  "cagr": -24.39,
+  "excess": -22.07,
+  "max_dd": -98.73,
+  "worst": -42.9,
+  "fresh": {
+   "2017": -28.5,
+   "2019": -35.3,
+   "2021": -42.9,
+   "2023": -27.7
+  },
+  "turnover": 99.6,
+  "hold_days": 2.3
+ },
+ "now+0.5%|DB-K4-b8": {
+  "cagr": -24.4,
+  "excess": -22.2,
+  "max_dd": -98.74,
+  "worst": -42.7,
+  "fresh": {
+   "2017": -28.5,
+   "2019": -35.0,
+   "2021": -42.7,
+   "2023": -24.4
+  },
+  "turnover": 92.3,
+  "hold_days": 2.4
+ },
+ "now+0.5%|DB-K4-b12": {
+  "cagr": -24.89,
+  "excess": -22.56,
+  "max_dd": -98.91,
+  "worst": -35.1,
+  "fresh": {
+   "2017": -28.5,
+   "2019": -35.1,
+   "2021": -30.8,
+   "2023": -15.2
+  },
+  "turnover": 78.0,
+  "hold_days": 3.0
+ },
+ "now+0.5%|DB-K4-b16": {
+  "cagr": -25.04,
+  "excess": -22.95,
+  "max_dd": -98.93,
+  "worst": -35.0,
+  "fresh": {
+   "2017": -28.5,
+   "2019": -35.0,
+   "2021": -14.8,
+   "2023": -11.8
+  },
+  "turnover": 70.5,
+  "hold_days": 3.3
+ },
+ "now+0.5%|DB-K6-b1": {
+  "cagr": -21.78,
+  "excess": -20.16,
+  "max_dd": -97.15,
+  "worst": -54.2,
+  "fresh": {
+   "2017": -25.6,
+   "2019": -30.9,
+   "2021": -39.6,
+   "2023": -54.2
+  },
+  "turnover": 121.0,
+  "hold_days": 1.4
+ },
+ "now+0.5%|DB-K6-b1.5": {
+  "cagr": -21.77,
+  "excess": -20.15,
+  "max_dd": -97.26,
+  "worst": -54.9,
+  "fresh": {
+   "2017": -25.5,
+   "2019": -30.9,
+   "2021": -39.6,
+   "2023": -54.9
+  },
+  "turnover": 114.0,
+  "hold_days": 1.5
+ },
+ "now+0.5%|DB-K6-b2": {
+  "cagr": -21.84,
+  "excess": -20.2,
+  "max_dd": -97.35,
+  "worst": -53.9,
+  "fresh": {
+   "2017": -25.5,
+   "2019": -30.9,
+   "2021": -39.6,
+   "2023": -53.9
+  },
+  "turnover": 107.3,
+  "hold_days": 1.6
+ },
+ "now+0.5%|DB-K6-b3": {
+  "cagr": -21.88,
+  "excess": -20.32,
+  "max_dd": -97.52,
+  "worst": -52.6,
+  "fresh": {
+   "2017": -25.4,
+   "2019": -30.9,
+   "2021": -39.4,
+   "2023": -52.6
+  },
+  "turnover": 96.2,
+  "hold_days": 1.9
+ },
+ "now+0.5%|DB-K6-b4": {
+  "cagr": -21.81,
+  "excess": -20.09,
+  "max_dd": -97.51,
+  "worst": -52.1,
+  "fresh": {
+   "2017": -25.4,
+   "2019": -30.8,
+   "2021": -39.4,
+   "2023": -52.1
+  },
+  "turnover": 91.1,
+  "hold_days": 2.0
+ },
+ "now+0.5%|DB-K6-b6": {
+  "cagr": -21.66,
+  "excess": -19.68,
+  "max_dd": -97.58,
+  "worst": -48.3,
+  "fresh": {
+   "2017": -25.5,
+   "2019": -31.2,
+   "2021": -39.4,
+   "2023": -48.3
+  },
+  "turnover": 83.0,
+  "hold_days": 2.5
+ },
+ "now+0.5%|DB-K6-b8": {
+  "cagr": -21.65,
+  "excess": -19.41,
+  "max_dd": -97.71,
+  "worst": -39.0,
+  "fresh": {
+   "2017": -25.5,
+   "2019": -31.2,
+   "2021": -39.0,
+   "2023": -29.9
+  },
+  "turnover": 77.9,
+  "hold_days": 2.7
+ },
+ "now+0.5%|DB-K6-b12": {
+  "cagr": -21.98,
+  "excess": -19.47,
+  "max_dd": -98.08,
+  "worst": -39.2,
+  "fresh": {
+   "2017": -25.5,
+   "2019": -31.2,
+   "2021": -39.2,
+   "2023": -25.1
+  },
+  "turnover": 72.7,
+  "hold_days": 3.1
+ },
+ "now+0.5%|DB-K6-b16": {
+  "cagr": -22.13,
+  "excess": -19.41,
+  "max_dd": -98.2,
+  "worst": -38.5,
+  "fresh": {
+   "2017": -25.4,
+   "2019": -31.2,
+   "2021": -38.5,
+   "2023": -14.3
+  },
+  "turnover": 66.7,
+  "hold_days": 3.4
+ },
+ "wait_a_day|DB-K1-b1": {
+  "cagr": 15.04,
+  "excess": 23.13,
+  "max_dd": -72.0,
+  "worst": -5.5,
+  "fresh": {
+   "2017": 3.4,
+   "2019": -5.5,
+   "2021": 7.1,
+   "2023": 7.2
+  },
+  "turnover": 99.1,
+  "hold_days": 1.4
+ },
+ "wait_a_day|DB-K1-b1.5": {
+  "cagr": 15.04,
+  "excess": 23.13,
+  "max_dd": -72.0,
+  "worst": -5.5,
+  "fresh": {
+   "2017": 3.4,
+   "2019": -5.5,
+   "2021": 7.1,
+   "2023": 7.2
+  },
+  "turnover": 99.1,
+  "hold_days": 1.4
+ },
+ "wait_a_day|DB-K1-b2": {
+  "cagr": 17.1,
+  "excess": 25.26,
+  "max_dd": -63.9,
+  "worst": 3.2,
+  "fresh": {
+   "2017": 7.8,
+   "2019": 3.2,
+   "2021": 16.1,
+   "2023": 12.7
+  },
+  "turnover": 85.8,
+  "hold_days": 1.7
+ },
+ "wait_a_day|DB-K1-b3": {
+  "cagr": 16.5,
+  "excess": 24.56,
+  "max_dd": -63.86,
+  "worst": 2.1,
+  "fresh": {
+   "2017": 7.7,
+   "2019": 2.1,
+   "2021": 14.4,
+   "2023": 13.7
+  },
+  "turnover": 79.7,
+  "hold_days": 1.9
+ },
+ "wait_a_day|DB-K1-b4": {
+  "cagr": 12.78,
+  "excess": 21.51,
+  "max_dd": -74.5,
+  "worst": -1.0,
+  "fresh": {
+   "2017": 2.8,
+   "2019": -1.0,
+   "2021": 7.8,
+   "2023": 17.9
+  },
+  "turnover": 77.5,
+  "hold_days": 2.0
+ },
+ "wait_a_day|DB-K1-b6": {
+  "cagr": 8.48,
+  "excess": 17.99,
+  "max_dd": -77.03,
+  "worst": 0.7,
+  "fresh": {
+   "2017": 3.5,
+   "2019": 0.7,
+   "2021": 9.7,
+   "2023": 12.1
+  },
+  "turnover": 69.1,
+  "hold_days": 2.3
+ },
+ "wait_a_day|DB-K1-b8": {
+  "cagr": 9.44,
+  "excess": 18.8,
+  "max_dd": -69.81,
+  "worst": -0.1,
+  "fresh": {
+   "2017": 0.5,
+   "2019": -0.1,
+   "2021": 7.0,
+   "2023": 8.2
+  },
+  "turnover": 67.3,
+  "hold_days": 2.4
+ },
+ "wait_a_day|DB-K1-b12": {
+  "cagr": 9.8,
+  "excess": 18.8,
+  "max_dd": -74.98,
+  "worst": -1.1,
+  "fresh": {
+   "2017": -1.1,
+   "2019": -0.3,
+   "2021": 13.8,
+   "2023": 13.6
+  },
+  "turnover": 61.4,
+  "hold_days": 2.7
+ },
+ "wait_a_day|DB-K1-b16": {
+  "cagr": 3.81,
+  "excess": 13.38,
+  "max_dd": -87.11,
+  "worst": -10.3,
+  "fresh": {
+   "2017": -10.3,
+   "2019": -3.2,
+   "2021": 10.9,
+   "2023": 13.6
+  },
+  "turnover": 59.9,
+  "hold_days": 3.1
+ },
+ "wait_a_day|DB-K2-b1": {
+  "cagr": 10.36,
+  "excess": 16.22,
+  "max_dd": -47.87,
+  "worst": -5.1,
+  "fresh": {
+   "2017": 0.2,
+   "2019": -5.1,
+   "2021": 1.6,
+   "2023": 1.6
+  },
+  "turnover": 93.1,
+  "hold_days": 1.5
+ },
+ "wait_a_day|DB-K2-b1.5": {
+  "cagr": 10.67,
+  "excess": 16.5,
+  "max_dd": -48.75,
+  "worst": -24.0,
+  "fresh": {
+   "2017": -0.8,
+   "2019": -24.0,
+   "2021": -0.1,
+   "2023": -1.9
+  },
+  "turnover": 86.5,
+  "hold_days": 1.7
+ },
+ "wait_a_day|DB-K2-b2": {
+  "cagr": 12.09,
+  "excess": 18.0,
+  "max_dd": -54.55,
+  "worst": -18.9,
+  "fresh": {
+   "2017": -0.6,
+   "2019": -18.9,
+   "2021": 3.5,
+   "2023": 4.1
+  },
+  "turnover": 81.6,
+  "hold_days": 1.8
+ },
+ "wait_a_day|DB-K2-b3": {
+  "cagr": 9.26,
+  "excess": 15.67,
+  "max_dd": -62.02,
+  "worst": -26.2,
+  "fresh": {
+   "2017": -4.2,
+   "2019": -26.2,
+   "2021": 5.2,
+   "2023": 11.8
+  },
+  "turnover": 75.6,
+  "hold_days": 2.1
+ },
+ "wait_a_day|DB-K2-b4": {
+  "cagr": 12.95,
+  "excess": 19.1,
+  "max_dd": -65.24,
+  "worst": -7.6,
+  "fresh": {
+   "2017": 4.4,
+   "2019": -7.6,
+   "2021": 8.3,
+   "2023": 12.9
+  },
+  "turnover": 70.4,
+  "hold_days": 2.3
+ },
+ "wait_a_day|DB-K2-b6": {
+  "cagr": 14.66,
+  "excess": 20.32,
+  "max_dd": -65.03,
+  "worst": 5.4,
+  "fresh": {
+   "2017": 6.4,
+   "2019": 5.4,
+   "2021": 11.0,
+   "2023": 12.5
+  },
+  "turnover": 63.0,
+  "hold_days": 2.6
+ },
+ "wait_a_day|DB-K2-b8": {
+  "cagr": 10.55,
+  "excess": 16.73,
+  "max_dd": -58.53,
+  "worst": 4.2,
+  "fresh": {
+   "2017": 4.2,
+   "2019": 5.7,
+   "2021": 8.8,
+   "2023": 12.0
+  },
+  "turnover": 61.4,
+  "hold_days": 2.8
+ },
+ "wait_a_day|DB-K2-b12": {
+  "cagr": 9.15,
+  "excess": 15.71,
+  "max_dd": -65.75,
+  "worst": -2.5,
+  "fresh": {
+   "2017": -2.0,
+   "2019": -2.5,
+   "2021": 8.4,
+   "2023": 12.4
+  },
+  "turnover": 55.6,
+  "hold_days": 3.2
+ },
+ "wait_a_day|DB-K2-b16": {
+  "cagr": 7.19,
+  "excess": 13.78,
+  "max_dd": -66.24,
+  "worst": -11.2,
+  "fresh": {
+   "2017": -11.2,
+   "2019": -2.8,
+   "2021": 10.5,
+   "2023": 12.3
+  },
+  "turnover": 51.7,
+  "hold_days": 3.5
+ },
+ "wait_a_day|DB-K3-b1": {
+  "cagr": 11.23,
+  "excess": 16.17,
+  "max_dd": -52.25,
+  "worst": -14.8,
+  "fresh": {
+   "2017": 4.4,
+   "2019": -14.8,
+   "2021": -5.0,
+   "2023": 0.3
+  },
+  "turnover": 90.0,
+  "hold_days": 1.6
+ },
+ "wait_a_day|DB-K3-b1.5": {
+  "cagr": 12.91,
+  "excess": 17.78,
+  "max_dd": -51.49,
+  "worst": -36.5,
+  "fresh": {
+   "2017": -1.7,
+   "2019": -36.5,
+   "2021": -3.0,
+   "2023": 7.1
+  },
+  "turnover": 85.6,
+  "hold_days": 1.7
+ },
+ "wait_a_day|DB-K3-b2": {
+  "cagr": 12.37,
+  "excess": 17.51,
+  "max_dd": -54.03,
+  "worst": -22.0,
+  "fresh": {
+   "2017": -2.9,
+   "2019": -22.0,
+   "2021": 6.3,
+   "2023": 15.9
+  },
+  "turnover": 78.5,
+  "hold_days": 1.9
+ },
+ "wait_a_day|DB-K3-b3": {
+  "cagr": 10.21,
+  "excess": 15.55,
+  "max_dd": -59.02,
+  "worst": -23.7,
+  "fresh": {
+   "2017": 1.7,
+   "2019": -23.7,
+   "2021": 7.3,
+   "2023": 11.4
+  },
+  "turnover": 73.3,
+  "hold_days": 2.2
+ },
+ "wait_a_day|DB-K3-b4": {
+  "cagr": 23.84,
+  "excess": 27.22,
+  "max_dd": -53.79,
+  "worst": 1.8,
+  "fresh": {
+   "2017": 12.2,
+   "2019": 1.8,
+   "2021": 1.8,
+   "2023": 2.2
+  },
+  "turnover": 65.0,
+  "hold_days": 2.4
+ },
+ "wait_a_day|DB-K3-b6": {
+  "cagr": 15.53,
+  "excess": 20.4,
+  "max_dd": -58.48,
+  "worst": -4.5,
+  "fresh": {
+   "2017": 0.1,
+   "2019": -4.5,
+   "2021": 0.5,
+   "2023": 14.3
+  },
+  "turnover": 62.3,
+  "hold_days": 2.7
+ },
+ "wait_a_day|DB-K3-b8": {
+  "cagr": 16.61,
+  "excess": 21.6,
+  "max_dd": -62.34,
+  "worst": -4.2,
+  "fresh": {
+   "2017": -4.2,
+   "2019": 0.7,
+   "2021": 5.7,
+   "2023": 16.5
+  },
+  "turnover": 56.5,
+  "hold_days": 3.0
+ },
+ "wait_a_day|DB-K3-b12": {
+  "cagr": 11.29,
+  "excess": 16.98,
+  "max_dd": -70.06,
+  "worst": -2.4,
+  "fresh": {
+   "2017": -2.4,
+   "2019": 0.6,
+   "2021": 8.5,
+   "2023": 15.5
+  },
+  "turnover": 51.0,
+  "hold_days": 3.5
+ },
+ "wait_a_day|DB-K3-b16": {
+  "cagr": 17.11,
+  "excess": 21.72,
+  "max_dd": -61.77,
+  "worst": 2.2,
+  "fresh": {
+   "2017": 3.3,
+   "2019": 2.2,
+   "2021": 9.3,
+   "2023": 17.3
+  },
+  "turnover": 46.7,
+  "hold_days": 3.9
+ },
+ "wait_a_day|DB-K4-b1": {
+  "cagr": 10.79,
+  "excess": 15.2,
+  "max_dd": -47.58,
+  "worst": -35.0,
+  "fresh": {
+   "2017": -28.5,
+   "2019": -35.0,
+   "2021": -14.3,
+   "2023": -1.9
+  },
+  "turnover": 88.6,
+  "hold_days": 1.6
+ },
+ "wait_a_day|DB-K4-b1.5": {
+  "cagr": 10.67,
+  "excess": 15.23,
+  "max_dd": -50.0,
+  "worst": -35.9,
+  "fresh": {
+   "2017": -12.9,
+   "2019": -35.9,
+   "2021": -4.7,
+   "2023": 2.0
+  },
+  "turnover": 82.4,
+  "hold_days": 1.8
+ },
+ "wait_a_day|DB-K4-b2": {
+  "cagr": 7.91,
+  "excess": 12.71,
+  "max_dd": -55.09,
+  "worst": -35.9,
+  "fresh": {
+   "2017": -27.9,
+   "2019": -35.9,
+   "2021": -2.2,
+   "2023": 0.1
+  },
+  "turnover": 76.5,
+  "hold_days": 2.0
+ },
+ "wait_a_day|DB-K4-b3": {
+  "cagr": 19.23,
+  "excess": 22.91,
+  "max_dd": -55.08,
+  "worst": -13.9,
+  "fresh": {
+   "2017": 5.1,
+   "2019": -13.9,
+   "2021": 0.5,
+   "2023": 9.9
+  },
+  "turnover": 69.8,
+  "hold_days": 2.3
+ },
+ "wait_a_day|DB-K4-b4": {
+  "cagr": 11.31,
+  "excess": 16.18,
+  "max_dd": -61.76,
+  "worst": -6.7,
+  "fresh": {
+   "2017": -0.9,
+   "2019": -6.7,
+   "2021": -1.4,
+   "2023": 12.2
+  },
+  "turnover": 65.9,
+  "hold_days": 2.5
+ },
+ "wait_a_day|DB-K4-b6": {
+  "cagr": 13.81,
+  "excess": 18.6,
+  "max_dd": -63.36,
+  "worst": -7.8,
+  "fresh": {
+   "2017": -2.1,
+   "2019": -7.8,
+   "2021": 2.8,
+   "2023": 13.5
+  },
+  "turnover": 59.7,
+  "hold_days": 2.8
+ },
+ "wait_a_day|DB-K4-b8": {
+  "cagr": 13.34,
+  "excess": 18.26,
+  "max_dd": -62.08,
+  "worst": -15.2,
+  "fresh": {
+   "2017": -13.9,
+   "2019": -15.2,
+   "2021": 1.4,
+   "2023": 6.4
+  },
+  "turnover": 55.8,
+  "hold_days": 3.1
+ },
+ "wait_a_day|DB-K4-b12": {
+  "cagr": 12.53,
+  "excess": 17.38,
+  "max_dd": -57.85,
+  "worst": -4.3,
+  "fresh": {
+   "2017": -4.3,
+   "2019": -2.2,
+   "2021": 2.1,
+   "2023": 10.1
+  },
+  "turnover": 49.5,
+  "hold_days": 3.6
+ },
+ "wait_a_day|DB-K4-b16": {
+  "cagr": 14.24,
+  "excess": 18.91,
+  "max_dd": -58.54,
+  "worst": -6.7,
+  "fresh": {
+   "2017": -6.7,
+   "2019": -4.5,
+   "2021": -0.2,
+   "2023": 17.8
+  },
+  "turnover": 45.9,
+  "hold_days": 4.0
+ },
+ "wait_a_day|DB-K6-b1": {
+  "cagr": -22.55,
+  "excess": -21.4,
+  "max_dd": -97.25,
+  "worst": -40.5,
+  "fresh": {
+   "2017": -25.5,
+   "2019": -31.2,
+   "2021": -40.5,
+   "2023": -26.4
+  },
+  "turnover": 89.6,
+  "hold_days": 1.6
+ },
+ "wait_a_day|DB-K6-b1.5": {
+  "cagr": -1.26,
+  "excess": 3.15,
+  "max_dd": -63.6,
+  "worst": -39.8,
+  "fresh": {
+   "2017": -25.9,
+   "2019": -31.2,
+   "2021": -39.8,
+   "2023": -16.1
+  },
+  "turnover": 81.7,
+  "hold_days": 1.9
+ },
+ "wait_a_day|DB-K6-b2": {
+  "cagr": 12.45,
+  "excess": 16.27,
+  "max_dd": -44.1,
+  "worst": -38.4,
+  "fresh": {
+   "2017": -25.6,
+   "2019": -31.1,
+   "2021": -38.4,
+   "2023": -11.2
+  },
+  "turnover": 73.3,
+  "hold_days": 2.1
+ },
+ "wait_a_day|DB-K6-b3": {
+  "cagr": -2.63,
+  "excess": 1.95,
+  "max_dd": -64.17,
+  "worst": -38.9,
+  "fresh": {
+   "2017": -25.7,
+   "2019": -31.7,
+   "2021": -38.9,
+   "2023": -9.3
+  },
+  "turnover": 69.0,
+  "hold_days": 2.4
+ },
+ "wait_a_day|DB-K6-b4": {
+  "cagr": 1.42,
+  "excess": 6.11,
+  "max_dd": -59.25,
+  "worst": -31.0,
+  "fresh": {
+   "2017": -25.6,
+   "2019": -31.0,
+   "2021": -11.2,
+   "2023": -3.8
+  },
+  "turnover": 64.3,
+  "hold_days": 2.6
+ },
+ "wait_a_day|DB-K6-b6": {
+  "cagr": 9.03,
+  "excess": 13.69,
+  "max_dd": -59.17,
+  "worst": -31.2,
+  "fresh": {
+   "2017": -26.1,
+   "2019": -31.2,
+   "2021": -10.2,
+   "2023": -0.4
+  },
+  "turnover": 56.5,
+  "hold_days": 3.0
+ },
+ "wait_a_day|DB-K6-b8": {
+  "cagr": 9.24,
+  "excess": 13.88,
+  "max_dd": -59.2,
+  "worst": -30.2,
+  "fresh": {
+   "2017": -26.5,
+   "2019": -30.2,
+   "2021": -7.5,
+   "2023": 3.1
+  },
+  "turnover": 51.9,
+  "hold_days": 3.4
+ },
+ "wait_a_day|DB-K6-b12": {
+  "cagr": 15.25,
+  "excess": 19.47,
+  "max_dd": -56.71,
+  "worst": -17.8,
+  "fresh": {
+   "2017": -13.5,
+   "2019": -17.8,
+   "2021": -2.3,
+   "2023": 2.1
+  },
+  "turnover": 46.2,
+  "hold_days": 3.9
+ },
+ "wait_a_day|DB-K6-b16": {
+  "cagr": 11.44,
+  "excess": 16.02,
+  "max_dd": -53.46,
+  "worst": -10.5,
+  "fresh": {
+   "2017": -7.7,
+   "2019": -10.5,
+   "2021": 3.9,
+   "2023": 3.6
+  },
+  "turnover": 42.5,
+  "hold_days": 4.4
+ },
+ "reserve|DB-K1-b1": {
+  "cagr": 12.15,
+  "excess": 16.51,
+  "max_dd": -43.78,
+  "worst": 0.5,
+  "fresh": {
+   "2017": 4.5,
+   "2019": 4.3,
+   "2021": 3.2,
+   "2023": 0.5
+  },
+  "turnover": 87.0,
+  "hold_days": 1.3
+ },
+ "reserve|DB-K1-b1.5": {
+  "cagr": 12.15,
+  "excess": 16.51,
+  "max_dd": -43.78,
+  "worst": 0.5,
+  "fresh": {
+   "2017": 4.5,
+   "2019": 4.3,
+   "2021": 3.2,
+   "2023": 0.5
+  },
+  "turnover": 87.0,
+  "hold_days": 1.3
+ },
+ "reserve|DB-K1-b2": {
+  "cagr": 8.12,
+  "excess": 12.68,
+  "max_dd": -46.6,
+  "worst": 1.5,
+  "fresh": {
+   "2017": 3.2,
+   "2019": 1.8,
+   "2021": 2.7,
+   "2023": 1.5
+  },
+  "turnover": 74.0,
+  "hold_days": 1.6
+ },
+ "reserve|DB-K1-b3": {
+  "cagr": 11.94,
+  "excess": 16.13,
+  "max_dd": -44.46,
+  "worst": 4.0,
+  "fresh": {
+   "2017": 5.1,
+   "2019": 5.4,
+   "2021": 6.5,
+   "2023": 4.0
+  },
+  "turnover": 65.8,
+  "hold_days": 1.7
+ },
+ "reserve|DB-K1-b4": {
+  "cagr": 12.59,
+  "excess": 16.68,
+  "max_dd": -44.85,
+  "worst": 3.9,
+  "fresh": {
+   "2017": 3.9,
+   "2019": 4.4,
+   "2021": 8.7,
+   "2023": 6.3
+  },
+  "turnover": 60.6,
+  "hold_days": 1.8
+ },
+ "reserve|DB-K1-b6": {
+  "cagr": 9.43,
+  "excess": 13.72,
+  "max_dd": -48.91,
+  "worst": 2.2,
+  "fresh": {
+   "2017": 4.1,
+   "2019": 2.2,
+   "2021": 4.9,
+   "2023": 5.1
+  },
+  "turnover": 54.0,
+  "hold_days": 2.1
+ },
+ "reserve|DB-K1-b8": {
+  "cagr": 9.2,
+  "excess": 13.49,
+  "max_dd": -47.06,
+  "worst": 3.0,
+  "fresh": {
+   "2017": 3.4,
+   "2019": 3.0,
+   "2021": 5.3,
+   "2023": 4.9
+  },
+  "turnover": 50.8,
+  "hold_days": 2.2
+ },
+ "reserve|DB-K1-b12": {
+  "cagr": 9.01,
+  "excess": 13.26,
+  "max_dd": -42.98,
+  "worst": 3.0,
+  "fresh": {
+   "2017": 3.0,
+   "2019": 3.2,
+   "2021": 7.7,
+   "2023": 4.0
+  },
+  "turnover": 44.5,
+  "hold_days": 2.5
+ },
+ "reserve|DB-K1-b16": {
+  "cagr": 13.37,
+  "excess": 17.16,
+  "max_dd": -44.47,
+  "worst": 7.1,
+  "fresh": {
+   "2017": 7.1,
+   "2019": 10.3,
+   "2021": 12.7,
+   "2023": 9.9
+  },
+  "turnover": 40.3,
+  "hold_days": 2.7
+ },
+ "reserve|DB-K2-b1": {
+  "cagr": 7.57,
+  "excess": 12.12,
+  "max_dd": -41.58,
+  "worst": -8.0,
+  "fresh": {
+   "2017": 2.4,
+   "2019": -8.0,
+   "2021": -4.5,
+   "2023": -4.2
+  },
+  "turnover": 90.4,
+  "hold_days": 1.4
+ },
+ "reserve|DB-K2-b1.5": {
+  "cagr": 10.01,
+  "excess": 14.38,
+  "max_dd": -45.95,
+  "worst": -10.4,
+  "fresh": {
+   "2017": 6.0,
+   "2019": -10.4,
+   "2021": -0.4,
+   "2023": -0.4
+  },
+  "turnover": 82.4,
+  "hold_days": 1.6
+ },
+ "reserve|DB-K2-b2": {
+  "cagr": 14.47,
+  "excess": 18.36,
+  "max_dd": -40.37,
+  "worst": -1.5,
+  "fresh": {
+   "2017": 8.0,
+   "2019": -1.5,
+   "2021": 4.0,
+   "2023": 2.8
+  },
+  "turnover": 77.2,
+  "hold_days": 1.7
+ },
+ "reserve|DB-K2-b3": {
+  "cagr": 13.51,
+  "excess": 17.51,
+  "max_dd": -46.08,
+  "worst": -5.5,
+  "fresh": {
+   "2017": 8.9,
+   "2019": -5.5,
+   "2021": 1.9,
+   "2023": 4.5
+  },
+  "turnover": 69.0,
+  "hold_days": 2.0
+ },
+ "reserve|DB-K2-b4": {
+  "cagr": 13.43,
+  "excess": 17.51,
+  "max_dd": -46.84,
+  "worst": -1.6,
+  "fresh": {
+   "2017": 7.8,
+   "2019": -1.6,
+   "2021": 4.9,
+   "2023": 3.7
+  },
+  "turnover": 64.6,
+  "hold_days": 2.1
+ },
+ "reserve|DB-K2-b6": {
+  "cagr": 17.82,
+  "excess": 21.33,
+  "max_dd": -47.12,
+  "worst": 6.7,
+  "fresh": {
+   "2017": 10.8,
+   "2019": 6.7,
+   "2021": 9.4,
+   "2023": 10.7
+  },
+  "turnover": 55.7,
+  "hold_days": 2.4
+ },
+ "reserve|DB-K2-b8": {
+  "cagr": 16.25,
+  "excess": 19.98,
+  "max_dd": -51.28,
+  "worst": 7.3,
+  "fresh": {
+   "2017": 10.9,
+   "2019": 7.3,
+   "2021": 9.9,
+   "2023": 10.9
+  },
+  "turnover": 51.7,
+  "hold_days": 2.6
+ },
+ "reserve|DB-K2-b12": {
+  "cagr": 10.64,
+  "excess": 14.97,
+  "max_dd": -49.92,
+  "worst": 0.6,
+  "fresh": {
+   "2017": 0.6,
+   "2019": 1.1,
+   "2021": 7.3,
+   "2023": 4.6
+  },
+  "turnover": 46.3,
+  "hold_days": 3.0
+ },
+ "reserve|DB-K2-b16": {
+  "cagr": 9.54,
+  "excess": 14.02,
+  "max_dd": -55.15,
+  "worst": 3.3,
+  "fresh": {
+   "2017": 3.7,
+   "2019": 3.3,
+   "2021": 6.3,
+   "2023": 7.8
+  },
+  "turnover": 42.5,
+  "hold_days": 3.3
+ },
+ "reserve|DB-K3-b1": {
+  "cagr": 6.39,
+  "excess": 10.82,
+  "max_dd": -46.58,
+  "worst": -34.4,
+  "fresh": {
+   "2017": -9.0,
+   "2019": -34.4,
+   "2021": -12.9,
+   "2023": -11.5
+  },
+  "turnover": 86.6,
+  "hold_days": 1.5
+ },
+ "reserve|DB-K3-b1.5": {
+  "cagr": 10.95,
+  "excess": 15.11,
+  "max_dd": -43.26,
+  "worst": -36.3,
+  "fresh": {
+   "2017": -4.0,
+   "2019": -36.3,
+   "2021": -16.0,
+   "2023": -9.9
+  },
+  "turnover": 84.8,
+  "hold_days": 1.6
+ },
+ "reserve|DB-K3-b2": {
+  "cagr": 12.25,
+  "excess": 16.34,
+  "max_dd": -50.35,
+  "worst": -35.8,
+  "fresh": {
+   "2017": -2.6,
+   "2019": -35.8,
+   "2021": -6.3,
+   "2023": -0.3
+  },
+  "turnover": 76.9,
+  "hold_days": 1.8
+ },
+ "reserve|DB-K3-b3": {
+  "cagr": 12.55,
+  "excess": 16.65,
+  "max_dd": -50.58,
+  "worst": -28.6,
+  "fresh": {
+   "2017": -0.3,
+   "2019": -28.6,
+   "2021": -4.7,
+   "2023": 4.0
+  },
+  "turnover": 69.5,
+  "hold_days": 2.1
+ },
+ "reserve|DB-K3-b4": {
+  "cagr": 15.8,
+  "excess": 19.49,
+  "max_dd": -49.55,
+  "worst": -2.7,
+  "fresh": {
+   "2017": 4.9,
+   "2019": -2.7,
+   "2021": -0.3,
+   "2023": 4.0
+  },
+  "turnover": 64.6,
+  "hold_days": 2.3
+ },
+ "reserve|DB-K3-b6": {
+  "cagr": 11.14,
+  "excess": 15.39,
+  "max_dd": -57.66,
+  "worst": -11.4,
+  "fresh": {
+   "2017": 0.2,
+   "2019": -11.4,
+   "2021": -0.7,
+   "2023": 5.1
+  },
+  "turnover": 57.8,
+  "hold_days": 2.6
+ },
+ "reserve|DB-K3-b8": {
+  "cagr": 11.53,
+  "excess": 15.88,
+  "max_dd": -56.96,
+  "worst": -5.8,
+  "fresh": {
+   "2017": 0.7,
+   "2019": -5.8,
+   "2021": -0.2,
+   "2023": 1.7
+  },
+  "turnover": 53.5,
+  "hold_days": 2.8
+ },
+ "reserve|DB-K3-b12": {
+  "cagr": 12.28,
+  "excess": 16.53,
+  "max_dd": -57.54,
+  "worst": -3.7,
+  "fresh": {
+   "2017": 2.5,
+   "2019": -3.7,
+   "2021": 5.0,
+   "2023": 8.3
+  },
+  "turnover": 47.4,
+  "hold_days": 3.3
+ },
+ "reserve|DB-K3-b16": {
+  "cagr": 15.02,
+  "excess": 18.81,
+  "max_dd": -46.85,
+  "worst": -6.0,
+  "fresh": {
+   "2017": -6.0,
+   "2019": -3.0,
+   "2021": 6.3,
+   "2023": 8.4
+  },
+  "turnover": 42.9,
+  "hold_days": 3.6
+ },
+ "reserve|DB-K4-b1": {
+  "cagr": 3.29,
+  "excess": 7.68,
+  "max_dd": -48.73,
+  "worst": -38.9,
+  "fresh": {
+   "2017": -27.3,
+   "2019": -32.9,
+   "2021": -38.9,
+   "2023": -13.9
+  },
+  "turnover": 87.3,
+  "hold_days": 1.5
+ },
+ "reserve|DB-K4-b1.5": {
+  "cagr": 6.54,
+  "excess": 10.82,
+  "max_dd": -47.62,
+  "worst": -32.9,
+  "fresh": {
+   "2017": -27.2,
+   "2019": -32.9,
+   "2021": -22.9,
+   "2023": -7.2
+  },
+  "turnover": 81.9,
+  "hold_days": 1.7
+ },
+ "reserve|DB-K4-b2": {
+  "cagr": 3.51,
+  "excess": 7.98,
+  "max_dd": -52.87,
+  "worst": -32.9,
+  "fresh": {
+   "2017": -27.1,
+   "2019": -32.9,
+   "2021": -19.1,
+   "2023": -9.3
+  },
+  "turnover": 76.6,
+  "hold_days": 1.9
+ },
+ "reserve|DB-K4-b3": {
+  "cagr": 13.85,
+  "excess": 17.59,
+  "max_dd": -52.07,
+  "worst": -32.2,
+  "fresh": {
+   "2017": -10.0,
+   "2019": -32.2,
+   "2021": -7.4,
+   "2023": -6.9
+  },
+  "turnover": 67.5,
+  "hold_days": 2.2
+ },
+ "reserve|DB-K4-b4": {
+  "cagr": 11.43,
+  "excess": 15.59,
+  "max_dd": -52.75,
+  "worst": -33.1,
+  "fresh": {
+   "2017": -14.1,
+   "2019": -33.1,
+   "2021": -4.4,
+   "2023": 0.5
+  },
+  "turnover": 62.9,
+  "hold_days": 2.4
+ },
+ "reserve|DB-K4-b6": {
+  "cagr": 12.96,
+  "excess": 17.05,
+  "max_dd": -55.69,
+  "worst": -26.1,
+  "fresh": {
+   "2017": -13.2,
+   "2019": -26.1,
+   "2021": -0.3,
+   "2023": -0.8
+  },
+  "turnover": 56.6,
+  "hold_days": 2.8
+ },
+ "reserve|DB-K4-b8": {
+  "cagr": 13.08,
+  "excess": 17.16,
+  "max_dd": -60.34,
+  "worst": -11.7,
+  "fresh": {
+   "2017": -6.7,
+   "2019": -11.7,
+   "2021": -2.0,
+   "2023": 3.1
+  },
+  "turnover": 51.8,
+  "hold_days": 3.0
+ },
+ "reserve|DB-K4-b12": {
+  "cagr": 15.85,
+  "excess": 19.49,
+  "max_dd": -48.73,
+  "worst": -1.2,
+  "fresh": {
+   "2017": -1.2,
+   "2019": -0.7,
+   "2021": 1.9,
+   "2023": 2.9
+  },
+  "turnover": 45.8,
+  "hold_days": 3.5
+ },
+ "reserve|DB-K4-b16": {
+  "cagr": 19.18,
+  "excess": 22.4,
+  "max_dd": -46.67,
+  "worst": -3.2,
+  "fresh": {
+   "2017": 1.4,
+   "2019": -3.2,
+   "2021": 10.6,
+   "2023": 11.4
+  },
+  "turnover": 41.5,
+  "hold_days": 3.9
+ },
+ "reserve|DB-K6-b1": {
+  "cagr": -20.59,
+  "excess": -19.46,
+  "max_dd": -96.05,
+  "worst": -48.9,
+  "fresh": {
+   "2017": -24.2,
+   "2019": -29.7,
+   "2021": -37.7,
+   "2023": -48.9
+  },
+  "turnover": 83.8,
+  "hold_days": 1.5
+ },
+ "reserve|DB-K6-b1.5": {
+  "cagr": -20.67,
+  "excess": -19.08,
+  "max_dd": -96.38,
+  "worst": -42.0,
+  "fresh": {
+   "2017": -24.2,
+   "2019": -29.6,
+   "2021": -38.1,
+   "2023": -42.0
+  },
+  "turnover": 85.0,
+  "hold_days": 1.7
+ },
+ "reserve|DB-K6-b2": {
+  "cagr": 0.15,
+  "excess": 4.48,
+  "max_dd": -61.62,
+  "worst": -38.0,
+  "fresh": {
+   "2017": -24.4,
+   "2019": -29.6,
+   "2021": -38.0,
+   "2023": -29.3
+  },
+  "turnover": 76.9,
+  "hold_days": 2.0
+ },
+ "reserve|DB-K6-b3": {
+  "cagr": -3.24,
+  "excess": 1.1,
+  "max_dd": -68.05,
+  "worst": -38.0,
+  "fresh": {
+   "2017": -24.4,
+   "2019": -29.6,
+   "2021": -38.0,
+   "2023": -18.4
+  },
+  "turnover": 68.2,
+  "hold_days": 2.3
+ },
+ "reserve|DB-K6-b4": {
+  "cagr": -2.14,
+  "excess": 2.25,
+  "max_dd": -65.79,
+  "worst": -37.5,
+  "fresh": {
+   "2017": -24.6,
+   "2019": -29.5,
+   "2021": -37.5,
+   "2023": -11.6
+  },
+  "turnover": 63.6,
+  "hold_days": 2.6
+ },
+ "reserve|DB-K6-b6": {
+  "cagr": 2.7,
+  "excess": 7.45,
+  "max_dd": -56.91,
+  "worst": -36.2,
+  "fresh": {
+   "2017": -24.4,
+   "2019": -29.9,
+   "2021": -36.2,
+   "2023": -2.5
+  },
+  "turnover": 57.4,
+  "hold_days": 2.9
+ },
+ "reserve|DB-K6-b8": {
+  "cagr": 8.57,
+  "excess": 12.97,
+  "max_dd": -50.7,
+  "worst": -16.5,
+  "fresh": {
+   "2017": -12.7,
+   "2019": -16.5,
+   "2021": -7.9,
+   "2023": -2.2
+  },
+  "turnover": 51.5,
+  "hold_days": 3.3
+ },
+ "reserve|DB-K6-b12": {
+  "cagr": 8.64,
+  "excess": 13.14,
+  "max_dd": -55.4,
+  "worst": -16.0,
+  "fresh": {
+   "2017": -12.9,
+   "2019": -16.0,
+   "2021": -5.1,
+   "2023": -3.7
+  },
+  "turnover": 45.4,
+  "hold_days": 3.7
+ },
+ "reserve|DB-K6-b16": {
+  "cagr": 8.89,
+  "excess": 13.32,
+  "max_dd": -53.76,
+  "worst": -12.6,
+  "fresh": {
+   "2017": -12.6,
+   "2019": -12.5,
+   "2021": -1.2,
+   "2023": -1.0
+  },
+  "turnover": 41.4,
+  "hold_days": 4.2
+ },
+ "half|DB-K1-b1": {
+  "cagr": 12.15,
+  "excess": 16.51,
+  "max_dd": -43.78,
+  "worst": 0.5,
+  "fresh": {
+   "2017": 4.5,
+   "2019": 4.3,
+   "2021": 3.2,
+   "2023": 0.5
+  },
+  "turnover": 87.0,
+  "hold_days": 1.3
+ },
+ "half|DB-K1-b1.5": {
+  "cagr": 12.15,
+  "excess": 16.51,
+  "max_dd": -43.78,
+  "worst": 0.5,
+  "fresh": {
+   "2017": 4.5,
+   "2019": 4.3,
+   "2021": 3.2,
+   "2023": 0.5
+  },
+  "turnover": 87.0,
+  "hold_days": 1.3
+ },
+ "half|DB-K1-b2": {
+  "cagr": 8.12,
+  "excess": 12.68,
+  "max_dd": -46.6,
+  "worst": 1.5,
+  "fresh": {
+   "2017": 3.2,
+   "2019": 1.8,
+   "2021": 2.7,
+   "2023": 1.5
+  },
+  "turnover": 74.0,
+  "hold_days": 1.6
+ },
+ "half|DB-K1-b3": {
+  "cagr": 11.94,
+  "excess": 16.13,
+  "max_dd": -44.46,
+  "worst": 4.0,
+  "fresh": {
+   "2017": 5.1,
+   "2019": 5.4,
+   "2021": 6.5,
+   "2023": 4.0
+  },
+  "turnover": 65.8,
+  "hold_days": 1.7
+ },
+ "half|DB-K1-b4": {
+  "cagr": 12.59,
+  "excess": 16.68,
+  "max_dd": -44.85,
+  "worst": 3.9,
+  "fresh": {
+   "2017": 3.9,
+   "2019": 4.4,
+   "2021": 8.7,
+   "2023": 6.3
+  },
+  "turnover": 60.6,
+  "hold_days": 1.8
+ },
+ "half|DB-K1-b6": {
+  "cagr": 9.43,
+  "excess": 13.72,
+  "max_dd": -48.91,
+  "worst": 2.2,
+  "fresh": {
+   "2017": 4.1,
+   "2019": 2.2,
+   "2021": 4.9,
+   "2023": 5.1
+  },
+  "turnover": 54.0,
+  "hold_days": 2.1
+ },
+ "half|DB-K1-b8": {
+  "cagr": 9.2,
+  "excess": 13.49,
+  "max_dd": -47.06,
+  "worst": 3.0,
+  "fresh": {
+   "2017": 3.4,
+   "2019": 3.0,
+   "2021": 5.3,
+   "2023": 4.9
+  },
+  "turnover": 50.8,
+  "hold_days": 2.2
+ },
+ "half|DB-K1-b12": {
+  "cagr": 9.01,
+  "excess": 13.26,
+  "max_dd": -42.98,
+  "worst": 3.0,
+  "fresh": {
+   "2017": 3.0,
+   "2019": 3.2,
+   "2021": 7.7,
+   "2023": 4.0
+  },
+  "turnover": 44.5,
+  "hold_days": 2.5
+ },
+ "half|DB-K1-b16": {
+  "cagr": 13.37,
+  "excess": 17.16,
+  "max_dd": -44.47,
+  "worst": 7.1,
+  "fresh": {
+   "2017": 7.1,
+   "2019": 10.3,
+   "2021": 12.7,
+   "2023": 9.9
+  },
+  "turnover": 40.3,
+  "hold_days": 2.7
+ },
+ "half|DB-K2-b1": {
+  "cagr": 10.56,
+  "excess": 14.1,
+  "max_dd": -40.35,
+  "worst": -20.2,
+  "fresh": {
+   "2017": -5.2,
+   "2019": -20.2,
+   "2021": -8.6,
+   "2023": -5.8
+  },
+  "turnover": 81.4,
+  "hold_days": 1.4
+ },
+ "half|DB-K2-b1.5": {
+  "cagr": 10.78,
+  "excess": 14.25,
+  "max_dd": -38.13,
+  "worst": -17.2,
+  "fresh": {
+   "2017": -2.1,
+   "2019": -17.2,
+   "2021": -4.5,
+   "2023": -3.5
+  },
+  "turnover": 72.5,
+  "hold_days": 1.5
+ },
+ "half|DB-K2-b2": {
+  "cagr": 13.36,
+  "excess": 16.58,
+  "max_dd": -40.53,
+  "worst": -6.7,
+  "fresh": {
+   "2017": 5.4,
+   "2019": -6.7,
+   "2021": -0.7,
+   "2023": -2.8
+  },
+  "turnover": 66.8,
+  "hold_days": 1.7
+ },
+ "half|DB-K2-b3": {
+  "cagr": 13.26,
+  "excess": 16.46,
+  "max_dd": -45.38,
+  "worst": -3.5,
+  "fresh": {
+   "2017": 3.7,
+   "2019": -3.5,
+   "2021": 0.8,
+   "2023": 2.5
+  },
+  "turnover": 58.4,
+  "hold_days": 1.9
+ },
+ "half|DB-K2-b4": {
+  "cagr": 14.14,
+  "excess": 17.24,
+  "max_dd": -43.43,
+  "worst": -1.5,
+  "fresh": {
+   "2017": 6.7,
+   "2019": -1.5,
+   "2021": 1.2,
+   "2023": 2.0
+  },
+  "turnover": 53.5,
+  "hold_days": 2.1
+ },
+ "half|DB-K2-b6": {
+  "cagr": 14.41,
+  "excess": 17.41,
+  "max_dd": -42.04,
+  "worst": 1.7,
+  "fresh": {
+   "2017": 7.7,
+   "2019": 1.7,
+   "2021": 3.9,
+   "2023": 10.2
+  },
+  "turnover": 45.8,
+  "hold_days": 2.4
+ },
+ "half|DB-K2-b8": {
+  "cagr": 14.35,
+  "excess": 17.35,
+  "max_dd": -41.07,
+  "worst": 3.4,
+  "fresh": {
+   "2017": 6.4,
+   "2019": 3.4,
+   "2021": 4.5,
+   "2023": 11.1
+  },
+  "turnover": 41.8,
+  "hold_days": 2.6
+ },
+ "half|DB-K2-b12": {
+  "cagr": 10.15,
+  "excess": 13.55,
+  "max_dd": -40.18,
+  "worst": 3.0,
+  "fresh": {
+   "2017": 3.0,
+   "2019": 3.6,
+   "2021": 5.1,
+   "2023": 5.8
+  },
+  "turnover": 36.5,
+  "hold_days": 3.0
+ },
+ "half|DB-K2-b16": {
+  "cagr": 11.33,
+  "excess": 14.59,
+  "max_dd": -38.74,
+  "worst": 3.0,
+  "fresh": {
+   "2017": 3.3,
+   "2019": 3.0,
+   "2021": 4.1,
+   "2023": 5.8
+  },
+  "turnover": 33.4,
+  "hold_days": 3.2
+ },
+ "half|DB-K3-b1": {
+  "cagr": -5.76,
+  "excess": -2.44,
+  "max_dd": -70.15,
+  "worst": -39.0,
+  "fresh": {
+   "2017": -25.8,
+   "2019": -31.1,
+   "2021": -39.0,
+   "2023": -17.0
+  },
+  "turnover": 73.1,
+  "hold_days": 1.4
+ },
+ "half|DB-K3-b1.5": {
+  "cagr": 0.94,
+  "excess": 4.45,
+  "max_dd": -46.39,
+  "worst": -37.7,
+  "fresh": {
+   "2017": -25.7,
+   "2019": -31.6,
+   "2021": -37.7,
+   "2023": -14.2
+  },
+  "turnover": 66.7,
+  "hold_days": 1.6
+ },
+ "half|DB-K3-b2": {
+  "cagr": 0.57,
+  "excess": 4.09,
+  "max_dd": -46.19,
+  "worst": -32.1,
+  "fresh": {
+   "2017": -25.6,
+   "2019": -32.1,
+   "2021": -19.1,
+   "2023": -7.2
+  },
+  "turnover": 59.1,
+  "hold_days": 1.8
+ },
+ "half|DB-K3-b3": {
+  "cagr": 6.96,
+  "excess": 10.23,
+  "max_dd": -39.16,
+  "worst": -30.1,
+  "fresh": {
+   "2017": -24.9,
+   "2019": -30.1,
+   "2021": -10.0,
+   "2023": -3.6
+  },
+  "turnover": 50.5,
+  "hold_days": 2.0
+ },
+ "half|DB-K3-b4": {
+  "cagr": 10.16,
+  "excess": 13.24,
+  "max_dd": -38.39,
+  "worst": -18.0,
+  "fresh": {
+   "2017": -11.7,
+   "2019": -18.0,
+   "2021": -4.6,
+   "2023": 0.1
+  },
+  "turnover": 48.3,
+  "hold_days": 2.2
+ },
+ "half|DB-K3-b6": {
+  "cagr": 11.3,
+  "excess": 14.27,
+  "max_dd": -36.99,
+  "worst": -13.2,
+  "fresh": {
+   "2017": -3.8,
+   "2019": -13.2,
+   "2021": -3.4,
+   "2023": 0.1
+  },
+  "turnover": 42.6,
+  "hold_days": 2.5
+ },
+ "half|DB-K3-b8": {
+  "cagr": 11.49,
+  "excess": 14.41,
+  "max_dd": -36.34,
+  "worst": -2.8,
+  "fresh": {
+   "2017": 2.0,
+   "2019": -2.8,
+   "2021": 1.4,
+   "2023": 2.2
+  },
+  "turnover": 38.1,
+  "hold_days": 2.8
+ },
+ "half|DB-K3-b12": {
+  "cagr": 14.7,
+  "excess": 17.29,
+  "max_dd": -35.79,
+  "worst": -2.4,
+  "fresh": {
+   "2017": 3.7,
+   "2019": -2.4,
+   "2021": 3.7,
+   "2023": 6.2
+  },
+  "turnover": 33.6,
+  "hold_days": 3.1
+ },
+ "half|DB-K3-b16": {
+  "cagr": 12.0,
+  "excess": 14.8,
+  "max_dd": -32.21,
+  "worst": -4.0,
+  "fresh": {
+   "2017": -4.0,
+   "2019": -1.9,
+   "2021": 3.0,
+   "2023": 5.8
+  },
+  "turnover": 29.3,
+  "hold_days": 3.6
+ },
+ "half|DB-K4-b1": {
+  "cagr": -19.78,
+  "excess": -19.09,
+  "max_dd": -94.6,
+  "worst": -42.3,
+  "fresh": {
+   "2017": -23.5,
+   "2019": -28.3,
+   "2021": -36.6,
+   "2023": -42.3
+  },
+  "turnover": 63.4,
+  "hold_days": 1.4
+ },
+ "half|DB-K4-b1.5": {
+  "cagr": -19.82,
+  "excess": -19.07,
+  "max_dd": -94.82,
+  "worst": -36.7,
+  "fresh": {
+   "2017": -23.2,
+   "2019": -28.3,
+   "2021": -36.7,
+   "2023": -23.9
+  },
+  "turnover": 59.8,
+  "hold_days": 1.5
+ },
+ "half|DB-K4-b2": {
+  "cagr": -19.83,
+  "excess": -19.06,
+  "max_dd": -94.84,
+  "worst": -35.6,
+  "fresh": {
+   "2017": -23.3,
+   "2019": -28.3,
+   "2021": -35.6,
+   "2023": -17.3
+  },
+  "turnover": 57.4,
+  "hold_days": 1.7
+ },
+ "half|DB-K4-b3": {
+  "cagr": -8.87,
+  "excess": -6.05,
+  "max_dd": -78.28,
+  "worst": -35.3,
+  "fresh": {
+   "2017": -23.3,
+   "2019": -28.3,
+   "2021": -35.3,
+   "2023": -10.9
+  },
+  "turnover": 51.5,
+  "hold_days": 2.1
+ },
+ "half|DB-K4-b4": {
+  "cagr": 3.06,
+  "excess": 6.3,
+  "max_dd": -31.69,
+  "worst": -28.1,
+  "fresh": {
+   "2017": -23.2,
+   "2019": -28.1,
+   "2021": -19.8,
+   "2023": -10.7
+  },
+  "turnover": 44.8,
+  "hold_days": 2.3
+ },
+ "half|DB-K4-b6": {
+  "cagr": 6.74,
+  "excess": 9.83,
+  "max_dd": -28.24,
+  "worst": -17.3,
+  "fresh": {
+   "2017": -16.3,
+   "2019": -17.3,
+   "2021": -8.9,
+   "2023": -5.9
+  },
+  "turnover": 40.3,
+  "hold_days": 2.6
+ },
+ "half|DB-K4-b8": {
+  "cagr": 7.32,
+  "excess": 10.38,
+  "max_dd": -29.48,
+  "worst": -8.6,
+  "fresh": {
+   "2017": -7.0,
+   "2019": -8.6,
+   "2021": -4.9,
+   "2023": -0.3
+  },
+  "turnover": 36.8,
+  "hold_days": 2.9
+ },
+ "half|DB-K4-b12": {
+  "cagr": 10.98,
+  "excess": 13.73,
+  "max_dd": -27.05,
+  "worst": -1.2,
+  "fresh": {
+   "2017": -1.0,
+   "2019": -1.2,
+   "2021": -0.1,
+   "2023": 3.2
+  },
+  "turnover": 31.0,
+  "hold_days": 3.4
+ },
+ "half|DB-K4-b16": {
+  "cagr": 7.43,
+  "excess": 10.44,
+  "max_dd": -28.43,
+  "worst": -22.6,
+  "fresh": {
+   "2017": -22.6,
+   "2019": -4.4,
+   "2021": 0.8,
+   "2023": 2.8
+  },
+  "turnover": 27.9,
+  "hold_days": 3.8
+ },
+ "half|DB-K6-b1": {
+  "cagr": -16.78,
+  "excess": -15.6,
+  "max_dd": -91.24,
+  "worst": -43.9,
+  "fresh": {
+   "2017": -20.0,
+   "2019": -24.5,
+   "2021": -31.3,
+   "2023": -43.9
+  },
+  "turnover": 48.3,
+  "hold_days": 1.3
+ },
+ "half|DB-K6-b1.5": {
+  "cagr": -16.78,
+  "excess": -15.56,
+  "max_dd": -91.6,
+  "worst": -43.8,
+  "fresh": {
+   "2017": -20.0,
+   "2019": -24.4,
+   "2021": -31.3,
+   "2023": -43.8
+  },
+  "turnover": 50.1,
+  "hold_days": 1.4
+ },
+ "half|DB-K6-b2": {
+  "cagr": -16.76,
+  "excess": -15.53,
+  "max_dd": -91.85,
+  "worst": -43.3,
+  "fresh": {
+   "2017": -20.0,
+   "2019": -24.4,
+   "2021": -31.2,
+   "2023": -43.3
+  },
+  "turnover": 48.8,
+  "hold_days": 1.5
+ },
+ "half|DB-K6-b3": {
+  "cagr": -16.94,
+  "excess": -15.64,
+  "max_dd": -92.28,
+  "worst": -42.4,
+  "fresh": {
+   "2017": -20.0,
+   "2019": -24.4,
+   "2021": -31.4,
+   "2023": -42.4
+  },
+  "turnover": 44.4,
+  "hold_days": 1.8
+ },
+ "half|DB-K6-b4": {
+  "cagr": -16.93,
+  "excess": -15.58,
+  "max_dd": -92.09,
+  "worst": -31.3,
+  "fresh": {
+   "2017": -20.0,
+   "2019": -24.4,
+   "2021": -31.3,
+   "2023": -31.1
+  },
+  "turnover": 42.9,
+  "hold_days": 2.0
+ },
+ "half|DB-K6-b6": {
+  "cagr": -16.79,
+  "excess": -15.39,
+  "max_dd": -92.41,
+  "worst": -31.1,
+  "fresh": {
+   "2017": -20.1,
+   "2019": -24.4,
+   "2021": -31.1,
+   "2023": -15.7
+  },
+  "turnover": 39.5,
+  "hold_days": 2.3
+ },
+ "half|DB-K6-b8": {
+  "cagr": -16.77,
+  "excess": -15.37,
+  "max_dd": -92.58,
+  "worst": -31.2,
+  "fresh": {
+   "2017": -20.1,
+   "2019": -24.4,
+   "2021": -31.2,
+   "2023": -10.5
+  },
+  "turnover": 35.8,
+  "hold_days": 2.6
+ },
+ "half|DB-K6-b12": {
+  "cagr": -17.11,
+  "excess": -15.71,
+  "max_dd": -92.9,
+  "worst": -24.4,
+  "fresh": {
+   "2017": -19.9,
+   "2019": -24.4,
+   "2021": -16.7,
+   "2023": -9.5
+  },
+  "turnover": 31.6,
+  "hold_days": 3.2
+ },
+ "half|DB-K6-b16": {
+  "cagr": -2.35,
+  "excess": 0.76,
+  "max_dd": -51.13,
+  "worst": -24.5,
+  "fresh": {
+   "2017": -19.9,
+   "2019": -24.5,
+   "2021": -11.9,
+   "2023": -7.6
+  },
+  "turnover": 26.1,
+  "hold_days": 4.0
+ }
+}

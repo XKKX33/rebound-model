@@ -1,0 +1,1574 @@
+{
+ "last": "2026-10-30",
+ "slips": [
+  -0.002,
+  0.0,
+  0.001,
+  0.002,
+  0.003,
+  0.005,
+  0.0075,
+  0.01,
+  0.015,
+  0.02
+ ],
+ "schedules": {
+  "now": "现状：开盘先卖后买（回测按同一个开盘价）",
+  "open_sell_close_buy": "开盘卖、同一天尾盘（收盘竞价）买",
+  "wait_a_day": "开盘卖、空仓一天、第二天开盘买",
+  "close_sell_prev_rank": "尾盘卖（用前一天的排名）、第二天开盘买",
+  "close_sell_same_day": "尾盘卖（当天排名，偏乐观）、第二天开盘买",
+  "reserve": "留一部分现金：开盘卖的同时用现金在集合竞价买",
+  "half": "永远半仓：开盘卖的同时用另一半现金在集合竞价买"
+ },
+ "rules": {
+  "20000|DB-K2-b8": {
+   "schedules": {
+    "now": {
+     "cagr": 32.48,
+     "excess": 37.83,
+     "excess_ci": [
+      18.41,
+      58.05
+     ],
+     "max_dd": -67.43,
+     "final": 573394.0,
+     "hold_days": 2.6,
+     "turnover": 81.7,
+     "cost_pct": 12.42,
+     "idle_cash_pct": 0.7,
+     "avg_holdings": 2.0,
+     "buys_per_day": 0.78,
+     "funded_share": 100.0,
+     "funded_turnover": 93.6,
+     "fresh": {
+      "2017": 19.0,
+      "2019": 18.1,
+      "2021": 19.9,
+      "2023": 31.8
+     },
+     "worst": 18.1
+    },
+    "open_sell_close_buy": {
+     "cagr": -28.46,
+     "excess": -29.18,
+     "excess_ci": [
+      -47.77,
+      -11.67
+     ],
+     "max_dd": -98.84,
+     "final": 369.0,
+     "hold_days": 2.0,
+     "turnover": 105.1,
+     "cost_pct": 35.78,
+     "idle_cash_pct": 73.3,
+     "avg_holdings": 0.6,
+     "buys_per_day": 0.3,
+     "funded_share": 0.0,
+     "funded_turnover": 0.0,
+     "fresh": {
+      "2017": -33.8,
+      "2019": -17.8,
+      "2021": -1.2,
+      "2023": 7.8
+     },
+     "worst": -33.8,
+     "vs_now": {
+      "diff": -67.01,
+      "ci": [
+       -92.46,
+       -41.88
+      ]
+     },
+     "breakeven_slip": {
+      "excess": ">2",
+      "worst": 0.35
+     }
+    },
+    "wait_a_day": {
+     "cagr": 23.65,
+     "excess": 27.95,
+     "excess_ci": [
+      12.78,
+      44.32
+     ],
+     "max_dd": -47.73,
+     "final": 257064.0,
+     "hold_days": 2.6,
+     "turnover": 54.1,
+     "cost_pct": 8.57,
+     "idle_cash_pct": 36.6,
+     "avg_holdings": 1.9,
+     "buys_per_day": 0.71,
+     "funded_share": 0.0,
+     "funded_turnover": 0.0,
+     "fresh": {
+      "2017": -1.0,
+      "2019": -6.8,
+      "2021": 7.3,
+      "2023": 11.3
+     },
+     "worst": -6.8,
+     "vs_now": {
+      "diff": -9.88,
+      "ci": [
+       -24.04,
+       5.13
+      ]
+     },
+     "breakeven_slip": {
+      "excess": 0.1,
+      "worst": 0.22
+     }
+    },
+    "close_sell_prev_rank": {
+     "cagr": 21.22,
+     "excess": 28.29,
+     "excess_ci": [
+      9.27,
+      49.09
+     ],
+     "max_dd": -67.57,
+     "final": 213355.0,
+     "hold_days": 2.8,
+     "turnover": 59.3,
+     "cost_pct": 9.02,
+     "idle_cash_pct": 26.8,
+     "avg_holdings": 1.5,
+     "buys_per_day": 0.53,
+     "funded_share": 0.0,
+     "funded_turnover": 0.0,
+     "fresh": {
+      "2017": 8.6,
+      "2019": 10.9,
+      "2021": 15.5,
+      "2023": 17.6
+     },
+     "worst": 8.6,
+     "vs_now": {
+      "diff": -9.54,
+      "ci": [
+       -23.36,
+       4.02
+      ]
+     },
+     "breakeven_slip": {
+      "excess": 0.09,
+      "worst": 0.09
+     }
+    },
+    "close_sell_same_day": {
+     "cagr": 36.63,
+     "excess": 40.25,
+     "excess_ci": [
+      21.28,
+      60.51
+     ],
+     "max_dd": -67.32,
+     "final": 875647.0,
+     "hold_days": 2.4,
+     "turnover": 64.7,
+     "cost_pct": 9.84,
+     "idle_cash_pct": 29.7,
+     "avg_holdings": 1.4,
+     "buys_per_day": 0.59,
+     "funded_share": 0.0,
+     "funded_turnover": 0.0,
+     "fresh": {
+      "2017": 21.4,
+      "2019": 15.8,
+      "2021": 19.7,
+      "2023": 21.3
+     },
+     "worst": 15.8,
+     "vs_now": {
+      "diff": 2.42,
+      "ci": [
+       -9.83,
+       14.55
+      ]
+     },
+     "breakeven_slip": {
+      "excess": -0.03,
+      "worst": 0.02
+     }
+    },
+    "reserve": {
+     "cagr": 15.75,
+     "excess": 19.47,
+     "excess_ci": [
+      6.25,
+      32.91
+     ],
+     "max_dd": -48.1,
+     "final": 114663.0,
+     "hold_days": 2.6,
+     "turnover": 50.0,
+     "cost_pct": 7.84,
+     "idle_cash_pct": 41.8,
+     "avg_holdings": 2.0,
+     "buys_per_day": 0.75,
+     "funded_share": 0.0,
+     "funded_turnover": 0.0,
+     "fresh": {
+      "2017": 9.4,
+      "2019": 8.3,
+      "2021": 8.8,
+      "2023": 13.7
+     },
+     "worst": 8.3,
+     "vs_now": {
+      "diff": -18.36,
+      "ci": [
+       -30.03,
+       -6.74
+      ]
+     },
+     "breakeven_slip": {
+      "excess": 0.19,
+      "worst": 0.09
+     }
+    },
+    "half": {
+     "cagr": 14.35,
+     "excess": 17.35,
+     "excess_ci": [
+      5.13,
+      29.63
+     ],
+     "max_dd": -41.07,
+     "final": 99137.0,
+     "hold_days": 2.6,
+     "turnover": 41.8,
+     "cost_pct": 6.59,
+     "idle_cash_pct": 52.4,
+     "avg_holdings": 2.0,
+     "buys_per_day": 0.78,
+     "funded_share": 0.0,
+     "funded_turnover": 0.0,
+     "fresh": {
+      "2017": 6.4,
+      "2019": 3.4,
+      "2021": 4.5,
+      "2023": 11.1
+     },
+     "worst": 3.4,
+     "vs_now": {
+      "diff": -20.49,
+      "ci": [
+       -35.15,
+       -6.2
+      ]
+     },
+     "breakeven_slip": {
+      "excess": 0.22,
+      "worst": 0.14
+     }
+    }
+   },
+   "slip": {
+    "-0.002": {
+     "cagr": 60.15,
+     "excess": 56.94,
+     "excess_ci": [
+      36.63,
+      77.58
+     ],
+     "max_dd": -67.29,
+     "final": 5450751.0,
+     "hold_days": 2.6,
+     "turnover": 75.8,
+     "cost_pct": 11.52,
+     "idle_cash_pct": 0.4,
+     "avg_holdings": 2.0,
+     "buys_per_day": 0.78,
+     "funded_share": 100.0,
+     "funded_turnover": 93.9,
+     "fresh": {
+      "2017": 42.4,
+      "2019": 40.5,
+      "2021": 37.7,
+      "2023": 49.2
+     },
+     "worst": 37.7
+    },
+    "0": {
+     "cagr": 32.48,
+     "excess": 37.83,
+     "excess_ci": [
+      18.41,
+      58.05
+     ],
+     "max_dd": -67.43,
+     "final": 573394.0,
+     "hold_days": 2.6,
+     "turnover": 81.7,
+     "cost_pct": 12.42,
+     "idle_cash_pct": 0.7,
+     "avg_holdings": 2.0,
+     "buys_per_day": 0.78,
+     "funded_share": 100.0,
+     "funded_turnover": 93.6,
+     "fresh": {
+      "2017": 19.0,
+      "2019": 18.1,
+      "2021": 19.9,
+      "2023": 31.8
+     },
+     "worst": 18.1
+    },
+    "0.001": {
+     "cagr": 19.73,
+     "excess": 27.66,
+     "excess_ci": [
+      8.16,
+      47.91
+     ],
+     "max_dd": -70.34,
+     "final": 172846.0,
+     "hold_days": 2.6,
+     "turnover": 86.4,
+     "cost_pct": 13.14,
+     "idle_cash_pct": 1.0,
+     "avg_holdings": 2.0,
+     "buys_per_day": 0.78,
+     "funded_share": 100.0,
+     "funded_turnover": 93.2,
+     "fresh": {
+      "2017": 9.2,
+      "2019": 7.4,
+      "2021": 8.5,
+      "2023": 21.7
+     },
+     "worst": 7.4
+    },
+    "0.002": {
+     "cagr": 9.74,
+     "excess": 18.79,
+     "excess_ci": [
+      -0.61,
+      39.44
+     ],
+     "max_dd": -75.03,
+     "final": 61402.0,
+     "hold_days": 2.6,
+     "turnover": 91.1,
+     "cost_pct": 13.85,
+     "idle_cash_pct": 1.6,
+     "avg_holdings": 2.0,
+     "buys_per_day": 0.78,
+     "funded_share": 100.0,
+     "funded_turnover": 92.5,
+     "fresh": {
+      "2017": 0.5,
+      "2019": -1.9,
+      "2021": 0.2,
+      "2023": 14.3
+     },
+     "worst": -1.9
+    },
+    "0.003": {
+     "cagr": -0.13,
+     "excess": 9.27,
+     "excess_ci": [
+      -10.15,
+      29.53
+     ],
+     "max_dd": -85.37,
+     "final": 20061.0,
+     "hold_days": 2.6,
+     "turnover": 95.7,
+     "cost_pct": 14.77,
+     "idle_cash_pct": 2.6,
+     "avg_holdings": 2.0,
+     "buys_per_day": 0.78,
+     "funded_share": 100.0,
+     "funded_turnover": 91.4,
+     "fresh": {
+      "2017": -31.4,
+      "2019": -19.9,
+      "2021": -11.7,
+      "2023": 7.5
+     },
+     "worst": -31.4
+    },
+    "0.005": {
+     "cagr": -30.22,
+     "excess": -28.21,
+     "excess_ci": [
+      -47.72,
+      -8.99
+     ],
+     "max_dd": -99.61,
+     "final": 286.0,
+     "hold_days": 2.3,
+     "turnover": 106.6,
+     "cost_pct": 20.1,
+     "idle_cash_pct": 38.1,
+     "avg_holdings": 1.3,
+     "buys_per_day": 0.58,
+     "funded_share": 99.6,
+     "funded_turnover": 65.0,
+     "fresh": {
+      "2017": -33.5,
+      "2019": -40.3,
+      "2021": -31.1,
+      "2023": -9.7
+     },
+     "worst": -40.3
+    },
+    "0.0075": {
+     "cagr": -29.05,
+     "excess": -27.59,
+     "excess_ci": [
+      -47.08,
+      -9.3
+     ],
+     "max_dd": -99.46,
+     "final": 346.0,
+     "hold_days": 2.2,
+     "turnover": 108.4,
+     "cost_pct": 24.35,
+     "idle_cash_pct": 59.5,
+     "avg_holdings": 0.9,
+     "buys_per_day": 0.4,
+     "funded_share": 99.0,
+     "funded_turnover": 44.3,
+     "fresh": {
+      "2017": -33.6,
+      "2019": -40.0,
+      "2021": -49.7,
+      "2023": -23.8
+     },
+     "worst": -49.7
+    },
+    "0.01": {
+     "cagr": -28.91,
+     "excess": -27.98,
+     "excess_ci": [
+      -47.11,
+      -9.96
+     ],
+     "max_dd": -99.36,
+     "final": 352.0,
+     "hold_days": 2.1,
+     "turnover": 108.9,
+     "cost_pct": 25.33,
+     "idle_cash_pct": 71.8,
+     "avg_holdings": 0.6,
+     "buys_per_day": 0.3,
+     "funded_share": 99.3,
+     "funded_turnover": 32.1,
+     "fresh": {
+      "2017": -33.7,
+      "2019": -40.1,
+      "2021": -51.9,
+      "2023": -47.0
+     },
+     "worst": -51.9
+    },
+    "0.015": {
+     "cagr": -28.85,
+     "excess": -28.86,
+     "excess_ci": [
+      -51.34,
+      -8.61
+     ],
+     "max_dd": -99.13,
+     "final": 351.0,
+     "hold_days": 1.9,
+     "turnover": 105.5,
+     "cost_pct": 28.52,
+     "idle_cash_pct": 83.6,
+     "avg_holdings": 0.4,
+     "buys_per_day": 0.2,
+     "funded_share": 98.4,
+     "funded_turnover": 20.6,
+     "fresh": {
+      "2017": -33.7,
+      "2019": -40.3,
+      "2021": -51.7,
+      "2023": -64.1
+     },
+     "worst": -64.1
+    },
+    "0.02": {
+     "cagr": -28.53,
+     "excess": -28.61,
+     "excess_ci": [
+      -51.44,
+      -7.76
+     ],
+     "max_dd": -98.81,
+     "final": 365.0,
+     "hold_days": 1.8,
+     "turnover": 100.0,
+     "cost_pct": 27.29,
+     "idle_cash_pct": 88.3,
+     "avg_holdings": 0.3,
+     "buys_per_day": 0.14,
+     "funded_share": 97.3,
+     "funded_turnover": 15.0,
+     "fresh": {
+      "2017": -33.7,
+      "2019": -40.3,
+      "2021": -51.8,
+      "2023": -60.9
+     },
+     "worst": -60.9
+    }
+   },
+   "cross_check": {
+    "cagr": 32.48,
+    "fresh": {
+     "2017": 19.0,
+     "2019": 18.1,
+     "2021": 19.9,
+     "2023": 31.8
+    },
+    "production_cache": {
+     "cagr": 32.48,
+     "fresh": {
+      "2017": 19.0,
+      "2019": 18.1,
+      "2021": 19.9,
+      "2023": 31.8
+     }
+    },
+    "same_as_cache": true
+   }
+  },
+  "20000|DB-K2-b6": {
+   "schedules": {
+    "now": {
+     "cagr": 31.53,
+     "excess": 37.16,
+     "excess_ci": [
+      17.83,
+      56.51
+     ],
+     "max_dd": -70.95,
+     "final": 526472.0,
+     "hold_days": 2.4,
+     "turnover": 91.3,
+     "cost_pct": 13.89,
+     "idle_cash_pct": 0.6,
+     "avg_holdings": 2.0,
+     "buys_per_day": 0.85,
+     "funded_share": 100.0,
+     "funded_turnover": 101.9,
+     "fresh": {
+      "2017": 17.5,
+      "2019": 14.9,
+      "2021": 17.0,
+      "2023": 27.5
+     },
+     "worst": 14.9
+    },
+    "open_sell_close_buy": {
+     "cagr": -28.73,
+     "excess": -29.41,
+     "excess_ci": [
+      -48.19,
+      -10.38
+     ],
+     "max_dd": -98.86,
+     "final": 353.0,
+     "hold_days": 1.9,
+     "turnover": 110.6,
+     "cost_pct": 34.57,
+     "idle_cash_pct": 69.5,
+     "avg_holdings": 0.7,
+     "buys_per_day": 0.35,
+     "funded_share": 0.0,
+     "funded_turnover": 0.0,
+     "fresh": {
+      "2017": -33.5,
+      "2019": -39.3,
+      "2021": -1.8,
+      "2023": 7.8
+     },
+     "worst": -39.3,
+     "vs_now": {
+      "diff": -66.57,
+      "ci": [
+       -91.12,
+       -42.5
+      ]
+     },
+     "breakeven_slip": {
+      "excess": ">2",
+      "worst": 0.29
+     }
+    },
+    "wait_a_day": {
+     "cagr": 5.79,
+     "excess": 12.05,
+     "excess_ci": [
+      -5.27,
+      29.71
+     ],
+     "max_dd": -70.9,
+     "final": 40537.0,
+     "hold_days": 2.4,
+     "turnover": 61.4,
+     "cost_pct": 10.66,
+     "idle_cash_pct": 35.9,
+     "avg_holdings": 1.8,
+     "buys_per_day": 0.77,
+     "funded_share": 0.0,
+     "funded_turnover": 0.0,
+     "fresh": {
+      "2017": 10.1,
+      "2019": 3.4,
+      "2021": 7.0,
+      "2023": 7.2
+     },
+     "worst": 3.4,
+     "vs_now": {
+      "diff": -25.11,
+      "ci": [
+       -39.19,
+       -11.75
+      ]
+     },
+     "breakeven_slip": {
+      "excess": 0.24,
+      "worst": 0.09
+     }
+    },
+    "close_sell_prev_rank": {
+     "cagr": 29.04,
+     "excess": 34.58,
+     "excess_ci": [
+      14.94,
+      55.55
+     ],
+     "max_dd": -70.58,
+     "final": 447240.0,
+     "hold_days": 2.6,
+     "turnover": 60.6,
+     "cost_pct": 9.21,
+     "idle_cash_pct": 28.1,
+     "avg_holdings": 1.4,
+     "buys_per_day": 0.55,
+     "funded_share": 0.0,
+     "funded_turnover": 0.0,
+     "fresh": {
+      "2017": 16.5,
+      "2019": 14.1,
+      "2021": 18.1,
+      "2023": 21.4
+     },
+     "worst": 14.1,
+     "vs_now": {
+      "diff": -2.57,
+      "ci": [
+       -16.45,
+       10.91
+      ]
+     },
+     "breakeven_slip": {
+      "excess": 0.02,
+      "worst": 0.01
+     }
+    },
+    "close_sell_same_day": {
+     "cagr": 27.68,
+     "excess": 33.4,
+     "excess_ci": [
+      14.74,
+      53.09
+     ],
+     "max_dd": -68.75,
+     "final": 392760.0,
+     "hold_days": 2.2,
+     "turnover": 70.7,
+     "cost_pct": 10.74,
+     "idle_cash_pct": 31.5,
+     "avg_holdings": 1.4,
+     "buys_per_day": 0.62,
+     "funded_share": 0.0,
+     "funded_turnover": 0.0,
+     "fresh": {
+      "2017": 9.9,
+      "2019": 5.7,
+      "2021": 7.7,
+      "2023": 16.4
+     },
+     "worst": 5.7,
+     "vs_now": {
+      "diff": -3.75,
+      "ci": [
+       -14.26,
+       7.37
+      ]
+     },
+     "breakeven_slip": {
+      "excess": 0.03,
+      "worst": 0.07
+     }
+    },
+    "reserve": {
+     "cagr": 17.69,
+     "excess": 21.15,
+     "excess_ci": [
+      7.95,
+      34.57
+     ],
+     "max_dd": -44.69,
+     "final": 139579.0,
+     "hold_days": 2.4,
+     "turnover": 54.6,
+     "cost_pct": 8.51,
+     "idle_cash_pct": 41.9,
+     "avg_holdings": 1.9,
+     "buys_per_day": 0.82,
+     "funded_share": 0.0,
+     "funded_turnover": 0.0,
+     "fresh": {
+      "2017": 11.2,
+      "2019": 7.7,
+      "2021": 7.4,
+      "2023": 11.5
+     },
+     "worst": 7.4,
+     "vs_now": {
+      "diff": -16.01,
+      "ci": [
+       -27.22,
+       -4.42
+      ]
+     },
+     "breakeven_slip": {
+      "excess": 0.15,
+      "worst": 0.06
+     }
+    },
+    "half": {
+     "cagr": 14.41,
+     "excess": 17.41,
+     "excess_ci": [
+      5.43,
+      29.73
+     ],
+     "max_dd": -42.04,
+     "final": 99694.0,
+     "hold_days": 2.4,
+     "turnover": 45.8,
+     "cost_pct": 7.22,
+     "idle_cash_pct": 52.4,
+     "avg_holdings": 2.0,
+     "buys_per_day": 0.85,
+     "funded_share": 0.0,
+     "funded_turnover": 0.0,
+     "fresh": {
+      "2017": 7.7,
+      "2019": 1.7,
+      "2021": 3.9,
+      "2023": 10.2
+     },
+     "worst": 1.7,
+     "vs_now": {
+      "diff": -19.74,
+      "ci": [
+       -33.88,
+       -5.79
+      ]
+     },
+     "breakeven_slip": {
+      "excess": 0.18,
+      "worst": 0.1
+     }
+    }
+   },
+   "slip": {
+    "-0.002": {
+     "cagr": 61.94,
+     "excess": 58.08,
+     "excess_ci": [
+      38.49,
+      77.95
+     ],
+     "max_dd": -69.54,
+     "final": 6217778.0,
+     "hold_days": 2.4,
+     "turnover": 83.3,
+     "cost_pct": 12.66,
+     "idle_cash_pct": 0.4,
+     "avg_holdings": 2.0,
+     "buys_per_day": 0.85,
+     "funded_share": 100.0,
+     "funded_turnover": 102.2,
+     "fresh": {
+      "2017": 44.4,
+      "2019": 36.9,
+      "2021": 38.6,
+      "2023": 48.8
+     },
+     "worst": 36.9
+    },
+    "0": {
+     "cagr": 31.53,
+     "excess": 37.16,
+     "excess_ci": [
+      17.83,
+      56.51
+     ],
+     "max_dd": -70.95,
+     "final": 526472.0,
+     "hold_days": 2.4,
+     "turnover": 91.3,
+     "cost_pct": 13.89,
+     "idle_cash_pct": 0.6,
+     "avg_holdings": 2.0,
+     "buys_per_day": 0.85,
+     "funded_share": 100.0,
+     "funded_turnover": 101.9,
+     "fresh": {
+      "2017": 17.5,
+      "2019": 14.9,
+      "2021": 17.0,
+      "2023": 27.5
+     },
+     "worst": 14.9
+    },
+    "0.001": {
+     "cagr": 18.07,
+     "excess": 26.29,
+     "excess_ci": [
+      7.03,
+      45.8
+     ],
+     "max_dd": -74.52,
+     "final": 146469.0,
+     "hold_days": 2.4,
+     "turnover": 97.4,
+     "cost_pct": 14.81,
+     "idle_cash_pct": 1.0,
+     "avg_holdings": 2.0,
+     "buys_per_day": 0.85,
+     "funded_share": 100.0,
+     "funded_turnover": 101.4,
+     "fresh": {
+      "2017": 8.3,
+      "2019": 2.0,
+      "2021": 7.6,
+      "2023": 17.1
+     },
+     "worst": 2.0
+    },
+    "0.002": {
+     "cagr": 5.94,
+     "excess": 15.28,
+     "excess_ci": [
+      -3.95,
+      34.54
+     ],
+     "max_dd": -81.8,
+     "final": 40467.0,
+     "hold_days": 2.4,
+     "turnover": 103.2,
+     "cost_pct": 15.7,
+     "idle_cash_pct": 1.8,
+     "avg_holdings": 2.0,
+     "buys_per_day": 0.85,
+     "funded_share": 100.0,
+     "funded_turnover": 100.5,
+     "fresh": {
+      "2017": -4.9,
+      "2019": -16.9,
+      "2021": -5.3,
+      "2023": 7.6
+     },
+     "worst": -16.9
+    },
+    "0.003": {
+     "cagr": -2.38,
+     "excess": 7.05,
+     "excess_ci": [
+      -12.05,
+      26.33
+     ],
+     "max_dd": -88.65,
+     "final": 15318.0,
+     "hold_days": 2.4,
+     "turnover": 106.7,
+     "cost_pct": 16.79,
+     "idle_cash_pct": 3.0,
+     "avg_holdings": 2.0,
+     "buys_per_day": 0.85,
+     "funded_share": 100.0,
+     "funded_turnover": 99.5,
+     "fresh": {
+      "2017": -34.9,
+      "2019": -42.1,
+      "2021": -14.6,
+      "2023": 0.7
+     },
+     "worst": -42.1
+    },
+    "0.005": {
+     "cagr": -28.83,
+     "excess": -26.35,
+     "excess_ci": [
+      -47.64,
+      -5.61
+     ],
+     "max_dd": -99.52,
+     "final": 361.0,
+     "hold_days": 2.1,
+     "turnover": 115.7,
+     "cost_pct": 21.21,
+     "idle_cash_pct": 42.4,
+     "avg_holdings": 1.2,
+     "buys_per_day": 0.59,
+     "funded_share": 99.8,
+     "funded_turnover": 67.5,
+     "fresh": {
+      "2017": -33.7,
+      "2019": -41.7,
+      "2021": -44.1,
+      "2023": -13.8
+     },
+     "worst": -44.1
+    },
+    "0.0075": {
+     "cagr": -29.14,
+     "excess": -27.61,
+     "excess_ci": [
+      -47.66,
+      -8.72
+     ],
+     "max_dd": -99.48,
+     "final": 341.0,
+     "hold_days": 2.0,
+     "turnover": 116.1,
+     "cost_pct": 25.99,
+     "idle_cash_pct": 60.2,
+     "avg_holdings": 0.9,
+     "buys_per_day": 0.43,
+     "funded_share": 99.3,
+     "funded_turnover": 46.9,
+     "fresh": {
+      "2017": -33.6,
+      "2019": -40.1,
+      "2021": -49.7,
+      "2023": -38.7
+     },
+     "worst": -49.7
+    },
+    "0.01": {
+     "cagr": -28.93,
+     "excess": -28.5,
+     "excess_ci": [
+      -49.79,
+      -7.94
+     ],
+     "max_dd": -99.36,
+     "final": 351.0,
+     "hold_days": 1.8,
+     "turnover": 116.7,
+     "cost_pct": 28.75,
+     "idle_cash_pct": 74.3,
+     "avg_holdings": 0.6,
+     "buys_per_day": 0.31,
+     "funded_share": 97.8,
+     "funded_turnover": 32.7,
+     "fresh": {
+      "2017": -33.7,
+      "2019": -40.5,
+      "2021": -51.6,
+      "2023": -64.2
+     },
+     "worst": -64.2
+    },
+    "0.015": {
+     "cagr": -28.63,
+     "excess": -28.58,
+     "excess_ci": [
+      -51.35,
+      -7.71
+     ],
+     "max_dd": -99.07,
+     "final": 364.0,
+     "hold_days": 1.9,
+     "turnover": 109.1,
+     "cost_pct": 29.71,
+     "idle_cash_pct": 82.7,
+     "avg_holdings": 0.4,
+     "buys_per_day": 0.2,
+     "funded_share": 98.1,
+     "funded_turnover": 21.3,
+     "fresh": {
+      "2017": -33.6,
+      "2019": -40.5,
+      "2021": -51.8,
+      "2023": -58.8
+     },
+     "worst": -58.8
+    },
+    "0.02": {
+     "cagr": -28.73,
+     "excess": -28.96,
+     "excess_ci": [
+      -53.02,
+      -7.09
+     ],
+     "max_dd": -98.81,
+     "final": 353.0,
+     "hold_days": 1.7,
+     "turnover": 105.1,
+     "cost_pct": 28.85,
+     "idle_cash_pct": 89.2,
+     "avg_holdings": 0.2,
+     "buys_per_day": 0.15,
+     "funded_share": 97.8,
+     "funded_turnover": 15.4,
+     "fresh": {
+      "2017": -33.4,
+      "2019": -40.4,
+      "2021": -52.0,
+      "2023": -62.5
+     },
+     "worst": -62.5
+    }
+   },
+   "cross_check": {
+    "cagr": 31.53,
+    "fresh": {
+     "2017": 17.5,
+     "2019": 14.9,
+     "2021": 17.0,
+     "2023": 27.5
+    },
+    "production_cache": {
+     "cagr": 31.53,
+     "fresh": {
+      "2017": 17.5,
+      "2019": 14.9,
+      "2021": 17.0,
+      "2023": 27.5
+     }
+    },
+    "same_as_cache": true
+   }
+  },
+  "200000|DB-K30-b6": {
+   "schedules": {
+    "now": {
+     "cagr": 28.68,
+     "excess": 31.22,
+     "excess_ci": [
+      22.47,
+      39.99
+     ],
+     "max_dd": -51.68,
+     "final": 4027455.0,
+     "hold_days": 3.8,
+     "turnover": 55.8,
+     "cost_pct": 8.49,
+     "idle_cash_pct": 0.1,
+     "avg_holdings": 30.0,
+     "buys_per_day": 7.8,
+     "funded_share": 100.0,
+     "funded_turnover": 63.5,
+     "fresh": {
+      "2017": 17.6,
+      "2019": 17.1,
+      "2021": 8.2,
+      "2023": 6.5
+     },
+     "worst": 6.5
+    },
+    "open_sell_close_buy": {
+     "cagr": -4.42,
+     "excess": -0.04,
+     "excess_ci": [
+      -8.63,
+      9.1
+     ],
+     "max_dd": -74.73,
+     "final": 113470.0,
+     "hold_days": 3.8,
+     "turnover": 65.1,
+     "cost_pct": 15.34,
+     "idle_cash_pct": 0.5,
+     "avg_holdings": 30.0,
+     "buys_per_day": 7.84,
+     "funded_share": 0.0,
+     "funded_turnover": 0.0,
+     "fresh": {
+      "2017": -5.7,
+      "2019": 1.3,
+      "2021": -2.4,
+      "2023": 1.2
+     },
+     "worst": -5.7,
+     "vs_now": {
+      "diff": -31.26,
+      "ci": [
+       -38.25,
+       -24.48
+      ]
+     },
+     "breakeven_slip": {
+      "excess": 0.42,
+      "worst": 0.22
+     }
+    },
+    "wait_a_day": {
+     "cagr": 18.44,
+     "excess": 21.62,
+     "excess_ci": [
+      13.44,
+      29.98
+     ],
+     "max_dd": -48.02,
+     "final": 1512118.0,
+     "hold_days": 4.0,
+     "turnover": 44.8,
+     "cost_pct": 6.96,
+     "idle_cash_pct": 19.8,
+     "avg_holdings": 25.7,
+     "buys_per_day": 6.32,
+     "funded_share": 0.0,
+     "funded_turnover": 0.0,
+     "fresh": {
+      "2017": 9.7,
+      "2019": 9.1,
+      "2021": 2.2,
+      "2023": 2.9
+     },
+     "worst": 2.2,
+     "vs_now": {
+      "diff": -9.61,
+      "ci": [
+       -13.56,
+       -5.77
+      ]
+     },
+     "breakeven_slip": {
+      "excess": 0.15,
+      "worst": 0.09
+     }
+    },
+    "close_sell_prev_rank": {
+     "cagr": 23.63,
+     "excess": 26.9,
+     "excess_ci": [
+      18.39,
+      35.49
+     ],
+     "max_dd": -52.68,
+     "final": 2502414.0,
+     "hold_days": 4.1,
+     "turnover": 43.3,
+     "cost_pct": 6.6,
+     "idle_cash_pct": 19.6,
+     "avg_holdings": 24.2,
+     "buys_per_day": 5.8,
+     "funded_share": 0.0,
+     "funded_turnover": 0.0,
+     "fresh": {
+      "2017": 14.1,
+      "2019": 13.8,
+      "2021": 7.0,
+      "2023": 7.8
+     },
+     "worst": 7.0,
+     "vs_now": {
+      "diff": -4.33,
+      "ci": [
+       -8.05,
+       -0.63
+      ]
+     },
+     "breakeven_slip": {
+      "excess": 0.07,
+      "worst": -0.01
+     }
+    },
+    "close_sell_same_day": {
+     "cagr": 25.54,
+     "excess": 28.57,
+     "excess_ci": [
+      19.66,
+      37.77
+     ],
+     "max_dd": -57.12,
+     "final": 2984253.0,
+     "hold_days": 3.5,
+     "turnover": 48.7,
+     "cost_pct": 7.42,
+     "idle_cash_pct": 22.3,
+     "avg_holdings": 23.4,
+     "buys_per_day": 6.59,
+     "funded_share": 0.0,
+     "funded_turnover": 0.0,
+     "fresh": {
+      "2017": 15.9,
+      "2019": 15.1,
+      "2021": 10.1,
+      "2023": 7.3
+     },
+     "worst": 7.3,
+     "vs_now": {
+      "diff": -2.65,
+      "ci": [
+       -6.4,
+       0.8
+      ]
+     },
+     "breakeven_slip": {
+      "excess": 0.04,
+      "worst": -0.01
+     }
+    },
+    "reserve": {
+     "cagr": 18.67,
+     "excess": 21.72,
+     "excess_ci": [
+      13.8,
+      30.24
+     ],
+     "max_dd": -44.78,
+     "final": 1544382.0,
+     "hold_days": 4.0,
+     "turnover": 45.3,
+     "cost_pct": 6.99,
+     "idle_cash_pct": 20.7,
+     "avg_holdings": 27.5,
+     "buys_per_day": 6.89,
+     "funded_share": 0.0,
+     "funded_turnover": 0.0,
+     "fresh": {
+      "2017": 9.3,
+      "2019": 9.0,
+      "2021": 4.1,
+      "2023": 2.2
+     },
+     "worst": 2.2,
+     "vs_now": {
+      "diff": -9.5,
+      "ci": [
+       -13.75,
+       -5.54
+      ]
+     },
+     "breakeven_slip": {
+      "excess": 0.14,
+      "worst": 0.09
+     }
+    },
+    "half": {
+     "cagr": 11.76,
+     "excess": 14.24,
+     "excess_ci": [
+      4.6,
+      24.04
+     ],
+     "max_dd": -25.39,
+     "final": 746298.0,
+     "hold_days": 3.8,
+     "turnover": 28.4,
+     "cost_pct": 5.23,
+     "idle_cash_pct": 53.0,
+     "avg_holdings": 30.0,
+     "buys_per_day": 7.87,
+     "funded_share": 0.0,
+     "funded_turnover": 0.0,
+     "fresh": {
+      "2017": 2.9,
+      "2019": 3.4,
+      "2021": -0.7,
+      "2023": -0.3
+     },
+     "worst": -0.7,
+     "vs_now": {
+      "diff": -16.98,
+      "ci": [
+       -25.76,
+       -8.05
+      ]
+     },
+     "breakeven_slip": {
+      "excess": 0.25,
+      "worst": 0.14
+     }
+    }
+   },
+   "slip": {
+    "-0.002": {
+     "cagr": 46.38,
+     "excess": 44.16,
+     "excess_ci": [
+      35.27,
+      53.13
+     ],
+     "max_dd": -50.04,
+     "final": 18590088.0,
+     "hold_days": 3.8,
+     "turnover": 52.0,
+     "cost_pct": 7.9,
+     "idle_cash_pct": 0.1,
+     "avg_holdings": 30.0,
+     "buys_per_day": 7.8,
+     "funded_share": 100.0,
+     "funded_turnover": 63.6,
+     "fresh": {
+      "2017": 33.3,
+      "2019": 33.3,
+      "2021": 21.8,
+      "2023": 17.8
+     },
+     "worst": 17.8
+    },
+    "0": {
+     "cagr": 28.68,
+     "excess": 31.22,
+     "excess_ci": [
+      22.47,
+      39.99
+     ],
+     "max_dd": -51.68,
+     "final": 4027455.0,
+     "hold_days": 3.8,
+     "turnover": 55.8,
+     "cost_pct": 8.49,
+     "idle_cash_pct": 0.1,
+     "avg_holdings": 30.0,
+     "buys_per_day": 7.8,
+     "funded_share": 100.0,
+     "funded_turnover": 63.5,
+     "fresh": {
+      "2017": 17.6,
+      "2019": 17.1,
+      "2021": 8.2,
+      "2023": 6.5
+     },
+     "worst": 6.5
+    },
+    "0.001": {
+     "cagr": 20.44,
+     "excess": 24.59,
+     "excess_ci": [
+      16.04,
+      33.22
+     ],
+     "max_dd": -52.9,
+     "final": 1833766.0,
+     "hold_days": 3.8,
+     "turnover": 58.1,
+     "cost_pct": 8.84,
+     "idle_cash_pct": 0.1,
+     "avg_holdings": 30.0,
+     "buys_per_day": 7.81,
+     "funded_share": 100.0,
+     "funded_turnover": 63.5,
+     "fresh": {
+      "2017": 9.9,
+      "2019": 10.0,
+      "2021": 2.1,
+      "2023": 1.6
+     },
+     "worst": 1.6
+    },
+    "0.002": {
+     "cagr": 12.78,
+     "excess": 18.0,
+     "excess_ci": [
+      9.67,
+      26.51
+     ],
+     "max_dd": -53.71,
+     "final": 841514.0,
+     "hold_days": 3.8,
+     "turnover": 60.5,
+     "cost_pct": 9.22,
+     "idle_cash_pct": 0.1,
+     "avg_holdings": 30.0,
+     "buys_per_day": 7.81,
+     "funded_share": 100.0,
+     "funded_turnover": 63.4,
+     "fresh": {
+      "2017": 1.9,
+      "2019": 2.9,
+      "2021": -4.8,
+      "2023": -2.9
+     },
+     "worst": -4.8
+    },
+    "0.003": {
+     "cagr": 5.22,
+     "excess": 11.05,
+     "excess_ci": [
+      2.74,
+      19.47
+     ],
+     "max_dd": -54.53,
+     "final": 368849.0,
+     "hold_days": 3.8,
+     "turnover": 63.0,
+     "cost_pct": 9.61,
+     "idle_cash_pct": 0.2,
+     "avg_holdings": 30.0,
+     "buys_per_day": 7.81,
+     "funded_share": 100.0,
+     "funded_turnover": 63.4,
+     "fresh": {
+      "2017": -8.9,
+      "2019": -5.1,
+      "2021": -10.4,
+      "2023": -8.7
+     },
+     "worst": -10.4
+    },
+    "0.005": {
+     "cagr": -12.03,
+     "excess": -6.9,
+     "excess_ci": [
+      -15.04,
+      1.4
+     ],
+     "max_dd": -90.98,
+     "final": 44096.0,
+     "hold_days": 3.8,
+     "turnover": 68.7,
+     "cost_pct": 13.51,
+     "idle_cash_pct": 0.4,
+     "avg_holdings": 30.0,
+     "buys_per_day": 7.91,
+     "funded_share": 100.0,
+     "funded_turnover": 63.9,
+     "fresh": {
+      "2017": -30.2,
+      "2019": -35.8,
+      "2021": -24.6,
+      "2023": -16.9
+     },
+     "worst": -35.8
+    },
+    "0.0075": {
+     "cagr": -25.87,
+     "excess": -24.87,
+     "excess_ci": [
+      -39.93,
+      -10.76
+     ],
+     "max_dd": -98.67,
+     "final": 5777.0,
+     "hold_days": 3.1,
+     "turnover": 70.1,
+     "cost_pct": 18.73,
+     "idle_cash_pct": 47.1,
+     "avg_holdings": 16.0,
+     "buys_per_day": 5.08,
+     "funded_share": 97.9,
+     "funded_turnover": 39.8,
+     "fresh": {
+      "2017": -30.3,
+      "2019": -36.4,
+      "2021": -45.4,
+      "2023": -28.6
+     },
+     "worst": -45.4
+    },
+    "0.01": {
+     "cagr": -25.91,
+     "excess": -25.26,
+     "excess_ci": [
+      -38.77,
+      -11.61
+     ],
+     "max_dd": -98.55,
+     "final": 5721.0,
+     "hold_days": 3.2,
+     "turnover": 69.0,
+     "cost_pct": 20.13,
+     "idle_cash_pct": 60.8,
+     "avg_holdings": 11.9,
+     "buys_per_day": 3.72,
+     "funded_share": 95.5,
+     "funded_turnover": 28.4,
+     "fresh": {
+      "2017": -30.3,
+      "2019": -36.4,
+      "2021": -45.6,
+      "2023": -39.4
+     },
+     "worst": -45.6
+    },
+    "0.015": {
+     "cagr": -25.86,
+     "excess": -25.72,
+     "excess_ci": [
+      -39.96,
+      -10.77
+     ],
+     "max_dd": -98.2,
+     "final": 5712.0,
+     "hold_days": 3.0,
+     "turnover": 67.5,
+     "cost_pct": 23.47,
+     "idle_cash_pct": 75.8,
+     "avg_holdings": 7.3,
+     "buys_per_day": 2.44,
+     "funded_share": 91.1,
+     "funded_turnover": 17.6,
+     "fresh": {
+      "2017": -30.3,
+      "2019": -36.4,
+      "2021": -45.6,
+      "2023": -59.6
+     },
+     "worst": -59.6
+    },
+    "0.02": {
+     "cagr": -25.8,
+     "excess": -25.71,
+     "excess_ci": [
+      -43.23,
+      -8.84
+     ],
+     "max_dd": -97.81,
+     "final": 5707.0,
+     "hold_days": 2.8,
+     "turnover": 64.7,
+     "cost_pct": 24.51,
+     "idle_cash_pct": 82.4,
+     "avg_holdings": 5.4,
+     "buys_per_day": 1.93,
+     "funded_share": 88.7,
+     "funded_turnover": 13.5,
+     "fresh": {
+      "2017": -30.3,
+      "2019": -36.4,
+      "2021": -45.6,
+      "2023": -60.0
+     },
+     "worst": -60.0
+    }
+   },
+   "cross_check": {
+    "cagr": 28.68,
+    "fresh": {
+     "2017": 17.6,
+     "2019": 17.1,
+     "2021": 8.2,
+     "2023": 6.5
+    },
+    "production_cache": {
+     "cagr": 28.68,
+     "fresh": {
+      "2017": 17.6,
+      "2019": 17.1,
+      "2021": 8.2,
+      "2023": 6.5
+     }
+    },
+    "same_as_cache": true
+   }
+  }
+ }
+}

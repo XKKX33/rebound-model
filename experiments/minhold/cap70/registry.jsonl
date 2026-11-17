@@ -1,0 +1,1 @@
+{"at": "2026-11-01T00:45:59", "stage": "run_minhold", "fingerprint": "08957bf821d1", "config": {"capital": [20000, 200000], "rules": ["primary"], "ns": [1, 4, 2, 3, 5, 6, 8, 10], "fee": "min5", "fresh": true, "delist": true, "runs": 32}, "metrics": {"delist_rows": 39, "delist_new": 12, "delist_codes": 16}}

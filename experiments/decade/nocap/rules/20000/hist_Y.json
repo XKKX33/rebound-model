@@ -1,0 +1,73 @@
+{
+"FH-K6-next-o1o5": {
+"days": 2857,
+"total": -76.59,
+"cagr": -11.57,
+"excess": -9.51,
+"excess_ci": [
+-22.83,
+3.96
+],
+"beta": 0.327,
+"alpha": -10.71,
+"max_dd": -86.11,
+"years": {
+"2015": {
+"total": -32.22,
+"excess": -90.34
+},
+"2016": {
+"total": -56.91,
+"excess": -61.8
+},
+"2017": {
+"total": -11.58,
+"excess": 4.83
+},
+"2018": {
+"total": -4.73,
+"excess": 54.24
+},
+"2019": {
+"total": -0.92,
+"excess": -11.72
+},
+"2020": {
+"total": -1.76,
+"excess": -17.24
+},
+"2021": {
+"total": 0.0,
+"excess": -13.59
+},
+"2022": {
+"total": -1.11,
+"excess": 19.44
+},
+"2023": {
+"total": 0.0,
+"excess": 9.02
+},
+"2024": {
+"total": -1.23,
+"excess": 2.35
+},
+"2025": {
+"total": 0.08,
+"excess": -21.88
+},
+"2026": {
+"total": 0.0,
+"excess": 17.23
+}
+},
+"final": 4520.0,
+"buys_per_day": 0.72,
+"hold_days": 4.2,
+"turnover": 15.3,
+"cost_pct": 29.39,
+"idle_cash_pct": 89.3,
+"avg_holdings": 3.0,
+"poor_buys": 3581934
+}
+}

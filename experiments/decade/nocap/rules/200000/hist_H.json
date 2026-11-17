@@ -1,0 +1,286 @@
+{
+"DB-K1-b16-o1o5": {
+"days": 2857,
+"total": 1760.79,
+"cagr": 28.1,
+"excess": 37.31,
+"excess_ci": [
+9.9,
+65.55
+],
+"beta": 0.847,
+"alpha": 37.04,
+"max_dd": -77.57,
+"years": {
+"2015": {
+"total": 42.81,
+"excess": 4.99
+},
+"2016": {
+"total": 55.12,
+"excess": 76.63
+},
+"2017": {
+"total": -20.24,
+"excess": 3.5
+},
+"2018": {
+"total": 82.22,
+"excess": 138.14
+},
+"2019": {
+"total": 197.48,
+"excess": 105.22
+},
+"2020": {
+"total": -62.76,
+"excess": -100.99
+},
+"2021": {
+"total": 5.3,
+"excess": -3.57
+},
+"2022": {
+"total": 94.85,
+"excess": 94.59
+},
+"2023": {
+"total": -23.88,
+"excess": -16.1
+},
+"2024": {
+"total": 172.24,
+"excess": 113.37
+},
+"2025": {
+"total": 83.61,
+"excess": 40.75
+},
+"2026": {
+"total": -33.18,
+"excess": -22.74
+}
+},
+"final": 3658120.0,
+"buys_per_day": 0.38,
+"hold_days": 2.6,
+"turnover": 75.6,
+"cost_pct": 13.48,
+"idle_cash_pct": 0.2,
+"avg_holdings": 1.0,
+"poor_buys": 0
+},
+"DB-K2-b16-o1o5": {
+"days": 2857,
+"total": 3524.78,
+"cagr": 35.54,
+"excess": 39.33,
+"excess_ci": [
+19.52,
+58.87
+],
+"beta": 0.866,
+"alpha": 39.09,
+"max_dd": -73.22,
+"years": {
+"2015": {
+"total": 79.19,
+"excess": 23.29
+},
+"2016": {
+"total": 112.93,
+"excess": 104.34
+},
+"2017": {
+"total": 10.36,
+"excess": 31.56
+},
+"2018": {
+"total": 64.03,
+"excess": 120.4
+},
+"2019": {
+"total": 46.19,
+"excess": 31.01
+},
+"2020": {
+"total": -27.88,
+"excess": -41.91
+},
+"2021": {
+"total": 9.32,
+"excess": -1.55
+},
+"2022": {
+"total": 48.97,
+"excess": 65.33
+},
+"2023": {
+"total": 24.55,
+"excess": 32.15
+},
+"2024": {
+"total": 88.11,
+"excess": 72.26
+},
+"2025": {
+"total": 53.06,
+"excess": 22.44
+},
+"2026": {
+"total": -14.78,
+"excess": 4.59
+}
+},
+"final": 7665297.0,
+"buys_per_day": 0.65,
+"hold_days": 3.1,
+"turnover": 64.8,
+"cost_pct": 11.43,
+"idle_cash_pct": 0.1,
+"avg_holdings": 2.0,
+"poor_buys": 0
+},
+"DB-K1-b12-o1o5": {
+"days": 2857,
+"total": 1641.1,
+"cagr": 27.38,
+"excess": 36.66,
+"excess_ci": [
+10.9,
+63.4
+],
+"beta": 0.856,
+"alpha": 36.4,
+"max_dd": -77.73,
+"years": {
+"2015": {
+"total": 69.06,
+"excess": 23.29
+},
+"2016": {
+"total": 63.96,
+"excess": 81.64
+},
+"2017": {
+"total": -20.45,
+"excess": 2.87
+},
+"2018": {
+"total": 35.27,
+"excess": 107.52
+},
+"2019": {
+"total": 236.74,
+"excess": 117.53
+},
+"2020": {
+"total": -62.94,
+"excess": -101.32
+},
+"2021": {
+"total": 3.93,
+"excess": -4.94
+},
+"2022": {
+"total": 79.04,
+"excess": 85.9
+},
+"2023": {
+"total": -20.0,
+"excess": -11.07
+},
+"2024": {
+"total": 146.95,
+"excess": 103.6
+},
+"2025": {
+"total": 73.99,
+"excess": 35.45
+},
+"2026": {
+"total": -26.86,
+"excess": -11.71
+}
+},
+"final": 3422824.0,
+"buys_per_day": 0.42,
+"hold_days": 2.4,
+"turnover": 87.2,
+"cost_pct": 15.63,
+"idle_cash_pct": 0.2,
+"avg_holdings": 1.0,
+"poor_buys": 0
+},
+"DB-K3-b16-o1o5": {
+"days": 2857,
+"total": 2533.06,
+"cagr": 31.92,
+"excess": 35.52,
+"excess_ci": [
+18.28,
+52.86
+],
+"beta": 0.873,
+"alpha": 35.29,
+"max_dd": -69.61,
+"years": {
+"2015": {
+"total": 101.84,
+"excess": 32.96
+},
+"2016": {
+"total": 104.75,
+"excess": 99.02
+},
+"2017": {
+"total": 6.73,
+"excess": 27.33
+},
+"2018": {
+"total": 32.67,
+"excess": 96.83
+},
+"2019": {
+"total": 52.24,
+"excess": 34.05
+},
+"2020": {
+"total": -20.47,
+"excess": -33.23
+},
+"2021": {
+"total": 2.44,
+"excess": -8.58
+},
+"2022": {
+"total": 27.83,
+"excess": 49.0
+},
+"2023": {
+"total": -0.29,
+"excess": 9.79
+},
+"2024": {
+"total": 95.88,
+"excess": 75.92
+},
+"2025": {
+"total": 53.44,
+"excess": 22.22
+},
+"2026": {
+"total": -5.32,
+"excess": 16.5
+}
+},
+"final": 5568794.0,
+"buys_per_day": 0.92,
+"hold_days": 3.3,
+"turnover": 62.7,
+"cost_pct": 11.28,
+"idle_cash_pct": 0.1,
+"avg_holdings": 3.0,
+"poor_buys": 0
+}
+}

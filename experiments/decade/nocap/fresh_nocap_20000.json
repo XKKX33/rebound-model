@@ -1,0 +1,198 @@
+{
+ "20000|M|DB-K2-b6-o1o5|min5|2017": {
+  "first_year": 18.2,
+  "cagr": 23.5,
+  "max_dd": -48.4,
+  "final_x": 7.96,
+  "pool_cagr": -8.3
+ },
+ "20000|M|DB-K2-b6-o1o5|min5|2019": {
+  "first_year": 102.8,
+  "cagr": 21.3,
+  "max_dd": -49.9,
+  "final_x": 4.52,
+  "pool_cagr": -0.3
+ },
+ "20000|M|DB-K2-b6-o1o5|min5|2021": {
+  "first_year": 12.9,
+  "cagr": 25.8,
+  "max_dd": -47.1,
+  "final_x": 3.77,
+  "pool_cagr": -4.2
+ },
+ "20000|M|DB-K2-b6-o1o5|min5|2023": {
+  "first_year": 5.5,
+  "cagr": 24.8,
+  "max_dd": -47.7,
+  "final_x": 2.31,
+  "pool_cagr": -3.6
+ },
+ "20000|M|DB-K2-b4-o1o5|min5|2017": {
+  "first_year": 25.7,
+  "cagr": 21.9,
+  "max_dd": -52.7,
+  "final_x": 6.95,
+  "pool_cagr": -8.3
+ },
+ "20000|M|DB-K2-b4-o1o5|min5|2019": {
+  "first_year": 70.5,
+  "cagr": 15.5,
+  "max_dd": -51.7,
+  "final_x": 3.07,
+  "pool_cagr": -0.3
+ },
+ "20000|M|DB-K2-b4-o1o5|min5|2021": {
+  "first_year": 19.7,
+  "cagr": 21.4,
+  "max_dd": -43.3,
+  "final_x": 3.07,
+  "pool_cagr": -4.2
+ },
+ "20000|M|DB-K2-b4-o1o5|min5|2023": {
+  "first_year": -2.7,
+  "cagr": 20.4,
+  "max_dd": -44.6,
+  "final_x": 2.02,
+  "pool_cagr": -3.6
+ },
+ "20000|M|DB-K3-b4-o1o5|min5|2017": {
+  "first_year": 18.0,
+  "cagr": 25.4,
+  "max_dd": -44.4,
+  "final_x": 9.23,
+  "pool_cagr": -8.3
+ },
+ "20000|M|DB-K3-b4-o1o5|min5|2019": {
+  "first_year": 89.1,
+  "cagr": 19.9,
+  "max_dd": -44.3,
+  "final_x": 4.11,
+  "pool_cagr": -0.3
+ },
+ "20000|M|DB-K3-b4-o1o5|min5|2021": {
+  "first_year": 13.9,
+  "cagr": 17.5,
+  "max_dd": -43.5,
+  "final_x": 2.54,
+  "pool_cagr": -4.2
+ },
+ "20000|M|DB-K3-b4-o1o5|min5|2023": {
+  "first_year": -9.1,
+  "cagr": 16.0,
+  "max_dd": -44.0,
+  "final_x": 1.75,
+  "pool_cagr": -3.6
+ },
+ "20000|M|DB-K3-b16-o1o5|min5|2017": {
+  "first_year": 42.4,
+  "cagr": 24.2,
+  "max_dd": -41.0,
+  "final_x": 8.35,
+  "pool_cagr": -8.3
+ },
+ "20000|M|DB-K3-b16-o1o5|min5|2019": {
+  "first_year": 78.2,
+  "cagr": 23.1,
+  "max_dd": -40.7,
+  "final_x": 5.06,
+  "pool_cagr": -0.3
+ },
+ "20000|M|DB-K3-b16-o1o5|min5|2021": {
+  "first_year": 10.5,
+  "cagr": 23.6,
+  "max_dd": -40.9,
+  "final_x": 3.41,
+  "pool_cagr": -4.2
+ },
+ "20000|M|DB-K3-b16-o1o5|min5|2023": {
+  "first_year": 15.4,
+  "cagr": 22.8,
+  "max_dd": -40.7,
+  "final_x": 2.18,
+  "pool_cagr": -3.6
+ },
+ "20000|M|DB-K2-b8-o1o5|min5|2017": {
+  "first_year": 30.4,
+  "cagr": 19.5,
+  "max_dd": -55.5,
+  "final_x": 5.73,
+  "pool_cagr": -8.3
+ },
+ "20000|M|DB-K2-b8-o1o5|min5|2019": {
+  "first_year": 78.1,
+  "cagr": 13.6,
+  "max_dd": -57.0,
+  "final_x": 2.69,
+  "pool_cagr": -0.3
+ },
+ "20000|M|DB-K2-b8-o1o5|min5|2021": {
+  "first_year": 12.7,
+  "cagr": 22.9,
+  "max_dd": -55.5,
+  "final_x": 3.29,
+  "pool_cagr": -4.2
+ },
+ "20000|M|DB-K2-b8-o1o5|min5|2023": {
+  "first_year": 16.7,
+  "cagr": 19.9,
+  "max_dd": -54.9,
+  "final_x": 1.99,
+  "pool_cagr": -3.6
+ },
+ "20000|M|DB-K1-b12-o1o5|min5|2017": {
+  "first_year": 22.0,
+  "cagr": 17.6,
+  "max_dd": -69.0,
+  "final_x": 4.91,
+  "pool_cagr": -8.3
+ },
+ "20000|M|DB-K1-b12-o1o5|min5|2019": {
+  "first_year": 74.5,
+  "cagr": 18.5,
+  "max_dd": -67.6,
+  "final_x": 3.76,
+  "pool_cagr": -0.3
+ },
+ "20000|M|DB-K1-b12-o1o5|min5|2021": {
+  "first_year": 13.2,
+  "cagr": 31.6,
+  "max_dd": -60.7,
+  "final_x": 4.89,
+  "pool_cagr": -4.2
+ },
+ "20000|M|DB-K1-b12-o1o5|min5|2023": {
+  "first_year": 12.6,
+  "cagr": 22.5,
+  "max_dd": -60.2,
+  "final_x": 2.15,
+  "pool_cagr": -3.6
+ },
+ "20000|M|DB-K10-b12-o1o5|min5|2017": {
+  "first_year": -5.7,
+  "cagr": -21.5,
+  "max_dd": -91.5,
+  "final_x": 0.09,
+  "pool_cagr": -8.3
+ },
+ "20000|M|DB-K10-b12-o1o5|min5|2019": {
+  "first_year": 36.6,
+  "cagr": -9.2,
+  "max_dd": -69.0,
+  "final_x": 0.47,
+  "pool_cagr": -0.3
+ },
+ "20000|M|DB-K10-b12-o1o5|min5|2021": {
+  "first_year": -13.4,
+  "cagr": -33.2,
+  "max_dd": -90.5,
+  "final_x": 0.1,
+  "pool_cagr": -4.2
+ },
+ "20000|M|DB-K10-b12-o1o5|min5|2023": {
+  "first_year": -16.8,
+  "cagr": -12.8,
+  "max_dd": -46.3,
+  "final_x": 0.6,
+  "pool_cagr": -3.6
+ }
+}

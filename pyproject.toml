@@ -1,0 +1,39 @@
+[project]
+name = "rebound-model"
+version = "0.1.0"
+description = "反弹模型：A 股主板短线选股的机器学习全流程（数据 → 特征和标签 → 滚动训练 → 选股 → 回测）"
+requires-python = ">=3.11"
+dependencies = [
+    "duckdb==1.5.5",
+    "pandas==2.3.3",
+    "numpy==2.3.5",
+    # 版本钉死：训出来的模型文件和分数才能逐位复现（manifest 里也记着版本）
+    "xgboost==3.2.0",
+    "tushare==1.4.29",
+    "pyyaml==6.0.3",
+    "python-dotenv==1.1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest==8.4.2"]
+# 跑 experiments/ 里的研究脚本要多装这几个
+research = ["pyarrow", "scipy", "psutil"]
+
+[project.scripts]
+rebound = "rebound.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["rebound", "rebound.data", "rebound.model", "rebound.backtest"]
+
+[tool.pytest.ini_options]
+# 仓库根直接进 sys.path：不安装也能 `python -m rebound ...`、`pytest`。
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+markers = [
+    "slow: 需要真实数据或网络",
+]

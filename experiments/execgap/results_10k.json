@@ -1,0 +1,420 @@
+{
+ "rules": {
+  "DB-K1-b16": {
+   "full_10k": {
+    "now": {
+     "cagr": 21.44,
+     "excess": 31.33,
+     "excess_ci": [
+      8.56,
+      53.99
+     ],
+     "max_dd": -73.08,
+     "final": 97860.0,
+     "hold_days": 2.7,
+     "turnover": 77.6,
+     "cost_pct": 11.8,
+     "idle_cash_pct": 2.0,
+     "avg_holdings": 1.0,
+     "buys_per_day": 0.37,
+     "funded_share": 100.0,
+     "funded_turnover": 88.0,
+     "fresh": {
+      "2017": 13.5,
+      "2019": 13.8,
+      "2021": 23.9,
+      "2023": 18.5
+     },
+     "worst": 13.5
+    },
+    "close_sell_prev_rank": {
+     "cagr": 6.06,
+     "excess": 17.72,
+     "excess_ci": [
+      -8.09,
+      43.13
+     ],
+     "max_dd": -90.63,
+     "final": 20049.0,
+     "hold_days": 3.1,
+     "turnover": 60.2,
+     "cost_pct": 9.16,
+     "idle_cash_pct": 26.7,
+     "avg_holdings": 0.8,
+     "buys_per_day": 0.25,
+     "funded_share": 0.0,
+     "funded_turnover": 0.0,
+     "fresh": {
+      "2017": -33.7,
+      "2019": -11.9,
+      "2021": 9.7,
+      "2023": 15.2
+     },
+     "worst": -33.7
+    },
+    "now+0.1%": {
+     "cagr": 10.46,
+     "excess": 21.55,
+     "excess_ci": [
+      -0.83,
+      43.35
+     ],
+     "max_dd": -74.94,
+     "final": 31790.0,
+     "hold_days": 2.7,
+     "turnover": 83.7,
+     "cost_pct": 12.73,
+     "idle_cash_pct": 3.3,
+     "avg_holdings": 1.0,
+     "buys_per_day": 0.37,
+     "funded_share": 100.0,
+     "funded_turnover": 86.5,
+     "fresh": {
+      "2017": 4.9,
+      "2019": 9.9,
+      "2021": 14.4,
+      "2023": 9.7
+     },
+     "worst": 4.9
+    },
+    "now+0.2%": {
+     "cagr": 3.88,
+     "excess": 15.21,
+     "excess_ci": [
+      -7.27,
+      36.56
+     ],
+     "max_dd": -83.9,
+     "final": 15326.0,
+     "hold_days": 2.7,
+     "turnover": 86.8,
+     "cost_pct": 13.33,
+     "idle_cash_pct": 4.6,
+     "avg_holdings": 1.0,
+     "buys_per_day": 0.37,
+     "funded_share": 100.0,
+     "funded_turnover": 85.1,
+     "fresh": {
+      "2017": -20.1,
+      "2019": 2.2,
+      "2021": 6.4,
+      "2023": 2.8
+     },
+     "worst": -20.1
+    }
+   },
+   "plus_10k_cash": {
+    "now": {
+     "cagr": 15.39,
+     "max_dd": -61.63,
+     "final": 107860,
+     "fresh": {
+      "2017": 8.5,
+      "2019": 8.4,
+      "2021": 14.9,
+      "2023": 10.3
+     },
+     "worst": 8.4,
+     "covered_share": {
+      "2015": 43.0,
+      "2016": 30.2,
+      "2017": 19.5,
+      "2018": 28.9,
+      "2019": 30.4,
+      "2020": 35.5,
+      "2021": 26.7,
+      "2022": 24.5,
+      "2023": 18.1,
+      "2024": 12.4,
+      "2025": 7.9,
+      "2026": 7.7
+     },
+     "covered_total": 20.6
+    },
+    "close_sell_prev_rank": {
+     "cagr": 3.5,
+     "max_dd": -81.72,
+     "final": 30049,
+     "fresh": {
+      "2017": -6.6,
+      "2019": -4.7,
+      "2021": 5.4,
+      "2023": 8.3
+     },
+     "worst": -6.6
+    }
+   },
+   "same_as_cache": true,
+   "side_by_side": {
+    "2015": {
+     "full_10k": 25484,
+     "half_stock": 15525,
+     "half_cash": 18179
+    },
+    "2016": {
+     "full_10k": 37977,
+     "half_stock": 20955,
+     "half_cash": 22215
+    },
+    "2017": {
+     "full_10k": 54916,
+     "half_stock": 25600,
+     "half_cash": 28725
+    },
+    "2018": {
+     "full_10k": 28336,
+     "half_stock": 19950,
+     "half_cash": 20688
+    },
+    "2019": {
+     "full_10k": 36944,
+     "half_stock": 23616,
+     "half_cash": 24120
+    },
+    "2020": {
+     "full_10k": 34256,
+     "half_stock": 24955,
+     "half_cash": 24928
+    },
+    "2021": {
+     "full_10k": 34847,
+     "half_stock": 24705,
+     "half_cash": 24894
+    },
+    "2022": {
+     "full_10k": 54864,
+     "half_stock": 30555,
+     "half_cash": 30496
+    },
+    "2023": {
+     "full_10k": 58687,
+     "half_stock": 31304,
+     "half_cash": 32158
+    },
+    "2024": {
+     "full_10k": 105537,
+     "half_stock": 42600,
+     "half_cash": 43247
+    },
+    "2025": {
+     "full_10k": 146668,
+     "half_stock": 45408,
+     "half_cash": 56256
+    },
+    "2026": {
+     "full_10k": 97860,
+     "half_stock": 39546,
+     "half_cash": 48022
+    }
+   }
+  },
+  "DB-K2-b8": {
+   "full_10k": {
+    "now": {
+     "cagr": 31.06,
+     "excess": 36.59,
+     "excess_ci": [
+      17.19,
+      57.11
+     ],
+     "max_dd": -69.79,
+     "final": 253089.0,
+     "hold_days": 2.6,
+     "turnover": 81.3,
+     "cost_pct": 12.38,
+     "idle_cash_pct": 1.4,
+     "avg_holdings": 2.0,
+     "buys_per_day": 0.78,
+     "funded_share": 100.0,
+     "funded_turnover": 92.6,
+     "fresh": {
+      "2017": 18.0,
+      "2019": 10.5,
+      "2021": 11.2,
+      "2023": 26.2
+     },
+     "worst": 10.5
+    },
+    "close_sell_prev_rank": {
+     "cagr": 21.14,
+     "excess": 28.04,
+     "excess_ci": [
+      8.91,
+      48.52
+     ],
+     "max_dd": -67.26,
+     "final": 105427.0,
+     "hold_days": 2.8,
+     "turnover": 59.2,
+     "cost_pct": 9.01,
+     "idle_cash_pct": 27.3,
+     "avg_holdings": 1.5,
+     "buys_per_day": 0.53,
+     "funded_share": 0.0,
+     "funded_turnover": 0.0,
+     "fresh": {
+      "2017": -1.1,
+      "2019": 1.7,
+      "2021": 12.8,
+      "2023": 18.2
+     },
+     "worst": -1.1
+    },
+    "now+0.1%": {
+     "cagr": 16.9,
+     "excess": 24.94,
+     "excess_ci": [
+      5.62,
+      45.3
+     ],
+     "max_dd": -71.76,
+     "final": 65186.0,
+     "hold_days": 2.6,
+     "turnover": 86.2,
+     "cost_pct": 13.2,
+     "idle_cash_pct": 2.3,
+     "avg_holdings": 2.0,
+     "buys_per_day": 0.78,
+     "funded_share": 100.0,
+     "funded_turnover": 91.8,
+     "fresh": {
+      "2017": -28.5,
+      "2019": -19.4,
+      "2021": -6.9,
+      "2023": 14.0
+     },
+     "worst": -28.5
+    },
+    "now+0.2%": {
+     "cagr": 6.75,
+     "excess": 15.74,
+     "excess_ci": [
+      -3.46,
+      35.55
+     ],
+     "max_dd": -75.91,
+     "final": 22168.0,
+     "hold_days": 2.6,
+     "turnover": 90.7,
+     "cost_pct": 14.52,
+     "idle_cash_pct": 3.4,
+     "avg_holdings": 2.0,
+     "buys_per_day": 0.78,
+     "funded_share": 100.0,
+     "funded_turnover": 90.6,
+     "fresh": {
+      "2017": -30.2,
+      "2019": -36.7,
+      "2021": -31.4,
+      "2023": 4.2
+     },
+     "worst": -36.7
+    }
+   },
+   "plus_10k_cash": {
+    "now": {
+     "cagr": 24.16,
+     "max_dd": -57.56,
+     "final": 263089,
+     "fresh": {
+      "2017": 12.0,
+      "2019": 6.1,
+      "2021": 6.3,
+      "2023": 15.2
+     },
+     "worst": 6.1,
+     "covered_share": {
+      "2015": 61.4,
+      "2016": 45.7,
+      "2017": 32.6,
+      "2018": 26.8,
+      "2019": 19.1,
+      "2020": 14.7,
+      "2021": 18.6,
+      "2022": 17.8,
+      "2023": 15.5,
+      "2024": 9.3,
+      "2025": 5.3,
+      "2026": 5.3
+     },
+     "covered_total": 15.1
+    },
+    "close_sell_prev_rank": {
+     "cagr": 15.53,
+     "max_dd": -61.64,
+     "final": 115427,
+     "fresh": {
+      "2017": -0.5,
+      "2019": 0.9,
+      "2021": 7.3,
+      "2023": 10.1
+     },
+     "worst": -0.5
+    }
+   },
+   "same_as_cache": true,
+   "side_by_side": {
+    "2015": {
+     "full_10k": 27957,
+     "half_stock": 13002,
+     "half_cash": 17616
+    },
+    "2016": {
+     "full_10k": 40766,
+     "half_stock": 13286,
+     "half_cash": 24868
+    },
+    "2017": {
+     "full_10k": 51898,
+     "half_stock": 18123,
+     "half_cash": 23942
+    },
+    "2018": {
+     "full_10k": 60105,
+     "half_stock": 22120,
+     "half_cash": 24442
+    },
+    "2019": {
+     "full_10k": 129115,
+     "half_stock": 32343,
+     "half_cash": 32383
+    },
+    "2020": {
+     "full_10k": 93520,
+     "half_stock": 27625,
+     "half_cash": 28254
+    },
+    "2021": {
+     "full_10k": 75590,
+     "half_stock": 25311,
+     "half_cash": 26510
+    },
+    "2022": {
+     "full_10k": 92965,
+     "half_stock": 30109,
+     "half_cash": 27119
+    },
+    "2023": {
+     "full_10k": 113088,
+     "half_stock": 31062,
+     "half_cash": 32146
+    },
+    "2024": {
+     "full_10k": 220825,
+     "half_stock": 44772,
+     "half_cash": 45081
+    },
+    "2025": {
+     "full_10k": 358082,
+     "half_stock": 56500,
+     "half_cash": 57442
+    },
+    "2026": {
+     "full_10k": 253089,
+     "half_stock": 39070,
+     "half_cash": 60067
+    }
+   }
+  }
+ }
+}

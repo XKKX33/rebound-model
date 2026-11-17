@@ -1,0 +1,18 @@
+[
+ {
+  "variant": "nocap",
+  "model": "o1o2-cuda",
+  "rules": [
+   "DB-K10-b16-o1o5",
+   "FH-K2-next-o1o2"
+  ]
+ },
+ {
+  "variant": "nocap",
+  "model": "o1o5-cpu",
+  "rules": [
+   "DB-K1-b6-o1o5",
+   "DB-K3-b6-o1o5"
+  ]
+ }
+]

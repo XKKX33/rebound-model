@@ -1,0 +1,555 @@
+{
+ "monthly": {
+  "ind_wml60": {
+   "mean": -1.01,
+   "t": -1.9,
+   "pos%": 44,
+   "n": 142
+  },
+  "ind_ic60": {
+   "mean": -7.19,
+   "t": -3.0,
+   "pos%": 42,
+   "n": 142
+  },
+  "within_wml60": {
+   "mean": -1.31,
+   "t": -3.5,
+   "pos%": 35,
+   "n": 142
+  },
+  "ind_wml20": {
+   "mean": -0.96,
+   "t": -1.7,
+   "pos%": 40,
+   "n": 142
+  },
+  "ind_ic20": {
+   "mean": -6.63,
+   "t": -2.9,
+   "pos%": 44,
+   "n": 142
+  },
+  "within_wml20": {
+   "mean": -1.71,
+   "t": -4.6,
+   "pos%": 32,
+   "n": 142
+  },
+  "wml60": {
+   "mean": -1.4,
+   "t": -2.9,
+   "pos%": 38,
+   "n": 142
+  },
+  "ic60": {
+   "mean": -7.94,
+   "t": -6.0,
+   "pos%": 26,
+   "n": 142
+  }
+ },
+ "monthly_by_wml60": {
+  "ind_wml60": {
+   "反转月": -5.76,
+   "中间": -0.96,
+   "强势股月": 3.59
+  },
+  "ind_wml20": {
+   "反转月": -3.47,
+   "中间": -1.73,
+   "强势股月": 2.25
+  },
+  "within_wml60": {
+   "反转月": -5.46,
+   "中间": -1.2,
+   "强势股月": 2.65
+  },
+  "within_wml20": {
+   "反转月": -4.91,
+   "中间": -1.81,
+   "强势股月": 1.51
+  }
+ },
+ "monthly_2021_2026": {
+  "2021-01": {
+   "wml60": 1.6,
+   "ind_wml60": 3.5,
+   "ind_wml20": -2.4,
+   "within_wml60": 1.6
+  },
+  "2021-02": {
+   "wml60": -5.0,
+   "ind_wml60": -2.6,
+   "ind_wml20": 7.5,
+   "within_wml60": -6.6
+  },
+  "2021-03": {
+   "wml60": -4.1,
+   "ind_wml60": -1.8,
+   "ind_wml20": 0.2,
+   "within_wml60": -4.6
+  },
+  "2021-04": {
+   "wml60": 0.3,
+   "ind_wml60": -0.1,
+   "ind_wml20": -10.7,
+   "within_wml60": -1.4
+  },
+  "2021-05": {
+   "wml60": 1.5,
+   "ind_wml60": -4.0,
+   "ind_wml20": -3.2,
+   "within_wml60": 4.1
+  },
+  "2021-06": {
+   "wml60": -2.6,
+   "ind_wml60": -4.5,
+   "ind_wml20": -1.5,
+   "within_wml60": -1.1
+  },
+  "2021-07": {
+   "wml60": 8.9,
+   "ind_wml60": 8.6,
+   "ind_wml20": 16.8,
+   "within_wml60": 2.1
+  },
+  "2021-08": {
+   "wml60": 12.3,
+   "ind_wml60": 13.3,
+   "ind_wml20": 23.5,
+   "within_wml60": 7.8
+  },
+  "2021-09": {
+   "wml60": -10.5,
+   "ind_wml60": -16.3,
+   "ind_wml20": -10.9,
+   "within_wml60": -6.4
+  },
+  "2021-10": {
+   "wml60": -0.9,
+   "ind_wml60": -7.8,
+   "ind_wml20": -4.3,
+   "within_wml60": 1.0
+  },
+  "2021-11": {
+   "wml60": -0.8,
+   "ind_wml60": -4.1,
+   "ind_wml20": 5.4,
+   "within_wml60": 0.0
+  },
+  "2021-12": {
+   "wml60": -4.4,
+   "ind_wml60": -0.6,
+   "ind_wml20": -3.9,
+   "within_wml60": -4.8
+  },
+  "2026-01": {
+   "wml60": 1.1,
+   "ind_wml60": 0.0,
+   "ind_wml20": 7.7,
+   "within_wml60": -0.6
+  },
+  "2026-02": {
+   "wml60": 3.1,
+   "ind_wml60": 6.9,
+   "ind_wml20": 5.6,
+   "within_wml60": 1.6
+  },
+  "2026-03": {
+   "wml60": -4.2,
+   "ind_wml60": -11.2,
+   "ind_wml20": -2.5,
+   "within_wml60": -1.8
+  },
+  "2026-04": {
+   "wml60": 4.2,
+   "ind_wml60": 1.3,
+   "ind_wml20": -8.8,
+   "within_wml60": 3.1
+  },
+  "2026-05": {
+   "wml60": 5.3,
+   "ind_wml60": 8.0,
+   "ind_wml20": 5.4,
+   "within_wml60": 3.7
+  },
+  "2026-06": {
+   "wml60": 9.1,
+   "ind_wml60": 5.1,
+   "ind_wml20": 16.7,
+   "within_wml60": 7.9
+  },
+  "2026-07": {
+   "wml60": -34.9,
+   "ind_wml60": -29.6,
+   "ind_wml20": -26.8,
+   "within_wml60": -28.0
+  },
+  "2026-08": {
+   "wml60": -7.3,
+   "ind_wml60": -9.2,
+   "ind_wml20": -12.9,
+   "within_wml60": -3.0
+  },
+  "2026-09": {
+   "wml60": -1.1,
+   "ind_wml60": -0.3,
+   "ind_wml20": -4.1,
+   "within_wml60": -1.7
+  },
+  "2026-10": {
+   "wml60": 0.5,
+   "ind_wml60": 0.1,
+   "ind_wml20": 3.7,
+   "within_wml60": -0.3
+  }
+ },
+ "daily": {
+  "ic_total": {
+   "mean": 11.59,
+   "t": 25.2,
+   "pos%": 97,
+   "n": 142
+  },
+  "ic_within": {
+   "mean": 11.43,
+   "t": 29.8,
+   "pos%": 99,
+   "n": 142
+  },
+  "mom20_total": {
+   "mean": -6.66,
+   "t": -11.5,
+   "pos%": 17,
+   "n": 142
+  },
+  "mom20_within": {
+   "mean": -6.75,
+   "t": -14.0,
+   "pos%": 13,
+   "n": 142
+  },
+  "ic_between": {
+   "mean": 11.43,
+   "t": 14.4,
+   "pos%": 88,
+   "n": 142
+  },
+  "ind_mom5": {
+   "mean": -3.56,
+   "t": -4.9,
+   "pos%": 34,
+   "n": 142
+  },
+  "ind_mom20": {
+   "mean": -6.4,
+   "t": -7.2,
+   "pos%": 25,
+   "n": 142
+  },
+  "ind_mom60": {
+   "mean": -6.22,
+   "t": -6.4,
+   "pos%": 30,
+   "n": 142
+  },
+  "score_vs_ind_r20": {
+   "mean": -47.81,
+   "t": -40.9,
+   "pos%": 1,
+   "n": 142
+  }
+ },
+ "daily_by_wml60": {
+  "ic_total": {
+   "反转月": 13.53,
+   "中间": 12.32,
+   "强势股月": 8.98
+  },
+  "ic_within": {
+   "反转月": 13.11,
+   "中间": 11.99,
+   "强势股月": 9.25
+  },
+  "mom20_total": {
+   "反转月": -9.88,
+   "中间": -7.34,
+   "强势股月": -2.84
+  },
+  "mom20_within": {
+   "反转月": -10.23,
+   "中间": -7.14,
+   "强势股月": -2.96
+  },
+  "ic_between": {
+   "反转月": 14.44,
+   "中间": 12.12,
+   "强势股月": 7.82
+  },
+  "ind_mom5": {
+   "反转月": -4.07,
+   "中间": -4.7,
+   "强势股月": -1.95
+  },
+  "ind_mom20": {
+   "反转月": -9.46,
+   "中间": -7.66,
+   "强势股月": -2.16
+  },
+  "ind_mom60": {
+   "反转月": -14.36,
+   "中间": -6.47,
+   "强势股月": 1.99
+  },
+  "score_vs_ind_r20": {
+   "反转月": -49.08,
+   "中间": -44.24,
+   "强势股月": -50.06
+  }
+ },
+ "daily_2021_2026": {
+  "2021-01": {
+   "ic_total": 12.9,
+   "ic_within": 11.2,
+   "mom20_total": -3.2,
+   "mom20_within": -1.8,
+   "ic_between": 15.3,
+   "ind_mom5": 4.8,
+   "ind_mom20": -5.9,
+   "ind_mom60": -4.7,
+   "score_vs_ind_r20": -58.1
+  },
+  "2021-02": {
+   "ic_total": 9.4,
+   "ic_within": 10.7,
+   "mom20_total": -6.2,
+   "mom20_within": -9.4,
+   "ic_between": 9.6,
+   "ind_mom5": 0.2,
+   "ind_mom20": -2.3,
+   "ind_mom60": -10.1,
+   "score_vs_ind_r20": -66.2
+  },
+  "2021-03": {
+   "ic_total": 12.1,
+   "ic_within": 11.8,
+   "mom20_total": -6.6,
+   "mom20_within": -8.2,
+   "ic_between": 12.3,
+   "ind_mom5": -3.1,
+   "ind_mom20": -2.9,
+   "ind_mom60": -5.9,
+   "score_vs_ind_r20": -59.1
+  },
+  "2021-04": {
+   "ic_total": 7.1,
+   "ic_within": 7.7,
+   "mom20_total": -3.9,
+   "mom20_within": -3.4,
+   "ic_between": 6.9,
+   "ind_mom5": 2.8,
+   "ind_mom20": -8.7,
+   "ind_mom60": -8.5,
+   "score_vs_ind_r20": -57.3
+  },
+  "2021-05": {
+   "ic_total": 5.0,
+   "ic_within": 4.1,
+   "mom20_total": -7.6,
+   "mom20_within": -3.6,
+   "ic_between": 2.4,
+   "ind_mom5": -8.4,
+   "ind_mom20": -14.4,
+   "ind_mom60": -10.0,
+   "score_vs_ind_r20": -56.3
+  },
+  "2021-06": {
+   "ic_total": 10.2,
+   "ic_within": 10.4,
+   "mom20_total": -5.3,
+   "mom20_within": -5.9,
+   "ic_between": 10.1,
+   "ind_mom5": 1.6,
+   "ind_mom20": 0.5,
+   "ind_mom60": 1.6,
+   "score_vs_ind_r20": -50.1
+  },
+  "2021-07": {
+   "ic_total": 0.8,
+   "ic_within": 5.7,
+   "mom20_total": 8.4,
+   "mom20_within": 1.2,
+   "ic_between": -12.1,
+   "ind_mom5": 12.1,
+   "ind_mom20": 21.1,
+   "ind_mom60": 18.9,
+   "score_vs_ind_r20": -63.5
+  },
+  "2021-08": {
+   "ic_total": 6.3,
+   "ic_within": 9.2,
+   "mom20_total": 1.1,
+   "mom20_within": -4.3,
+   "ic_between": 2.2,
+   "ind_mom5": -0.8,
+   "ind_mom20": 17.6,
+   "ind_mom60": 9.7,
+   "score_vs_ind_r20": -66.6
+  },
+  "2021-09": {
+   "ic_total": 12.9,
+   "ic_within": 12.9,
+   "mom20_total": -5.5,
+   "mom20_within": -9.1,
+   "ic_between": 12.0,
+   "ind_mom5": 9.7,
+   "ind_mom20": -1.2,
+   "ind_mom60": -21.7,
+   "score_vs_ind_r20": -64.0
+  },
+  "2021-10": {
+   "ic_total": -2.2,
+   "ic_within": -2.1,
+   "mom20_total": 0.7,
+   "mom20_within": -0.9,
+   "ic_between": 0.5,
+   "ind_mom5": -4.0,
+   "ind_mom20": 6.6,
+   "ind_mom60": 0.3,
+   "score_vs_ind_r20": -31.2
+  },
+  "2021-11": {
+   "ic_total": 4.0,
+   "ic_within": 7.1,
+   "mom20_total": -3.3,
+   "mom20_within": -6.9,
+   "ic_between": -2.9,
+   "ind_mom5": 5.4,
+   "ind_mom20": -1.9,
+   "ind_mom60": -12.6,
+   "score_vs_ind_r20": -56.7
+  },
+  "2021-12": {
+   "ic_total": 17.0,
+   "ic_within": 15.3,
+   "mom20_total": -9.1,
+   "mom20_within": -9.8,
+   "ic_between": 19.7,
+   "ind_mom5": -8.0,
+   "ind_mom20": -7.9,
+   "ind_mom60": 3.5,
+   "score_vs_ind_r20": -50.8
+  },
+  "2026-01": {
+   "ic_total": 9.0,
+   "ic_within": 9.7,
+   "mom20_total": -3.3,
+   "mom20_within": -2.2,
+   "ic_between": 3.4,
+   "ind_mom5": -6.5,
+   "ind_mom20": -0.4,
+   "ind_mom60": -2.5,
+   "score_vs_ind_r20": -66.9
+  },
+  "2026-02": {
+   "ic_total": -1.0,
+   "ic_within": 4.0,
+   "mom20_total": 7.8,
+   "mom20_within": 3.4,
+   "ic_between": -7.2,
+   "ind_mom5": 6.4,
+   "ind_mom20": 13.1,
+   "ind_mom60": 12.6,
+   "score_vs_ind_r20": -55.2
+  },
+  "2026-03": {
+   "ic_total": 16.2,
+   "ic_within": 10.1,
+   "mom20_total": -5.1,
+   "mom20_within": -4.4,
+   "ic_between": 29.5,
+   "ind_mom5": -1.0,
+   "ind_mom20": -9.9,
+   "ind_mom60": -24.6,
+   "score_vs_ind_r20": -42.0
+  },
+  "2026-04": {
+   "ic_total": -2.0,
+   "ic_within": -0.9,
+   "mom20_total": -3.0,
+   "mom20_within": 0.3,
+   "ic_between": -6.5,
+   "ind_mom5": 1.5,
+   "ind_mom20": -2.6,
+   "ind_mom60": 9.6,
+   "score_vs_ind_r20": -39.8
+  },
+  "2026-05": {
+   "ic_total": 6.2,
+   "ic_within": 5.6,
+   "mom20_total": 4.7,
+   "mom20_within": 3.4,
+   "ic_between": 10.0,
+   "ind_mom5": 6.6,
+   "ind_mom20": 1.6,
+   "ind_mom60": 7.3,
+   "score_vs_ind_r20": -67.3
+  },
+  "2026-06": {
+   "ic_total": 2.9,
+   "ic_within": 3.4,
+   "mom20_total": 1.0,
+   "mom20_within": 0.9,
+   "ic_between": 7.8,
+   "ind_mom5": -3.0,
+   "ind_mom20": -5.0,
+   "ind_mom60": 0.5,
+   "score_vs_ind_r20": -69.5
+  },
+  "2026-07": {
+   "ic_total": 19.2,
+   "ic_within": 16.3,
+   "mom20_total": -7.8,
+   "mom20_within": -8.5,
+   "ic_between": 25.2,
+   "ind_mom5": 12.4,
+   "ind_mom20": -14.4,
+   "ind_mom60": -36.1,
+   "score_vs_ind_r20": -63.3
+  },
+  "2026-08": {
+   "ic_total": 5.7,
+   "ic_within": 4.6,
+   "mom20_total": -21.4,
+   "mom20_within": -17.5,
+   "ic_between": 9.2,
+   "ind_mom5": -5.4,
+   "ind_mom20": -30.9,
+   "ind_mom60": -3.7,
+   "score_vs_ind_r20": -55.6
+  },
+  "2026-09": {
+   "ic_total": 12.9,
+   "ic_within": 13.3,
+   "mom20_total": -10.9,
+   "mom20_within": -9.8,
+   "ic_between": 9.5,
+   "ind_mom5": -9.2,
+   "ind_mom20": -16.9,
+   "ind_mom60": 5.3,
+   "score_vs_ind_r20": -51.6
+  },
+  "2026-10": {
+   "ic_total": 18.2,
+   "ic_within": 15.7,
+   "mom20_total": 0.0,
+   "mom20_within": -1.4,
+   "ic_between": 28.4,
+   "ind_mom5": 7.9,
+   "ind_mom20": -2.0,
+   "ind_mom60": -11.8,
+   "score_vs_ind_r20": -42.5
+  }
+ }
+}

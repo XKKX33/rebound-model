@@ -1,0 +1,58 @@
+{
+ "20000|Q|DB-K10-b12-o1o5|min5|2017": {
+  "first_year": -7.3,
+  "cagr": -21.5,
+  "max_dd": -91.9,
+  "final_x": 0.09,
+  "pool_cagr": -8.3
+ },
+ "20000|Q|DB-K10-b12-o1o5|min5|2019": {
+  "first_year": 37.2,
+  "cagr": -10.9,
+  "max_dd": -73.8,
+  "final_x": 0.41,
+  "pool_cagr": -0.3
+ },
+ "20000|Q|DB-K10-b12-o1o5|min5|2021": {
+  "first_year": -16.7,
+  "cagr": -33.1,
+  "max_dd": -90.4,
+  "final_x": 0.1,
+  "pool_cagr": -4.2
+ },
+ "20000|Q|DB-K10-b12-o1o5|min5|2023": {
+  "first_year": -13.5,
+  "cagr": -6.7,
+  "max_dd": -40.5,
+  "final_x": 0.77,
+  "pool_cagr": -3.6
+ },
+ "20000|Q|DB-K10-b12-o1o5|free5|2017": {
+  "first_year": 20.8,
+  "cagr": 25.2,
+  "max_dd": -31.0,
+  "final_x": 9.09,
+  "pool_cagr": -8.3
+ },
+ "20000|Q|DB-K10-b12-o1o5|free5|2019": {
+  "first_year": 71.1,
+  "cagr": 23.6,
+  "max_dd": -34.1,
+  "final_x": 5.23,
+  "pool_cagr": -0.3
+ },
+ "20000|Q|DB-K10-b12-o1o5|free5|2021": {
+  "first_year": 11.3,
+  "cagr": 13.7,
+  "max_dd": -34.0,
+  "final_x": 2.11,
+  "pool_cagr": -4.2
+ },
+ "20000|Q|DB-K10-b12-o1o5|free5|2023": {
+  "first_year": 5.3,
+  "cagr": 18.1,
+  "max_dd": -28.9,
+  "final_x": 1.87,
+  "pool_cagr": -3.6
+ }
+}

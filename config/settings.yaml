@@ -1,0 +1,42 @@
+# 反弹模型 —— 唯一的配置文件（加载与校验：rebound/config.py）。
+#
+# 特征、标签、XGBoost 参数写在代码里（rebound/params.py 等），不在这里：
+# 改了它们要重新训练，否则打分用的模型和股票池对不上。
+
+data:
+  # DuckDB 库（rebound sync 生成，不入库）。模型文件、本金测算结果、纸面跟踪都放在它旁边。
+  db_path: data/market.duckdb
+  # 新鲜度闸门往前检查多少个开市日的日线：特征要看前 120 根，股票池要求至少 150 根。
+  history_bars: 150
+  # 一个交易日的日线少于这么多行，算没收盘或残缺（主板一天约 3000 只）。
+  min_daily_rows: 1000
+  # 当天日线算定稿的时刻（北京时间）。收盘 15:00，留结算余量。
+  session_close_time: "15:30"
+
+sync:
+  # 每次同步向前回补多少个开市日（首次建库用 rebound sync --days 3500 从 2013 年拉起）。
+  days: 10
+  # 交易日历往今天之后多拉多少天：标签和回测要用到 T+5 这些未来的开市日。
+  calendar_lookahead_days: 45
+  # 同步涨跌停价：特征里的"涨停"和回测里的"一字板买不进、跌停卖不出"都靠它。
+  with_limits: true
+  exchange: SSE
+
+tushare:
+  # token 放在仓库根的 .env 里（TUSHARE_TOKEN=...），.env 不入库。
+  token_env: TUSHARE_TOKEN
+  request_timeout_seconds: 120
+  retry: 5
+  sleep_seconds: 0.02
+
+model:
+  # 股票池版本：nocap = 不限价（默认），cap70 = 收盘 < 70 元。
+  variant: nocap
+  # 重训频率：M = 每月（默认）、Q = 每季度、Y = 每年。三种共用同一批按月训的模型文件。
+  cadence: M
+
+pick:
+  # 每天按分数从高到低、每个行业最多 2 只、取前 6。
+  top_n: 6
+  max_per_industry: 2
+  candidate_limit: 260

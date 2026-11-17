@@ -1,0 +1,52 @@
+{
+ "rows": 9063605,
+ "codes": 3413,
+ "dates": 3350,
+ "first": "2013-01-04 00:00:00",
+ "last": "2026-10-23 00:00:00",
+ "eligible_rows": 4302086,
+ "eligible_now_rows": 4126241,
+ "eligible_only_by_name_then": 209445,
+ "eligible_only_by_name_now": 33600,
+ "pool_per_day_by_year": {
+  "2013": 206.0,
+  "2014": 767.0,
+  "2015": 1570.0,
+  "2016": 1335.0,
+  "2017": 980.0,
+  "2018": 754.0,
+  "2019": 1044.0,
+  "2020": 1322.0,
+  "2021": 1357.0,
+  "2022": 1572.0,
+  "2023": 1405.0,
+  "2024": 1587.0,
+  "2025": 2052.0,
+  "2026": 2082.0
+ },
+ "calendar_matches": true,
+ "source": "data\\research-2013-2026.duckdb",
+ "seam": {
+  "overlap_daily_rows": 104914,
+  "price_mismatch_rows": 0,
+  "amount_mismatch_rows": 0,
+  "overlap_limit_rows": 104145,
+  "limit_mismatch_rows": 0,
+  "scaled_codes": 4556,
+  "scale_not_one": 3,
+  "scale_inconsistent": 2,
+  "scale_min": 1.0,
+  "scale_max": 433.618,
+  "crossing_without_overlap": 0
+ },
+ "seconds": 99,
+ "price_max": null,
+ "derived_from": "data\\research\\decade\\panel10.parquet",
+ "cross_check": {
+  "capped_vs_stored_diff": 0,
+  "capped_now_vs_stored_diff": 0,
+  "capped_not_in_nocap": 0,
+  "capped_rows": 4168201,
+  "nocap_rows": 4302086
+ }
+}

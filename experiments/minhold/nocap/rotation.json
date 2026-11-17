@@ -1,0 +1,106 @@
+{
+ "20000|DB-K2-b6-o1o5": {
+  "trades": 2479,
+  "early_with_new_buy": 2098,
+  "gap": {
+   "mean": 0.314,
+   "ci": [
+    0.127,
+    0.504
+   ]
+  },
+  "repl": {
+   "mean": 0.561,
+   "ci": [
+    0.349,
+    0.762
+   ]
+  },
+  "rotation": {
+   "mean": 0.247,
+   "ci": [
+    0.027,
+    0.454
+   ]
+  },
+  "rotation_positive": 53.5
+ },
+ "20000|DB-K3-b16-o1o5": {
+  "trades": 2454,
+  "early_with_new_buy": 1803,
+  "gap": {
+   "mean": 0.27,
+   "ci": [
+    0.064,
+    0.491
+   ]
+  },
+  "repl": {
+   "mean": 0.654,
+   "ci": [
+    0.428,
+    0.895
+   ]
+  },
+  "rotation": {
+   "mean": 0.383,
+   "ci": [
+    0.152,
+    0.62
+   ]
+  },
+  "rotation_positive": 54.8
+ },
+ "200000|DB-K30-b4-o1o5": {
+  "trades": 27020,
+  "early_with_new_buy": 20366,
+  "gap": {
+   "mean": 0.224,
+   "ci": [
+    0.153,
+    0.297
+   ]
+  },
+  "repl": {
+   "mean": 0.478,
+   "ci": [
+    0.396,
+    0.566
+   ]
+  },
+  "rotation": {
+   "mean": 0.255,
+   "ci": [
+    0.173,
+    0.336
+   ]
+  },
+  "rotation_positive": 57.7
+ },
+ "200000|DB-K30-b8-o1o5": {
+  "trades": 19225,
+  "early_with_new_buy": 12311,
+  "gap": {
+   "mean": 0.176,
+   "ci": [
+    0.085,
+    0.271
+   ]
+  },
+  "repl": {
+   "mean": 0.482,
+   "ci": [
+    0.395,
+    0.568
+   ]
+  },
+  "rotation": {
+   "mean": 0.306,
+   "ci": [
+    0.199,
+    0.407
+   ]
+  },
+  "rotation_positive": 57.8
+ }
+}
