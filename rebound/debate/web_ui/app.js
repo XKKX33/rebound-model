@@ -50,9 +50,35 @@ const state = {
   // 历史模式下的流式路由动画演示状态
   demoFlowStage: -1,
   demoFlowTimer: null,
+
+  // 右侧 AI 投研复盘对话栏（档位 B：工具调用 Agent + 持久化会话）
+  chatOpen: false,
+  chatWide: false,
+  leftCollapsed: false,
+  chatRoles: [
+    { id: "research_copilot", name: "投研复盘助手", desc: "全局复盘视角：解读终选逻辑、跨股对比、排查风险、生成次日开盘清单" },
+    { id: "risk_chair", name: "风控主席 (risk_chair)", desc: "以风控拍板视角回应看多/看空与 0~100 打分依据" },
+    { id: "final_pick", name: "终选人 (final_pick)", desc: "以全局终选视角解释行业上限约束与保留/换出取舍" },
+    { id: "model_analyst", name: "模型解读员 (model_analyst)", desc: "侧重 XGBoost 排名、特征分位与模型盲区拆解" },
+    { id: "chart_analyst", name: "走势分析员 (chart_analyst)", desc: "只看 20 日量价形态、均线支撑压力与 MACD 动能" },
+    { id: "bull", name: "多方辩手 (bull)", desc: "从做多角度深挖 T+1 买进、持有约 5 日的看多依据" },
+    { id: "bear", name: "空方辩手 (bear)", desc: "从风控回避角度继续挑刺结构缺陷与买入障碍" },
+    { id: "bull_counter", name: "多方反驳手 (bull_counter)", desc: "针对空方质疑做逐条反驳与风险权重评估" },
+  ],
+  chatTools: [],
+  chatSessions: [],
+  activeChatSessionId: "",
+  chatRole: "research_copilot",
+  chatExtraAttachedCodes: [],
+  chatExcludeSelected: false,
+  chatStreaming: false,
+  chatAbortController: null,
+  chatLiveTurn: null,
+  chatStoreName: "",
 };
 
 const dom = {
+  workspace: document.getElementById("workspace"),
   modelMetaLine: document.getElementById("model-meta-line"),
   selDb: document.getElementById("sel-db"),
   selDate: document.getElementById("sel-date"),
@@ -62,6 +88,7 @@ const dom = {
   btnDryRun: document.getElementById("btn-dry-run"),
   btnStart: document.getElementById("btn-start"),
   btnStop: document.getElementById("btn-stop"),
+  btnToggleChat: document.getElementById("btn-toggle-chat"),
   statusBadge: document.getElementById("status-badge"),
   kpiProgress: document.getElementById("kpi-progress"),
   kpiTokens: document.getElementById("kpi-tokens"),
@@ -82,6 +109,7 @@ const dom = {
   chkAutofollow: document.getElementById("chk-autofollow"),
   rosterList: document.getElementById("roster-list"),
 
+  btnExpandLeft: document.getElementById("btn-expand-left"),
   tabStock: document.getElementById("tab-stock"),
   tabFinal: document.getElementById("tab-final"),
   tabStockTag: document.getElementById("tab-stock-tag"),
@@ -95,6 +123,26 @@ const dom = {
   stockContent: document.getElementById("stock-content"),
   finalContent: document.getElementById("final-content"),
   citationTooltip: document.getElementById("citation-tooltip"),
+
+  // 右侧 AI 投研复盘对话栏
+  chatDrawer: document.getElementById("chat-drawer"),
+  chatSubtitle: document.getElementById("chat-subtitle"),
+  btnChatToggleLeft: document.getElementById("btn-chat-toggle-left"),
+  btnChatWide: document.getElementById("btn-chat-wide"),
+  btnChatClose: document.getElementById("btn-chat-close"),
+  selChatRole: document.getElementById("sel-chat-role"),
+  selChatSession: document.getElementById("sel-chat-session"),
+  btnChatNew: document.getElementById("btn-chat-new"),
+  btnChatDelete: document.getElementById("btn-chat-delete"),
+  chatContextPills: document.getElementById("chat-context-pills"),
+  selChatAttach: document.getElementById("sel-chat-attach"),
+  chatToolsBadge: document.getElementById("chat-tools-badge"),
+  chatMessages: document.getElementById("chat-messages"),
+  chatForm: document.getElementById("chat-form"),
+  chatInput: document.getElementById("chat-input"),
+  chatPersistHint: document.getElementById("chat-persist-hint"),
+  btnChatStop: document.getElementById("btn-chat-stop"),
+  btnChatSend: document.getElementById("btn-chat-send"),
 };
 
 function esc(value) {
@@ -386,6 +434,14 @@ function renderAll() {
     dom.viewFinal.hidden = false;
     renderFinalView();
   }
+  renderChatLayout();
+  renderChatContextStrip();
+  if (state.chatOpen && !state.chatStreaming) {
+    const sess = getActiveChatSession();
+    if (!sess || !sess.messages?.length) {
+      renderChatMessages({ scrollBottom: false });
+    }
+  }
 }
 
 function renderTopbarStatus() {
@@ -574,6 +630,7 @@ function renderRosterList() {
   dom.rosterList.querySelectorAll(".roster-row").forEach((row) => {
     row.addEventListener("click", () => {
       state.selectedCode = row.dataset.code;
+      state.chatExcludeSelected = false;
       state.autoFollow = false;
       dom.chkAutofollow.checked = false;
       switchTab("stock");
@@ -700,6 +757,11 @@ function renderAnalystCard(code, roleId, title, data, st) {
     bodyHtml = `<div class="pending-placeholder">等待该角色进入执行…</div>`;
   }
 
+  const candName = (state.run?.request?.candidates || []).find((c) => c.ts_code === code)?.name || code;
+  const askBtnHtml = data
+    ? `<button class="role-ask-btn" type="button" data-ask-code="${esc(code)}" data-ask-role="${esc(roleId)}" data-ask-prompt="${esc(`针对 ${candName}(${code}) 的${title}结论，进一步解释你的核心判断依据和最值得警惕的风险点。`)}" title="打开 AI 对话栏以该角色视角追问">✦ 追问</button>`
+    : "";
+
   return `
     <article class="role-card${isLive ? " role-live" : ""}" id="role-card-${roleId}">
       <div class="role-card-head">
@@ -707,7 +769,10 @@ function renderAnalystCard(code, roleId, title, data, st) {
           <span class="role-name">${esc(title)}</span>
           <span class="role-code mono">${roleId}</span>
         </div>
-        ${stanceHtml}
+        <div class="role-head-right">
+          ${askBtnHtml}
+          ${stanceHtml}
+        </div>
       </div>
       ${bodyHtml}
     </article>
@@ -733,6 +798,11 @@ function renderDebateRoundCard(code, roleId, title, badgeText, accentClass, data
     bodyHtml = `<div class="pending-placeholder">等待前序发言结束后开始…</div>`;
   }
 
+  const candName = (state.run?.request?.candidates || []).find((c) => c.ts_code === code)?.name || code;
+  const askBtnHtml = data
+    ? `<button class="role-ask-btn" type="button" data-ask-code="${esc(code)}" data-ask-role="${esc(roleId)}" data-ask-prompt="${esc(`围绕 ${candName}(${code}) 在「${title}」中的核心论点，帮我展开检验它有哪些站得住与站不住的地方。`)}" title="打开 AI 对话栏追问该轮攻防">✦ 追问</button>`
+    : "";
+
   return `
     <article class="role-card ${accentClass}${isLive ? " role-live" : ""}" id="role-card-${roleId}">
       <div class="role-card-head">
@@ -740,7 +810,10 @@ function renderDebateRoundCard(code, roleId, title, badgeText, accentClass, data
           <span class="role-name">${esc(title)}</span>
           <span class="role-code mono">${roleId}</span>
         </div>
-        <span class="pill pill-soft">${isLive ? "实时推理中…" : esc(badgeText)}</span>
+        <div class="role-head-right">
+          ${askBtnHtml}
+          <span class="pill pill-soft">${isLive ? "实时推理中…" : esc(badgeText)}</span>
+        </div>
       </div>
       ${bodyHtml}
     </article>
@@ -786,6 +859,11 @@ function renderRiskChairCard(code, verdict, st) {
     bodyHtml = `<div class="pending-placeholder">等待三轮辩论完成后由风控主席结合 20 股 roster 拍板…</div>`;
   }
 
+  const candName = (state.run?.request?.candidates || []).find((c) => c.ts_code === code)?.name || code;
+  const askBtnHtml = verdict
+    ? `<button class="role-ask-btn" type="button" data-ask-code="${esc(code)}" data-ask-role="risk_chair" data-ask-prompt="${esc(`针对 ${candName}(${code}) 给出的「${verdict.verdict} ${fmtNum(verdict.score, 0)} 分」裁决，请说明它在全部 20 只送辩股中的横向位置，以及 T+1 开盘前具体什么条件下放弃买入。`)}" title="向风控主席追问打分与操作条件">✦ 追问裁决</button>`
+    : "";
+
   return `
     <article class="role-card role-chair-accent${isLive ? " role-live" : ""}" id="role-card-risk_chair">
       <div class="role-card-head">
@@ -793,7 +871,10 @@ function renderRiskChairCard(code, verdict, st) {
           <span class="role-name">风控主席最终裁决</span>
           <span class="role-code mono">risk_chair · 对照全部送辩 roster</span>
         </div>
-        ${headBadge}
+        <div class="role-head-right">
+          ${askBtnHtml}
+          ${headBadge}
+        </div>
       </div>
       ${bodyHtml}
     </article>
@@ -1024,7 +1105,19 @@ function renderFinalView() {
               <span class="tag-neutral mono">调用 ${final.usage?.calls ?? 0} 次（失败 ${final.usage?.failed_calls ?? 0}）· ${fmtTokens(final.usage)}</span>
             </div>
           </div>
-          <span class="status-badge status-done">已冻结定稿</span>
+          <div class="role-head-right">
+            <button
+              class="role-ask-btn"
+              type="button"
+              data-ask-code=""
+              data-ask-role="final_pick"
+              data-ask-prompt="${esc(`基于 ${final.as_of} 的终选结果，请详细拆解为什么换掉了未入选的原模型前 6 股票，以及新进替换标的的相对优势与行业上限取舍。`)}"
+              title="向终选官追问全局重排理由"
+            >
+              ✦ 追问终选
+            </button>
+            <span class="status-badge status-done">已冻结定稿</span>
+          </div>
         </div>
 
         <div class="final-kpi-row">
@@ -1208,6 +1301,12 @@ function tickElapsedTimers() {
       el.textContent = `${Math.max(0, Date.now() / 1000 - stream.started_at).toFixed(1)}s`;
     }
   });
+  if (state.chatStreaming && state.chatLiveTurn?.started_at) {
+    const el = document.getElementById("chat-live-elapsed");
+    if (el) {
+      el.textContent = `${Math.max(0, Date.now() / 1000 - state.chatLiveTurn.started_at).toFixed(1)}s`;
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -1488,9 +1587,12 @@ async function loadRunDetail(asOf, hashPrefix) {
   const detail = await apiJson(`/api/run?${qs.toString()}`);
   state.selectedDate = asOf;
   state.selectedRunKey = `${asOf}/${hashPrefix}`;
+  state.chatExtraAttachedCodes = [];
+  state.chatExcludeSelected = false;
   dom.selDate.value = asOf;
   dom.selRun.value = state.selectedRunKey;
   hydrateRunDetail(detail);
+  await refreshChatSessions({ preserveActive: false });
 }
 
 async function handleDryRun() {
@@ -1535,9 +1637,12 @@ async function handleDryRun() {
     };
     resetStockStateFromRequest(res.request);
     state.selectedCode = res.request.candidates[0]?.ts_code || "";
+    state.chatExtraAttachedCodes = [];
+    state.chatExcludeSelected = false;
     state.activeTab = "stock";
     showToast(`演练快照就绪：${res.as_of} 共 ${res.request.candidates.length} 只送辩候选，可直接浏览 20 日 K 线与特征。`, "info", 5000);
     renderAll();
+    await refreshChatSessions({ preserveActive: false });
   } catch (err) {
     showToast(`演练失败：${err.message}`, "error", 7000);
   }
@@ -1681,6 +1786,7 @@ function bindEvents() {
     } else {
       state.run = null;
       renderAll();
+      await refreshChatSessions({ preserveActive: false });
     }
   });
 
@@ -1738,6 +1844,957 @@ function bindEvents() {
   });
 
   bindCitationHover();
+  bindChatEvents();
+}
+
+// ---------------------------------------------------------------------------
+// 右侧 AI 投研复盘对话栏（档位 B：6 只读工具 + 逐字思考 + 落盘持久化）
+// ---------------------------------------------------------------------------
+
+function chatRunScope() {
+  const run = state.run;
+  const asOf = run?.as_of || state.selectedDate || "";
+  const hash = !state.isDryRun && run?.hash_prefix ? run.hash_prefix : "";
+  return {
+    db: state.selectedDb || "",
+    variant: run?.variant || state.meta?.variant || "",
+    cadence: run?.cadence || state.meta?.cadence || "",
+    as_of: asOf,
+    hash,
+  };
+}
+
+function getChatAttachedCodes() {
+  const candidates = state.run?.request?.candidates || [];
+  const validSet = new Set(candidates.map((c) => c.ts_code));
+  const out = [];
+  if (state.selectedCode && !state.chatExcludeSelected && validSet.has(state.selectedCode)) {
+    out.push(state.selectedCode);
+  }
+  for (const code of state.chatExtraAttachedCodes) {
+    if (validSet.has(code) && !out.includes(code)) {
+      out.push(code);
+    }
+    if (out.length >= 3) break;
+  }
+  return out.slice(0, 3);
+}
+
+function chatRoleLabel(roleId) {
+  const found = state.chatRoles.find((r) => r.id === roleId);
+  return found ? found.name : roleId || "投研复盘助手";
+}
+
+function renderChatLayout() {
+  dom.workspace.classList.toggle("chat-open", state.chatOpen);
+  dom.workspace.classList.toggle("chat-wide", state.chatOpen && state.chatWide);
+  dom.workspace.classList.toggle("left-collapsed", state.leftCollapsed);
+
+  dom.chatDrawer.hidden = !state.chatOpen;
+  dom.btnToggleChat.classList.toggle("active", state.chatOpen);
+  dom.btnExpandLeft.hidden = !state.leftCollapsed;
+
+  dom.btnChatToggleLeft.textContent = state.leftCollapsed ? "展开左栏" : "收起左栏";
+  dom.btnChatToggleLeft.classList.toggle("active", state.leftCollapsed);
+  dom.btnChatWide.textContent = state.chatWide ? "标准宽" : "宽屏";
+  dom.btnChatWide.classList.toggle("active", state.chatWide);
+}
+
+function renderChatControls() {
+  dom.selChatRole.innerHTML = state.chatRoles
+    .map((r) => `<option value="${esc(r.id)}" title="${esc(r.desc)}">${esc(r.name)}</option>`)
+    .join("");
+  dom.selChatRole.value = state.chatRole;
+
+  if (state.chatSessions.length === 0) {
+    dom.selChatSession.innerHTML = `<option value="">新对话（发送首句自动落盘）</option>`;
+    dom.selChatSession.value = "";
+  } else {
+    const opts = [
+      ...(state.activeChatSessionId ? [] : [`<option value="">＋ 新对话（未发送）</option>`]),
+      ...state.chatSessions.map((s) => {
+        const turns = Math.floor((s.messages?.length || 0) / 2);
+        const label = `${s.title || "未命名对话"}${turns > 0 ? ` (${turns}轮)` : ""}`;
+        return `<option value="${esc(s.id)}">${esc(label)}</option>`;
+      }),
+    ];
+    dom.selChatSession.innerHTML = opts.join("");
+    dom.selChatSession.value = state.activeChatSessionId;
+  }
+
+  dom.btnChatDelete.disabled = !state.activeChatSessionId || state.chatStreaming;
+  dom.btnChatNew.disabled = state.chatStreaming;
+  dom.btnChatSend.disabled = state.chatStreaming;
+  dom.btnChatStop.hidden = !state.chatStreaming;
+  dom.chatInput.disabled = state.chatStreaming;
+
+  const roleMeta = state.chatRoles.find((r) => r.id === state.chatRole);
+  dom.chatSubtitle.textContent = roleMeta ? roleMeta.desc : "预置方法论 · 6 只读工具按需查全池";
+
+  if (state.chatTools.length > 0) {
+    dom.chatToolsBadge.textContent = `⚙ ${state.chatTools.length} 工具`;
+    dom.chatToolsBadge.title = `只读工具（100% 覆盖本场辩论与 DuckDB）：\n${state.chatTools.map((t) => `• ${t.label} (${t.name})`).join("\n")}`;
+  }
+  dom.chatPersistHint.textContent = state.chatStreaming
+    ? "正在流式思考与调工具…"
+    : state.chatStoreName
+      ? `已落盘 · ${state.chatStoreName}`
+      : "会话自动落盘保存";
+}
+
+function renderChatContextStrip() {
+  const candidates = state.run?.request?.candidates || [];
+  const byCode = new Map(candidates.map((c) => [c.ts_code, c]));
+  const attached = getChatAttachedCodes();
+
+  let globalLabel = "仅 DuckDB 数据库";
+  if (state.run?.final) {
+    globalLabel = `${state.run.as_of} · 终选+${candidates.length}股全览`;
+  } else if (state.run?.request) {
+    globalLabel = `${state.run.as_of} · ${state.isDryRun ? "演练" : "进行中"} ${candidates.length}股`;
+  }
+
+  const pills = [
+    `<span class="chat-ctx-pill ctx-global" title="常驻系统提示词：方法论 + 终选结果 + 全部送辩风控简表">● ${esc(globalLabel)}</span>`,
+    ...attached.map((code) => {
+      const name = byCode.get(code)?.name || "";
+      const isAuto = code === state.selectedCode;
+      return `
+        <span class="chat-ctx-pill ctx-stock" title="${isAuto ? "当前聚焦个股（自动挂载完整 28 特征 + 20 日线 + 6 轮辩论）" : "手动追加挂载个股"}">
+          <button type="button" class="chat-ctx-stock-btn mono" data-chat-jump="${esc(code)}">@${esc(code)} ${esc(name)}</button>
+          <button type="button" class="chat-ctx-remove" data-chat-detach="${esc(code)}" title="移出常驻上下文">×</button>
+        </span>
+      `;
+    }),
+  ];
+  dom.chatContextPills.innerHTML = pills.join("");
+
+  const attachable = candidates.filter((c) => !attached.includes(c.ts_code));
+  dom.selChatAttach.innerHTML = [
+    `<option value="">${attached.length >= 3 ? "已挂满 3 只（可调工具查其余）" : "+ 追加个股明细…"}</option>`,
+    ...attachable.map(
+      (c) => `<option value="${esc(c.ts_code)}">#${String(c.model.rank).padStart(2, "0")} ${esc(c.ts_code)} ${esc(c.name)}</option>`,
+    ),
+  ].join("");
+  dom.selChatAttach.disabled = attached.length >= 3 || candidates.length === 0;
+}
+
+function getActiveChatSession() {
+  if (!state.activeChatSessionId) return null;
+  return state.chatSessions.find((s) => s.id === state.activeChatSessionId) || null;
+}
+
+// --- 安全研报风 Markdown + 字段证据芯片 + 可点击个股代码渲染器 ---
+
+const _CITATION_PATH_RE =
+  /\b(?:features\.[A-Za-z0-9_]+|feature_pct\.[A-Za-z0-9_]+|bars\[-?\d+\](?:\.[A-Za-z0-9_]+)?|flags\.[A-Za-z0-9_]+|industry_stats\.[A-Za-z0-9_]+|model\.[A-Za-z0-9_]+|context\.[A-Za-z0-9_]+)\b/g;
+const _STOCK_CODE_RE = /\b(\d{6}\.(?:SH|SZ))\b/g;
+
+function enhanceInlineEntities(escapedHtml) {
+  const validCodes = new Set((state.run?.request?.candidates || []).map((c) => c.ts_code));
+  // 1. 先处理反引号行内代码：若是已知引用路径则直接升级为悬停 citation-chip
+  let out = escapedHtml.replace(/`([^`\n]+)`/g, (_m, inner) => {
+    const trimmed = inner.trim();
+    if (/^(?:features|feature_pct|flags|industry_stats|model|context)\.[A-Za-z0-9_]+$|^bars\[-?\d+\](?:\.[A-Za-z0-9_]+)?$/.test(trimmed)) {
+      return `<span class="citation-chip mono" data-citation="${trimmed}">${trimmed}</span>`;
+    }
+    return `<code>${inner}</code>`;
+  });
+
+  // 2. 粗体与斜体
+  out = out.replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>");
+  out = out.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, "$1<em>$2</em>");
+
+  // 3. 在 HTML 标签之外的纯文本段中，升级裸字段路径与候选股票代码
+  const parts = out.split(/(<[^>]+>)/g);
+  let insideTagDepth = 0;
+  return parts
+    .map((part) => {
+      if (part.startsWith("<")) {
+        if (/^<(?:code|button|span)\b/i.test(part)) insideTagDepth += 1;
+        else if (/^<\/(?:code|button|span)>/i.test(part)) insideTagDepth = Math.max(0, insideTagDepth - 1);
+        return part;
+      }
+      if (insideTagDepth > 0) return part;
+      let seg = part.replace(
+        _CITATION_PATH_RE,
+        (match) => `<span class="citation-chip mono" data-citation="${match}">${match}</span>`,
+      );
+      if (validCodes.size > 0) {
+        seg = seg.replace(_STOCK_CODE_RE, (code) =>
+          validCodes.has(code)
+            ? `<button type="button" class="chat-code-link" data-chat-jump="${code}" title="点击切换到 ${code} 的 K 线与辩论详情">${code}</button>`
+            : code,
+        );
+      }
+      return seg;
+    })
+    .join("");
+}
+
+function renderChatMarkdown(rawText) {
+  const text = String(rawText || "").replace(/\r\n/g, "\n");
+  if (!text.trim()) return "";
+
+  // 提取围栏代码块避免被行级规则误拆
+  const codeBlocks = [];
+  const stripped = text.replace(/```([a-zA-Z0-9_-]*)\n([\s\S]*?)```/g, (_m, _lang, code) => {
+    const idx = codeBlocks.length;
+    codeBlocks.push(`<pre><code>${esc(code.replace(/\n$/, ""))}</code></pre>`);
+    return `\n@@CODEBLOCK_${idx}@@\n`;
+  });
+
+  const lines = stripped.split("\n");
+  const htmlBlocks = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    if (!trimmed) {
+      i += 1;
+      continue;
+    }
+
+    const cbMatch = /^@@CODEBLOCK_(\d+)@@$/.exec(trimmed);
+    if (cbMatch) {
+      htmlBlocks.push(codeBlocks[Number(cbMatch[1])] || "");
+      i += 1;
+      continue;
+    }
+
+    if (/^---+$|^\*\*\*+$/.test(trimmed)) {
+      htmlBlocks.push("<hr />");
+      i += 1;
+      continue;
+    }
+
+    const headMatch = /^(#{1,4})\s+(.+)$/.exec(trimmed);
+    if (headMatch) {
+      const lvl = Math.min(4, Math.max(2, headMatch[1].length));
+      htmlBlocks.push(`<h${lvl}>${enhanceInlineEntities(esc(headMatch[2]))}</h${lvl}>`);
+      i += 1;
+      continue;
+    }
+
+    // Markdown 表格
+    if (
+      trimmed.includes("|") &&
+      i + 1 < lines.length &&
+      /^\s*\|?\s*[:\-]+(?:\s*\|\s*[:\-]+)+\s*\|?\s*$/.test(lines[i + 1])
+    ) {
+      const splitRow = (r) =>
+        r
+          .trim()
+          .replace(/^\|/, "")
+          .replace(/\|$/, "")
+          .split("|")
+          .map((c) => c.trim());
+      const headers = splitRow(line);
+      i += 2;
+      const bodyRows = [];
+      while (i < lines.length && lines[i].trim() && lines[i].includes("|")) {
+        bodyRows.push(splitRow(lines[i]));
+        i += 1;
+      }
+      htmlBlocks.push(`
+        <div class="chat-table-wrap">
+          <table>
+            <thead><tr>${headers.map((h) => `<th>${enhanceInlineEntities(esc(h))}</th>`).join("")}</tr></thead>
+            <tbody>
+              ${bodyRows
+                .map((r) => `<tr>${headers.map((_h, idx) => `<td>${enhanceInlineEntities(esc(r[idx] ?? ""))}</td>`).join("")}</tr>`)
+                .join("")}
+            </tbody>
+          </table>
+        </div>
+      `);
+      continue;
+    }
+
+    // 引用块
+    if (trimmed.startsWith(">")) {
+      const qLines = [];
+      while (i < lines.length && lines[i].trim().startsWith(">")) {
+        qLines.push(lines[i].trim().replace(/^>\s?/, ""));
+        i += 1;
+      }
+      htmlBlocks.push(`<blockquote>${qLines.map((l) => enhanceInlineEntities(esc(l))).join("<br />")}</blockquote>`);
+      continue;
+    }
+
+    // 无序列表
+    if (/^[-*•]\s+/.test(trimmed)) {
+      const items = [];
+      while (i < lines.length && /^[-*•]\s+/.test(lines[i].trim())) {
+        items.push(lines[i].trim().replace(/^[-*•]\s+/, ""));
+        i += 1;
+      }
+      htmlBlocks.push(`<ul>${items.map((it) => `<li>${enhanceInlineEntities(esc(it))}</li>`).join("")}</ul>`);
+      continue;
+    }
+
+    // 有序列表
+    if (/^\d+\.\s+/.test(trimmed)) {
+      const items = [];
+      while (i < lines.length && /^\d+\.\s+/.test(lines[i].trim())) {
+        items.push(lines[i].trim().replace(/^\d+\.\s+/, ""));
+        i += 1;
+      }
+      htmlBlocks.push(`<ol>${items.map((it) => `<li>${enhanceInlineEntities(esc(it))}</li>`).join("")}</ol>`);
+      continue;
+    }
+
+    // 普通段落（合并连续非空普通行）
+    const pLines = [];
+    while (
+      i < lines.length &&
+      lines[i].trim() &&
+      !/^@@CODEBLOCK_\d+@@$/.test(lines[i].trim()) &&
+      !/^(#{1,4})\s+/.test(lines[i].trim()) &&
+      !/^[-*•]\s+/.test(lines[i].trim()) &&
+      !/^\d+\.\s+/.test(lines[i].trim()) &&
+      !lines[i].trim().startsWith(">") &&
+      !/^---+$|^\*\*\*+$/.test(lines[i].trim())
+    ) {
+      if (
+        lines[i].includes("|") &&
+        i + 1 < lines.length &&
+        /^\s*\|?\s*[:\-]+(?:\s*\|\s*[:\-]+)+\s*\|?\s*$/.test(lines[i + 1])
+      ) {
+        break;
+      }
+      pLines.push(lines[i].trim());
+      i += 1;
+    }
+    htmlBlocks.push(`<p>${pLines.map((l) => enhanceInlineEntities(esc(l))).join("<br />")}</p>`);
+  }
+
+  return htmlBlocks.join("");
+}
+
+function summarizeToolArgs(args) {
+  if (!args || typeof args !== "object") return "";
+  const entries = Object.entries(args).filter(([, v]) => v !== undefined && v !== null && v !== "");
+  if (entries.length === 0) return "";
+  return entries
+    .map(([k, v]) => `${k}=${Array.isArray(v) ? v.join(",") : String(v)}`)
+    .join(" · ");
+}
+
+function renderToolStepsHtml(toolCalls) {
+  if (!Array.isArray(toolCalls) || toolCalls.length === 0) return "";
+  return `
+    <div class="chat-tool-steps">
+      ${toolCalls
+        .map((tc) => {
+          const isRunning = tc.status === "running";
+          const isOk = tc.status === "ok" || (tc.status === undefined && tc.ok !== false);
+          const cls = isRunning ? " tool-running" : isOk ? "" : " tool-err";
+          const icon = isRunning
+            ? `<span class="tool-spinner" aria-hidden="true"></span>`
+            : isOk
+              ? `<span class="tool-check">✓</span>`
+              : `<span class="tool-fail">!</span>`;
+          const argPreview = summarizeToolArgs(tc.arguments);
+          const timeText = isRunning ? "查询中…" : `${tc.elapsed_ms ?? 0}ms`;
+          return `
+            <details class="tool-step-card${cls}">
+              <summary class="tool-step-summary">
+                <div class="tool-step-left">
+                  ${icon}
+                  <span class="tool-label">${esc(tc.label || tc.name)}</span>
+                  ${argPreview ? `<span class="tool-arg-preview mono">${esc(argPreview)}</span>` : ""}
+                </div>
+                <span class="tool-elapsed mono">${esc(timeText)}</span>
+              </summary>
+              <div class="tool-step-detail">
+                <div><strong>工具：</strong><span class="mono">${esc(tc.name)}</span></div>
+                ${tc.summary ? `<div><strong>结果：</strong>${esc(tc.summary)}</div>` : ""}
+                <pre>${esc(JSON.stringify(tc.arguments || {}, null, 2))}</pre>
+              </div>
+            </details>
+          `;
+        })
+        .join("")}
+    </div>
+  `;
+}
+
+function renderChatEmptyState() {
+  const candidates = state.run?.request?.candidates || [];
+  const focusCand = candidates.find((c) => c.ts_code === state.selectedCode);
+  const focusName = focusCand ? `${focusCand.name}(${focusCand.ts_code})` : "当前选中股票";
+  const quickPrompts = [
+    "为什么终选换掉了原模型第 1 名？被换掉的票各自有什么硬伤？",
+    "对比当前所有「看多」股票的买点结构与核心风险，列成一张对照表。",
+    "帮我筛一下这 20 只送辩股里，近 5 天放量最明显（vol5 最高）的前 5 只是谁？",
+    `针对 ${focusName}，给出明日 T+1 开盘前可执行检查清单（什么条件买、什么条件放弃）。`,
+  ];
+
+  return `
+    <div class="chat-empty">
+      <div class="chat-empty-title">✦ 反弹模型投研复盘 Agent（档位 B）</div>
+      <p class="chat-empty-desc">
+        已预置完整方法论 <code>docs/debate-methodology.md</code>，默认掌握终选名单、全部 20 只风控简表与当前聚焦个股的完整 6 轮辩论；问及任意其他股票、跨股筛选或历史事后收益时，会自动调用只读工具精准查证。
+      </p>
+      <div class="chat-empty-caps">
+        <span class="chat-cap-tag">100% 辩论账本可读</span>
+        <span class="chat-cap-tag">DuckDB 只读查询</span>
+        <span class="chat-cap-tag">逐字思考流</span>
+        <span class="chat-cap-tag">落盘持久化</span>
+      </div>
+      <div class="chat-quick-list">
+        ${quickPrompts
+          .map((q) => `<button type="button" class="chat-quick-btn" data-quick-prompt="${esc(q)}">↗ ${esc(q)}</button>`)
+          .join("")}
+      </div>
+    </div>
+  `;
+}
+
+function renderPersistedMessageHtml(msg) {
+  if (msg.role === "user") {
+    const tags = (msg.attached_codes || []).map((c) => `<span class="mono">@${esc(c)}</span>`).join(" ");
+    const timeStr = msg.created_at ? msg.created_at.slice(11, 16) : "";
+    return `
+      <div class="chat-msg chat-msg-user">
+        <div class="chat-bubble">${esc(msg.content)}</div>
+        <div class="chat-user-meta">${tags} ${timeStr ? `<span class="mono">${esc(timeStr)}</span>` : ""}</div>
+      </div>
+    `;
+  }
+
+  const roleName = chatRoleLabel(msg.role_preset);
+  const timeStr = msg.created_at ? msg.created_at.slice(11, 16) : "";
+  const tokStr = msg.usage && (msg.usage.input_tokens || msg.usage.output_tokens) ? fmtTokens(msg.usage) : "";
+  const thinkingHtml = msg.thinking
+    ? `
+      <details class="chat-thinking-archive">
+        <summary>深度思考过程（${msg.thinking.length} 字）</summary>
+        <pre>${esc(msg.thinking)}</pre>
+      </details>
+    `
+    : "";
+
+  return `
+    <div class="chat-msg chat-msg-assistant">
+      <div class="chat-asst-card">
+        <div class="chat-asst-head">
+          <span class="chat-asst-role">✦ ${esc(roleName)}</span>
+          <span class="mono">${esc([tokStr, timeStr].filter(Boolean).join(" · "))}</span>
+        </div>
+        ${renderToolStepsHtml(msg.tool_calls)}
+        ${thinkingHtml}
+        <div class="chat-md">${renderChatMarkdown(msg.content)}</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderLiveTurnHtml(live) {
+  if (!live) return "";
+  const roleName = chatRoleLabel(live.role_preset);
+  const elapsed = live.started_at ? `${Math.max(0, Date.now() / 1000 - live.started_at).toFixed(1)}s` : "0.0s";
+  const hasText = Boolean(live.text);
+  const hasTools = live.tool_calls.length > 0;
+  const showThinkingLive = Boolean(live.thinking) || (!hasText && !hasTools && !live.error);
+
+  return `
+    <div class="chat-msg chat-msg-assistant" id="chat-live-msg">
+      <div class="chat-asst-card is-live">
+        <div class="chat-asst-head">
+          <span class="chat-asst-role">✦ ${esc(roleName)}</span>
+          <span class="mono" id="chat-live-elapsed">${elapsed}</span>
+        </div>
+        <div id="chat-live-tools">${renderToolStepsHtml(live.tool_calls)}</div>
+        ${
+          showThinkingLive
+            ? `
+          <div class="chat-thinking-live" id="chat-live-thinking-wrap">
+            <div class="chat-thinking-label">
+              <span>深度思考 (Thinking)</span>
+              <span class="mono" id="chat-live-thinking-len">${live.thinking.length} 字</span>
+            </div>
+            <div class="chat-thinking-content" id="chat-live-thinking">${esc(live.thinking || "正在读取上下文并组织分析…")}${!hasText ? '<span class="caret"></span>' : ""}</div>
+          </div>
+        `
+            : ""
+        }
+        <div class="chat-md" id="chat-live-md">${hasText ? `${renderChatMarkdown(live.text)}<span class="caret"></span>` : ""}</div>
+        ${live.error ? `<div class="chat-error-banner">${esc(live.error)}</div>` : ""}
+      </div>
+    </div>
+  `;
+}
+
+function scrollChatToBottom(force = false) {
+  const el = dom.chatMessages;
+  if (!el) return;
+  const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+  if (force || nearBottom) {
+    el.scrollTop = el.scrollHeight;
+  }
+}
+
+function renderChatMessages({ scrollBottom = false } = {}) {
+  const session = getActiveChatSession();
+  const persisted = session?.messages || [];
+
+  if (persisted.length === 0 && !state.chatLiveTurn) {
+    dom.chatMessages.innerHTML = renderChatEmptyState();
+    return;
+  }
+
+  const parts = persisted.map((m) => renderPersistedMessageHtml(m));
+  if (state.chatLiveTurn) {
+    // 若刚才乐观追加的用户消息还未回刷进 session.messages，则先在前端展示
+    if (state.chatLiveTurn.optimisticUser && !persisted.some((m) => m.id === state.chatLiveTurn.optimisticUser.id)) {
+      parts.push(renderPersistedMessageHtml(state.chatLiveTurn.optimisticUser));
+    }
+    parts.push(renderLiveTurnHtml(state.chatLiveTurn));
+  }
+  dom.chatMessages.innerHTML = parts.join("");
+  scrollChatToBottom(scrollBottom);
+}
+
+function patchLiveChatDom(kind) {
+  const live = state.chatLiveTurn;
+  if (!live) return;
+  if (kind === "thinking") {
+    const box = document.getElementById("chat-live-thinking");
+    const lenEl = document.getElementById("chat-live-thinking-len");
+    if (!box) {
+      renderChatMessages({ scrollBottom: true });
+      return;
+    }
+    box.innerHTML = `${esc(live.thinking)}${!live.text ? '<span class="caret"></span>' : ""}`;
+    box.scrollTop = box.scrollHeight;
+    if (lenEl) lenEl.textContent = `${live.thinking.length} 字`;
+    scrollChatToBottom(false);
+  } else if (kind === "tools") {
+    const wrap = document.getElementById("chat-live-tools");
+    if (!wrap) {
+      renderChatMessages({ scrollBottom: true });
+      return;
+    }
+    wrap.innerHTML = renderToolStepsHtml(live.tool_calls);
+    scrollChatToBottom(false);
+  } else if (kind === "text") {
+    const mdEl = document.getElementById("chat-live-md");
+    if (!mdEl) {
+      renderChatMessages({ scrollBottom: true });
+      return;
+    }
+    // 正文开始输出时去掉思考框光标
+    const thinkBox = document.getElementById("chat-live-thinking");
+    if (thinkBox && thinkBox.querySelector(".caret")) {
+      thinkBox.textContent = live.thinking;
+    }
+    mdEl.innerHTML = `${renderChatMarkdown(live.text)}<span class="caret"></span>`;
+    scrollChatToBottom(false);
+  }
+}
+
+async function refreshChatSessions({ preserveActive = false } = {}) {
+  try {
+    const scope = chatRunScope();
+    const qs = new URLSearchParams();
+    if (scope.db) qs.set("db", scope.db);
+    if (scope.variant) qs.set("variant", scope.variant);
+    if (scope.cadence) qs.set("cadence", scope.cadence);
+    if (scope.as_of) qs.set("as_of", scope.as_of);
+    if (scope.hash) qs.set("hash", scope.hash);
+
+    const data = await apiJson(`/api/chat/sessions?${qs.toString()}`);
+    if (Array.isArray(data.roles) && data.roles.length > 0) state.chatRoles = data.roles;
+    if (Array.isArray(data.tools)) state.chatTools = data.tools;
+    state.chatSessions = Array.isArray(data.sessions) ? data.sessions : [];
+    state.chatStoreName = data.store_name || "";
+
+    const exists = state.chatSessions.some((s) => s.id === state.activeChatSessionId);
+    if (!preserveActive || !exists) {
+      state.activeChatSessionId = state.chatSessions[0]?.id || "";
+    }
+    const activeSess = getActiveChatSession();
+    if (activeSess?.role_preset) {
+      state.chatRole = activeSess.role_preset;
+    }
+  } catch (err) {
+    // 静默降级，避免阻断主界面加载
+    state.chatSessions = [];
+    state.activeChatSessionId = "";
+  }
+  renderChatControls();
+  renderChatContextStrip();
+  renderChatMessages({ scrollBottom: true });
+}
+
+async function handleCreateChatSession() {
+  if (state.chatStreaming) return;
+  try {
+    const scope = chatRunScope();
+    const res = await apiJson("/api/chat/sessions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...scope,
+        role_preset: state.chatRole,
+        title: "新对话",
+      }),
+    });
+    if (res.session) {
+      state.chatSessions.unshift(res.session);
+      state.activeChatSessionId = res.session.id;
+      renderChatControls();
+      renderChatMessages({ scrollBottom: true });
+      dom.chatInput.focus();
+    }
+  } catch (err) {
+    showToast(`创建会话失败：${err.message}`, "error", 5000);
+  }
+}
+
+async function handleDeleteChatSession() {
+  if (!state.activeChatSessionId || state.chatStreaming) return;
+  const sid = state.activeChatSessionId;
+  try {
+    const scope = chatRunScope();
+    const qs = new URLSearchParams({ session_id: sid });
+    if (scope.db) qs.set("db", scope.db);
+    if (scope.variant) qs.set("variant", scope.variant);
+    if (scope.cadence) qs.set("cadence", scope.cadence);
+    if (scope.as_of) qs.set("as_of", scope.as_of);
+    if (scope.hash) qs.set("hash", scope.hash);
+
+    await apiJson(`/api/chat/sessions?${qs.toString()}`, { method: "DELETE" });
+    state.chatSessions = state.chatSessions.filter((s) => s.id !== sid);
+    state.activeChatSessionId = state.chatSessions[0]?.id || "";
+    renderChatControls();
+    renderChatMessages({ scrollBottom: false });
+  } catch (err) {
+    showToast(`删除会话失败：${err.message}`, "error", 5000);
+  }
+}
+
+function setChatOpen(open) {
+  state.chatOpen = Boolean(open);
+  renderChatLayout();
+  if (state.chatOpen) {
+    renderChatControls();
+    renderChatContextStrip();
+    renderChatMessages({ scrollBottom: true });
+    requestAnimationFrame(() => dom.chatInput.focus());
+  }
+}
+
+function openChatWithPrompt({ code, role, prompt }) {
+  if (code) {
+    const valid = (state.run?.request?.candidates || []).some((c) => c.ts_code === code);
+    if (valid) {
+      if (state.selectedCode === code) {
+        state.chatExcludeSelected = false;
+      } else if (!state.chatExtraAttachedCodes.includes(code)) {
+        state.chatExtraAttachedCodes = [code, ...state.chatExtraAttachedCodes].slice(0, 2);
+      }
+    }
+  }
+  if (role && state.chatRoles.some((r) => r.id === role)) {
+    state.chatRole = role;
+  }
+  setChatOpen(true);
+  if (prompt) {
+    dom.chatInput.value = prompt;
+    autoResizeChatTextarea();
+    dom.chatInput.focus();
+    dom.chatInput.setSelectionRange(prompt.length, prompt.length);
+  }
+}
+
+function autoResizeChatTextarea() {
+  const ta = dom.chatInput;
+  ta.style.height = "auto";
+  ta.style.height = `${Math.min(150, Math.max(46, ta.scrollHeight))}px`;
+}
+
+async function handleSendChatMessage(overrideText = null) {
+  if (state.chatStreaming) return;
+  const text = (overrideText !== null ? overrideText : dom.chatInput.value).trim();
+  if (!text) return;
+
+  if (!state.chatOpen) setChatOpen(true);
+  dom.chatInput.value = "";
+  autoResizeChatTextarea();
+
+  const scope = chatRunScope();
+  const attachedCodes = getChatAttachedCodes();
+  const controller = new AbortController();
+
+  state.chatStreaming = true;
+  state.chatAbortController = controller;
+  state.chatLiveTurn = {
+    session_id: state.activeChatSessionId,
+    message_id: "",
+    role_preset: state.chatRole,
+    thinking: "",
+    text: "",
+    tool_calls: [],
+    started_at: Date.now() / 1000,
+    error: "",
+    optimisticUser: {
+      id: `local-${Date.now()}`,
+      role: "user",
+      content: text,
+      attached_codes: attachedCodes,
+      created_at: new Date().toISOString(),
+    },
+  };
+
+  renderChatControls();
+  renderChatMessages({ scrollBottom: true });
+
+  const handleChatEvent = (evName, payload) => {
+    const live = state.chatLiveTurn;
+    if (!live) return;
+    if (evName === "chat.start") {
+      live.session_id = payload.session_id || live.session_id;
+      live.message_id = payload.message_id || "";
+      if (payload.session_id) state.activeChatSessionId = payload.session_id;
+    } else if (evName === "chat.thinking") {
+      live.thinking += payload.delta || "";
+      patchLiveChatDom("thinking");
+    } else if (evName === "chat.tool_start") {
+      live.tool_calls.push({
+        call_id: payload.call_id,
+        name: payload.name,
+        label: payload.label || payload.name,
+        arguments: payload.arguments || {},
+        status: "running",
+        elapsed_ms: 0,
+        summary: "",
+      });
+      patchLiveChatDom("tools");
+    } else if (evName === "chat.tool_done") {
+      const slot = live.tool_calls.find((t) => t.call_id === payload.call_id);
+      if (slot) {
+        slot.status = payload.ok ? "ok" : "err";
+        slot.ok = payload.ok;
+        slot.elapsed_ms = payload.elapsed_ms ?? 0;
+        slot.summary = payload.summary || "";
+      }
+      patchLiveChatDom("tools");
+    } else if (evName === "chat.delta") {
+      live.text += payload.delta || "";
+      patchLiveChatDom("text");
+    } else if (evName === "chat.error") {
+      live.error = payload.error || "对话生成出错";
+      renderChatMessages({ scrollBottom: true });
+      showToast(`AI 对话出错：${live.error}`, "error", 6000);
+    } else if (evName === "chat.done" || evName === "chat.stopped") {
+      if (payload.session_id) state.activeChatSessionId = payload.session_id;
+    }
+  };
+
+  try {
+    const res = await fetch("/api/chat/stream", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      signal: controller.signal,
+      body: JSON.stringify({
+        ...scope,
+        session_id: state.activeChatSessionId || null,
+        message: text,
+        role_preset: state.chatRole,
+        attached_codes: attachedCodes,
+        reasoning_effort: dom.selEffort.value || undefined,
+      }),
+    });
+
+    if (!res.ok) {
+      const errData = await res.json().catch(() => ({}));
+      throw new Error(errData.error || `请求失败 (${res.status})`);
+    }
+    if (!res.body) {
+      throw new Error("浏览器不支持流式响应读取");
+    }
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let buffer = "";
+
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+      const frames = buffer.split(/\r?\n\r?\n/);
+      buffer = frames.pop() || "";
+
+      for (const frame of frames) {
+        const dataLines = frame
+          .split(/\r?\n/)
+          .filter((l) => l.startsWith("data:"))
+          .map((l) => l.slice(5).trim());
+        if (dataLines.length === 0) continue;
+        try {
+          const parsed = JSON.parse(dataLines.join("\n"));
+          handleChatEvent(parsed.type, parsed.payload || {});
+        } catch {
+          // 忽略异常帧
+        }
+      }
+    }
+  } catch (err) {
+    if (err.name === "AbortError") {
+      showToast("已中止本次生成。", "warn", 3000);
+      await new Promise((r) => setTimeout(r, 150));
+    } else {
+      if (state.chatLiveTurn) state.chatLiveTurn.error = err.message;
+      showToast(`AI 对话失败：${err.message}`, "error", 6000);
+    }
+  } finally {
+    const hadError = Boolean(state.chatLiveTurn?.error);
+    state.chatStreaming = false;
+    state.chatAbortController = null;
+    if (!hadError) {
+      state.chatLiveTurn = null;
+      await refreshChatSessions({ preserveActive: true });
+    } else {
+      renderChatControls();
+      renderChatMessages({ scrollBottom: true });
+      // 下次发送时清掉报错态
+      state.chatLiveTurn = null;
+    }
+  }
+}
+
+function handleStopChatGeneration() {
+  if (state.chatAbortController) {
+    state.chatAbortController.abort();
+  }
+}
+
+function bindChatEvents() {
+  dom.btnToggleChat.addEventListener("click", () => setChatOpen(!state.chatOpen));
+  dom.btnChatClose.addEventListener("click", () => setChatOpen(false));
+
+  dom.btnChatWide.addEventListener("click", () => {
+    state.chatWide = !state.chatWide;
+    renderChatLayout();
+  });
+
+  const toggleLeft = () => {
+    state.leftCollapsed = !state.leftCollapsed;
+    renderChatLayout();
+  };
+  dom.btnChatToggleLeft.addEventListener("click", toggleLeft);
+  dom.btnExpandLeft.addEventListener("click", () => {
+    state.leftCollapsed = false;
+    renderChatLayout();
+  });
+
+  dom.selChatRole.addEventListener("change", () => {
+    state.chatRole = dom.selChatRole.value;
+    renderChatControls();
+  });
+
+  dom.selChatSession.addEventListener("change", () => {
+    if (state.chatStreaming) return;
+    state.activeChatSessionId = dom.selChatSession.value;
+    const sess = getActiveChatSession();
+    if (sess?.role_preset) state.chatRole = sess.role_preset;
+    renderChatControls();
+    renderChatMessages({ scrollBottom: true });
+  });
+
+  dom.btnChatNew.addEventListener("click", handleCreateChatSession);
+  dom.btnChatDelete.addEventListener("click", handleDeleteChatSession);
+
+  dom.selChatAttach.addEventListener("change", () => {
+    const code = dom.selChatAttach.value;
+    if (!code) return;
+    if (code === state.selectedCode) {
+      state.chatExcludeSelected = false;
+    } else if (!state.chatExtraAttachedCodes.includes(code)) {
+      state.chatExtraAttachedCodes.push(code);
+    }
+    dom.selChatAttach.value = "";
+    renderChatContextStrip();
+  });
+
+  dom.chatContextPills.addEventListener("click", (ev) => {
+    const detachBtn = ev.target.closest?.("[data-chat-detach]");
+    if (detachBtn) {
+      const code = detachBtn.dataset.chatDetach;
+      if (code === state.selectedCode) state.chatExcludeSelected = true;
+      state.chatExtraAttachedCodes = state.chatExtraAttachedCodes.filter((c) => c !== code);
+      renderChatContextStrip();
+      return;
+    }
+    const jumpBtn = ev.target.closest?.("[data-chat-jump]");
+    if (jumpBtn) {
+      state.selectedCode = jumpBtn.dataset.chatJump;
+      state.chatExcludeSelected = false;
+      switchTab("stock");
+    }
+  });
+
+  dom.chatMessages.addEventListener("click", (ev) => {
+    const quickBtn = ev.target.closest?.("[data-quick-prompt]");
+    if (quickBtn) {
+      handleSendChatMessage(quickBtn.dataset.quickPrompt);
+      return;
+    }
+    const jumpBtn = ev.target.closest?.("[data-chat-jump]");
+    if (jumpBtn) {
+      state.selectedCode = jumpBtn.dataset.chatJump;
+      state.chatExcludeSelected = false;
+      switchTab("stock");
+    }
+  });
+
+  dom.chatForm.addEventListener("submit", (ev) => {
+    ev.preventDefault();
+    handleSendChatMessage();
+  });
+
+  dom.btnChatStop.addEventListener("click", handleStopChatGeneration);
+
+  dom.chatInput.addEventListener("input", autoResizeChatTextarea);
+  dom.chatInput.addEventListener("keydown", (ev) => {
+    if (ev.key === "Enter" && !ev.shiftKey && !ev.isComposing) {
+      ev.preventDefault();
+      handleSendChatMessage();
+    }
+  });
+
+  // 辩论卡片上的“✦ 追问”按钮事件委托
+  const handleAskClick = (ev) => {
+    const btn = ev.target.closest?.("[data-ask-prompt]");
+    if (!btn) return;
+    ev.stopPropagation();
+    openChatWithPrompt({
+      code: btn.dataset.askCode || "",
+      role: btn.dataset.askRole || "research_copilot",
+      prompt: btn.dataset.askPrompt || "",
+    });
+  };
+  dom.stockContent.addEventListener("click", handleAskClick);
+  dom.finalContent.addEventListener("click", handleAskClick);
+
+  // 全局快捷键 Ctrl+K / Cmd+K 打开或折叠对话栏
+  document.addEventListener("keydown", (ev) => {
+    if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === "k") {
+      ev.preventDefault();
+      if (!state.chatOpen) {
+        setChatOpen(true);
+      } else if (document.activeElement !== dom.chatInput) {
+        dom.chatInput.focus();
+      } else {
+        setChatOpen(false);
+      }
+    }
+  });
 }
 
 function toggleDemoFlow() {
@@ -1776,6 +2833,7 @@ async function boot() {
       await loadRunDetail(latest.as_of, latest.hash_prefix);
     } else {
       renderAll();
+      await refreshChatSessions({ preserveActive: false });
     }
   } catch (err) {
     showToast(`初始化加载失败：${err.message}`, "error", 0);

@@ -20,7 +20,7 @@ from datetime import date
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Any, Callable, Mapping
+from typing import Any, Callable, Iterator, Mapping, Sequence
 from urllib.parse import parse_qs, urlparse
 
 import duckdb
@@ -29,7 +29,7 @@ from rebound import clock
 from rebound import config as app_config
 from rebound import params as model_params
 from rebound.data.errors import DataError
-from rebound.debate import runs, service, snapshot
+from rebound.debate import chat, runs, service, snapshot
 from rebound.debate.contracts import ContractError, Event
 from rebound.debate.sidecar import SidecarError, SidecarStopped, resolve_api_key
 
@@ -116,10 +116,12 @@ class DebateHub:
         *,
         default_db: Path | None = None,
         sidecar_factory: Callable[[app_config.Settings], Any] | None = None,
+        chat_stream_fn: chat.StreamFn | None = None,
     ) -> None:
         self.settings = settings
         self.default_db = self._pick_default_db(default_db)
         self.sidecar_factory = sidecar_factory
+        self.chat_stream_fn = chat_stream_fn
         self._lock = threading.Lock()
         self._subscribers: set[queue.Queue[tuple[str, dict[str, Any]]]] = set()
         self._active: dict[str, Any] | None = None
@@ -128,6 +130,8 @@ class DebateHub:
         self._stream_run_key: str | None = None
         self._live_streams: dict[str, dict[str, Any]] = {}
         self._active_roles: dict[str, dict[str, Any]] = {}
+        self._chat_stores: dict[Path, chat.ChatStore] = {}
+        self._dry_run_cache: dict[tuple[str, str, str, str], dict[str, Any]] = {}
 
     def _pick_default_db(self, explicit: Path | None) -> Path:
         if explicit is not None:
@@ -385,7 +389,7 @@ class DebateHub:
         snap = snapshot.build_request(
             db_path, settings=eff, as_of=date.fromisoformat(as_of), variant=v, cadence=c
         )
-        return {
+        out = {
             "db": str(db_path),
             "as_of": snap.request.as_of,
             "variant": v,
@@ -393,6 +397,9 @@ class DebateHub:
             "hash_prefix": snap.request.input_hash[:12],
             "request": snap.request.payload(),
         }
+        with self._lock:
+            self._dry_run_cache[(str(db_path).lower(), v, c, snap.request.as_of)] = out
+        return out
 
     def _apply_overrides(self, overrides: Mapping[str, Any] | None) -> app_config.Settings:
         if not overrides:
@@ -629,6 +636,159 @@ class DebateHub:
                 except queue.Empty:
                     pass
 
+    # ------------------------------------------------------------------
+    # AI 投研复盘对话（档位 B：只读工具 + 落盘持久化 + 流式思考）
+    # ------------------------------------------------------------------
+
+    def chat_store(
+        self,
+        *,
+        db: str | None = None,
+        variant: str | None = None,
+        cadence: str | None = None,
+        as_of: str | None = None,
+        hash_prefix: str | None = None,
+    ) -> chat.ChatStore:
+        db_path = self.resolve_db(db)
+        v, c = self._resolve_vc(variant, cadence)
+        store = chat.ChatStore.for_run(
+            db_path,
+            variant=v,
+            cadence=c,
+            as_of=(as_of or "").strip(),
+            hash_prefix=(hash_prefix or "").strip() or None,
+        )
+        key = store.path.resolve()
+        with self._lock:
+            existing = self._chat_stores.get(key)
+            if existing is None:
+                self._chat_stores[key] = store
+                return store
+            return existing
+
+    def list_chat_sessions(
+        self,
+        *,
+        db: str | None = None,
+        variant: str | None = None,
+        cadence: str | None = None,
+        as_of: str | None = None,
+        hash_prefix: str | None = None,
+    ) -> dict[str, Any]:
+        store = self.chat_store(db=db, variant=variant, cadence=cadence, as_of=as_of, hash_prefix=hash_prefix)
+        return {
+            "roles": list(chat.CHAT_ROLE_PRESETS),
+            "tools": [{"name": k, "label": v} for k, v in chat.TOOL_LABELS.items()],
+            "sessions": store.list_sessions(),
+            "store_name": store.path.name,
+        }
+
+    def create_chat_session(
+        self,
+        *,
+        db: str | None = None,
+        variant: str | None = None,
+        cadence: str | None = None,
+        as_of: str | None = None,
+        hash_prefix: str | None = None,
+        role_preset: str = "research_copilot",
+        title: str = "新对话",
+    ) -> dict[str, Any]:
+        store = self.chat_store(db=db, variant=variant, cadence=cadence, as_of=as_of, hash_prefix=hash_prefix)
+        return store.create_session(role_preset=role_preset, title=title)
+
+    def delete_chat_session(
+        self,
+        *,
+        db: str | None = None,
+        variant: str | None = None,
+        cadence: str | None = None,
+        as_of: str | None = None,
+        hash_prefix: str | None = None,
+        session_id: str,
+    ) -> bool:
+        if not session_id or not session_id.strip():
+            raise ValueError("缺少 session_id")
+        store = self.chat_store(db=db, variant=variant, cadence=cadence, as_of=as_of, hash_prefix=hash_prefix)
+        return store.delete_session(session_id.strip())
+
+    def build_chat_toolbox(
+        self,
+        *,
+        db: str | None = None,
+        variant: str | None = None,
+        cadence: str | None = None,
+        as_of: str | None = None,
+        hash_prefix: str | None = None,
+    ) -> chat.ChatToolbox:
+        db_path = self.resolve_db(db)
+        v, c = self._resolve_vc(variant, cadence)
+        clean_date = (as_of or "").strip()
+        clean_hash = (hash_prefix or "").strip()
+        run_detail: dict[str, Any] | None = None
+
+        if _SAFE_DATE.fullmatch(clean_date) and _SAFE_HASH.fullmatch(clean_hash):
+            try:
+                run_detail = self.get_run_detail(
+                    db=str(db_path), variant=v, cadence=c, as_of=clean_date, hash_prefix=clean_hash
+                )
+            except NotFoundError:
+                run_detail = None
+
+        if run_detail is None and _SAFE_DATE.fullmatch(clean_date):
+            with self._lock:
+                cached_dry = self._dry_run_cache.get((str(db_path).lower(), v, c, clean_date))
+            if cached_dry is not None:
+                run_detail = {
+                    "request": cached_dry.get("request"),
+                    "stocks": {},
+                    "result": None,
+                    "final": None,
+                }
+
+        return chat.ChatToolbox(
+            db_path,
+            variant=v,
+            cadence=c,
+            as_of=clean_date,
+            hash_prefix=clean_hash,
+            run_detail=run_detail,
+        )
+
+    def prepare_chat_turn(
+        self,
+        *,
+        db: str | None = None,
+        variant: str | None = None,
+        cadence: str | None = None,
+        as_of: str | None = None,
+        hash_prefix: str | None = None,
+        session_id: str | None = None,
+        message: str,
+        role_preset: str = "research_copilot",
+        attached_codes: Sequence[str] = (),
+        reasoning_effort: str | None = None,
+        stop_event: threading.Event | None = None,
+    ) -> Iterator[tuple[str, dict[str, Any]]]:
+        """校验参数并返回对话 SSE 事件迭代器（便于在发送 HTTP 200 前拦截 400 错误）。"""
+        text_in = (message or "").strip()
+        if not text_in:
+            raise ValueError("消息内容不能为空")
+        eff = self._apply_overrides({"reasoning_effort": reasoning_effort} if reasoning_effort else None)
+        store = self.chat_store(db=db, variant=variant, cadence=cadence, as_of=as_of, hash_prefix=hash_prefix)
+        toolbox = self.build_chat_toolbox(db=db, variant=variant, cadence=cadence, as_of=as_of, hash_prefix=hash_prefix)
+        return chat.run_chat_turn(
+            settings=eff,
+            store=store,
+            toolbox=toolbox,
+            session_id=(session_id or "").strip() or None,
+            user_message=text_in,
+            role_preset=(role_preset or "research_copilot").strip(),
+            attached_codes=list(attached_codes or ()),
+            stop_event=stop_event,
+            stream_fn=self.chat_stream_fn,
+        )
+
 
 def _make_handler(hub: DebateHub) -> type[BaseHTTPRequestHandler]:
     class Handler(BaseHTTPRequestHandler):
@@ -759,6 +919,17 @@ def _make_handler(hub: DebateHub) -> type[BaseHTTPRequestHandler]:
                 if path == "/api/stream":
                     self._handle_sse()
                     return
+                if path == "/api/chat/sessions":
+                    self._send_json(
+                        hub.list_chat_sessions(
+                            db=arg("db"),
+                            variant=arg("variant"),
+                            cadence=arg("cadence"),
+                            as_of=arg("as_of"),
+                            hash_prefix=arg("hash"),
+                        )
+                    )
+                    return
                 self._send_json({"error": "未找到接口"}, HTTPStatus.NOT_FOUND)
             except NotFoundError as exc:
                 self._send_json({"error": str(exc)}, HTTPStatus.NOT_FOUND)
@@ -797,12 +968,83 @@ def _make_handler(hub: DebateHub) -> type[BaseHTTPRequestHandler]:
                 if path == "/api/runs/stop":
                     self._send_json(hub.stop_run())
                     return
+                if path == "/api/chat/sessions":
+                    session = hub.create_chat_session(
+                        db=body.get("db"),
+                        variant=body.get("variant"),
+                        cadence=body.get("cadence"),
+                        as_of=body.get("as_of"),
+                        hash_prefix=body.get("hash"),
+                        role_preset=str(body.get("role_preset") or "research_copilot"),
+                        title=str(body.get("title") or "新对话"),
+                    )
+                    self._send_json({"session": session}, HTTPStatus.CREATED)
+                    return
+                if path == "/api/chat/stream":
+                    attached = body.get("attached_codes")
+                    if not isinstance(attached, list):
+                        attached = []
+                    stop_ev = threading.Event()
+                    stream = hub.prepare_chat_turn(
+                        db=body.get("db"),
+                        variant=body.get("variant"),
+                        cadence=body.get("cadence"),
+                        as_of=body.get("as_of"),
+                        hash_prefix=body.get("hash"),
+                        session_id=body.get("session_id"),
+                        message=str(body.get("message") or ""),
+                        role_preset=str(body.get("role_preset") or "research_copilot"),
+                        attached_codes=[str(x) for x in attached],
+                        reasoning_effort=body.get("reasoning_effort"),
+                        stop_event=stop_ev,
+                    )
+                    self.close_connection = True
+                    self.send_response(HTTPStatus.OK)
+                    self.send_header("Content-Type", "text/event-stream; charset=utf-8")
+                    self.send_header("Cache-Control", "no-cache")
+                    self.send_header("Connection", "close")
+                    self.send_header("X-Accel-Buffering", "no")
+                    self.end_headers()
+                    client_gone = False
+                    for ev_name, payload in stream:
+                        if client_gone:
+                            continue
+                        try:
+                            self._write_sse(ev_name, payload)
+                        except (BrokenPipeError, ConnectionResetError, ConnectionAbortedError, OSError):
+                            stop_ev.set()
+                            client_gone = True
+                    return
                 self._send_json({"error": "未找到接口"}, HTTPStatus.NOT_FOUND)
             except BusyError as exc:
                 self._send_json({"error": str(exc)}, HTTPStatus.CONFLICT)
             except ValueError as exc:
                 self._send_json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
             except (DataError, ContractError, SidecarError) as exc:
+                self._send_json({"error": str(exc)}, HTTPStatus.UNPROCESSABLE_ENTITY)
+
+        def do_DELETE(self) -> None:  # noqa: N802
+            parsed = urlparse(self.path)
+            path = parsed.path
+            query = parse_qs(parsed.query)
+            arg = lambda key: query.get(key, [None])[0]
+            try:
+                if path == "/api/chat/sessions":
+                    sid = arg("session_id") or ""
+                    deleted = hub.delete_chat_session(
+                        db=arg("db"),
+                        variant=arg("variant"),
+                        cadence=arg("cadence"),
+                        as_of=arg("as_of"),
+                        hash_prefix=arg("hash"),
+                        session_id=sid,
+                    )
+                    self._send_json({"deleted": deleted, "session_id": sid})
+                    return
+                self._send_json({"error": "未找到接口"}, HTTPStatus.NOT_FOUND)
+            except ValueError as exc:
+                self._send_json({"error": str(exc)}, HTTPStatus.BAD_REQUEST)
+            except (DataError, ContractError) as exc:
                 self._send_json({"error": str(exc)}, HTTPStatus.UNPROCESSABLE_ENTITY)
 
     return Handler
@@ -820,8 +1062,14 @@ def create_server(
     host: str = "127.0.0.1",
     port: int = 8765,
     sidecar_factory: Callable[[app_config.Settings], Any] | None = None,
+    chat_stream_fn: chat.StreamFn | None = None,
 ) -> tuple[ThreadingHTTPServer, DebateHub]:
-    hub = DebateHub(settings, default_db=default_db, sidecar_factory=sidecar_factory)
+    hub = DebateHub(
+        settings,
+        default_db=default_db,
+        sidecar_factory=sidecar_factory,
+        chat_stream_fn=chat_stream_fn,
+    )
     server = _ReuseThreadingServer((host, port), _make_handler(hub))
     return server, hub
 

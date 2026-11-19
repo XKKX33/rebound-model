@@ -60,6 +60,16 @@
             <button id="btn-dry-run" class="btn btn-secondary" type="button">演练预览</button>
             <button id="btn-start" class="btn btn-primary" type="button">开始 / 续跑辩论</button>
             <button id="btn-stop" class="btn btn-danger" type="button" hidden>停止</button>
+            <button
+              id="btn-toggle-chat"
+              class="btn btn-chat-toggle"
+              type="button"
+              title="打开或折叠右侧 AI 投研复盘对话栏 (Ctrl+K)"
+            >
+              <span class="chat-spark" aria-hidden="true">✦</span>
+              <span>AI 复盘对话</span>
+              <kbd class="kbd-hint">Ctrl+K</kbd>
+            </button>
           </div>
           <div class="kpi-strip" id="kpi-strip">
             <span class="status-badge status-idle" id="status-badge">就绪</span>
@@ -73,8 +83,8 @@
       <!-- 通知条 -->
       <div id="toast-bar" class="toast-bar" hidden></div>
 
-      <!-- 主工作区：左工作流进度 + 右辩论与终选结果 -->
-      <main class="workspace">
+      <!-- 主工作区：左工作流进度 + 中辩论与终选结果 + 右可折叠 AI 对话栏 -->
+      <main class="workspace" id="workspace">
         <!-- 左侧栏 -->
         <aside class="left-pane">
           <!-- 工作流流式路由图卡片 -->
@@ -146,6 +156,15 @@
         <section class="right-pane">
           <div class="right-tabs-bar">
             <div class="tabs-left">
+              <button
+                id="btn-expand-left"
+                class="btn btn-ghost btn-sm"
+                type="button"
+                title="展开左侧工作流与候选列表"
+                hidden
+              >
+                ◧ 展开左栏
+              </button>
               <button class="tab-btn active" id="tab-stock" data-tab="stock" type="button">
                 <span>单股辩论过程</span>
                 <span class="tab-tag mono" id="tab-stock-tag">—</span>
@@ -175,6 +194,92 @@
             <div id="final-content"></div>
           </div>
         </section>
+
+        <!-- 右侧可折叠滑出栏：AI 投研复盘对话（档位 B · 工具调用 Agent） -->
+        <aside id="chat-drawer" class="chat-drawer card" aria-label="AI 投研复盘对话" hidden>
+          <div class="chat-head">
+            <div class="chat-head-top">
+              <div class="chat-title-group">
+                <span class="chat-avatar-badge" aria-hidden="true">✦</span>
+                <div>
+                  <h2 class="card-title">AI 投研对话</h2>
+                  <p class="card-subtitle" id="chat-subtitle">预置方法论 · 6 只读工具按需查全池</p>
+                </div>
+              </div>
+              <div class="chat-head-actions">
+                <button
+                  id="btn-chat-toggle-left"
+                  class="chat-icon-btn"
+                  type="button"
+                  title="收起/展开左侧工作流栏，腾出更宽阅读区"
+                >
+                  收起左栏
+                </button>
+                <button
+                  id="btn-chat-wide"
+                  class="chat-icon-btn"
+                  type="button"
+                  title="切换宽屏对话模式"
+                >
+                  宽屏
+                </button>
+                <button
+                  id="btn-chat-close"
+                  class="chat-icon-btn chat-close-btn"
+                  type="button"
+                  title="折叠对话栏 (Ctrl+K)"
+                  aria-label="关闭对话栏"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
+            <div class="chat-controls-row">
+              <select id="sel-chat-role" class="ctrl-select ctrl-mini chat-role-select" title="切换对话角色视角"></select>
+              <select id="sel-chat-session" class="ctrl-select ctrl-mini chat-session-select" title="切换历史持久化会话"></select>
+              <button id="btn-chat-new" class="chat-icon-btn" type="button" title="开启新对话">+ 新对话</button>
+              <button id="btn-chat-delete" class="chat-icon-btn chat-icon-danger" type="button" title="删除当前会话">删</button>
+            </div>
+          </div>
+
+          <!-- 常驻上下文与聚焦个股挂载条 -->
+          <div class="chat-context-strip">
+            <div class="chat-context-pills" id="chat-context-pills"></div>
+            <div class="chat-context-tools">
+              <select id="sel-chat-attach" class="ctrl-select ctrl-mini chat-attach-select" title="额外挂载个股完整明细（最多 3 只）">
+                <option value="">+ 追加个股</option>
+              </select>
+              <span
+                class="chat-tools-badge"
+                id="chat-tools-badge"
+                title="只读工具：单股完整辩论 / 跨股对比 / 20股筛选排序 / DuckDB日线 / 事后收益核验 / 历史运行列表"
+              >
+                ⚙ 6 工具
+              </span>
+            </div>
+          </div>
+
+          <!-- 对话消息流 -->
+          <div class="chat-messages" id="chat-messages"></div>
+
+          <!-- 底部输入区 -->
+          <form class="chat-composer" id="chat-form">
+            <textarea
+              id="chat-input"
+              class="chat-textarea"
+              rows="2"
+              placeholder="追问辩论细节、跨股对比或全池筛选…（Enter 发送，Shift+Enter 换行）"
+            ></textarea>
+            <div class="chat-composer-bar">
+              <span class="chat-persist-hint" id="chat-persist-hint">会话自动落盘保存</span>
+              <div class="chat-composer-btns">
+                <button id="btn-chat-stop" class="btn btn-danger btn-sm" type="button" hidden>停止生成</button>
+                <button id="btn-chat-send" class="btn btn-primary btn-sm" type="submit">发送 ↵</button>
+              </div>
+            </div>
+          </form>
+        </aside>
       </main>
     </div>
 
