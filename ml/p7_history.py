@@ -24,7 +24,8 @@ OUT = "p7_history"
 START_YEAR = 2015
 TRAIN_ORDER = ["xgb_F69", "xgb_repro_F28", "xgb_F28", "xgb_F69_s5", "xgb_F69_s4", "rf_F69"]
 NAMES = {"xgb_F69": "XGBoost F69", "xgb_F69_s5": "XGBoost F69（敏感性：第 5 组参数）", "xgb_F69_s4": "XGBoost F69（敏感性：第 4 组参数）",
-         "xgb_F28": "XGBoost F28", "xgb_repro_F28": "作者原模型 F28", "rf_F69": "随机森林 F69", "ens_top3": "集成 top3"}
+         "xgb_F28": "XGBoost F28", "xgb_repro_F28": "作者原模型 F28", "rf_F69": "随机森林 F69", "ens_top3": "集成 top3",
+         "lstm_SF69": "LSTM S+F69"}
 
 
 def hist_dir():

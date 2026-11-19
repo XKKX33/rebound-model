@@ -3,12 +3,12 @@
 给队友的智能体工作流和 UI 看板调用。**只读**：不训练、不写任何文件、研究库只读打开。说明见 `ml/INTERFACE.md`。
 
     from ml import api
-    api.models()                                   # 有哪些模型
+    api.models()                                   # 有哪些模型（三个：xgb_F69、rf_F69、lstm_SF69）
     api.leaderboard()                              # 排行榜
     api.scores("xgb_F69", "2025-03-14")            # 某天全池的分数和排名
     api.picks("xgb_F69", "2025-03-14", top_n=6)    # 候选名单（每个行业最多 2 只）
     api.explain("xgb_F69", "2025-03-14", "600000.SH")   # 这只票为什么得这个分（测试段）
-    api.nav("xgb_F69", "DB-K30-b8")                # 测试期组合净值
+    api.nav("xgb_F69", "DB-K30-b8")                # 测试期组合净值；period="long" 是 2015 ~ 2026 长期回测
     api.feature_info()                             # 特征和序列通道的说明
     api.data_summary()                             # 数据概况
 
@@ -16,6 +16,8 @@
 - 2021-01-04 ~ 2022-12-30：验证段（`select`），模型用 2013 ~ 2020 训练；
 - 2023-01-03 ~ 2026-10-16：测试段（`final`），模型每年第一个交易日用此前全部数据重训（PREREG 补充登记十）。
 两段都是“模型当时没见过的日子”，可以拿来展示历史名单和事后表现。
+
+交付范围（PREREG 补充登记十三）：只有三个用 69 个特征的模型。要给数据之外的新日子打分，用 `python -m ml.predict`（不在本接口里）。
 """
 
 from __future__ import annotations
@@ -29,29 +31,20 @@ import pandas as pd
 from ml.common import RESULTS, connect, data_dir, load_config
 
 __all__ = ["models", "leaderboard", "dates", "scores", "picks", "explain", "nav", "feature_info", "data_summary",
-           "ApiError", "EXPLAINED", "RULES"]
+           "ApiError", "EXPLAINED", "RULES", "DEFAULT_MODEL"]
 
 
 class ApiError(ValueError):
     """参数不对（模型不存在、日期没有分数等），信息是中文，可以直接展示给用户。"""
 
 
-#: model_id → (显示名, 类别, 输入)。和总排行榜（ml/p3_11_leaderboard.py）一致。
+#: model_id → (显示名, 类别, 输入)。交付范围只有这三个（PREREG 补充登记十三）；其他模型的结果是过程记录，不经接口提供。
 MODELS: dict[str, tuple[str, str, str]] = {
-    "random": ("随机打分", "参照", "—"),
-    "rev_r5": ("反转因子 −r5", "参照", "r5"),
-    "xgb_repro_F28": ("XGBoost 复现基准（仓库原模型）", "参照", "F28"),
-    "rf_F28": ("随机森林", "模型", "F28"),
-    "rf_F69": ("随机森林", "模型", "F69"),
-    "xgb_F28": ("XGBoost 调参版", "模型", "F28"),
-    "xgb_F69": ("XGBoost 调参版", "模型", "F69"),
-    "lstm_S": ("LSTM", "模型", "S"),
-    "lstm_SF69": ("LSTM", "模型", "S+F69"),
-    "xgb_clf_F69": ("XGBoost 二分类", "任务形式对比", "F69"),
-    "xgb_rank_F69": ("XGBoost 排序", "任务形式对比", "F69"),
-    "ens_top3": ("集成：XGB F69 + RF F69 + XGB F28", "集成", "—"),
-    "ens_family": ("集成：XGB F69 + RF F69 + LSTM-S+F69", "集成", "—"),
+    "xgb_F69": ("XGBoost", "推荐默认展示", "69 个特征"),
+    "rf_F69": ("随机森林", "模型", "69 个特征"),
+    "lstm_SF69": ("LSTM", "模型", "60 天日线序列 + 69 个特征"),
 }
+DEFAULT_MODEL = "xgb_F69"
 STAGES = ("select", "final")
 STAGE_NAMES = {"select": "验证段（2021 ~ 2022）", "final": "测试段（2023 起，按年重训）"}
 
@@ -103,11 +96,11 @@ def models() -> pd.DataFrame:
 
 
 def leaderboard() -> pd.DataFrame:
-    """总排行榜（任务 3.11 的 `ml/results/leaderboard.json`）；还没生成时，先返回只有验证段指标的版本。
+    """三个模型的排行榜（测试段正式数字，`ml/results/delivery/leaderboard.json`，由 `ml/p8_delivery.py` 生成）。
 
     小数口径：IC 是相关系数；超额、多空是小数（0.003 = 0.3%）。
     """
-    path = RESULTS / "leaderboard.json"
+    path = RESULTS / "delivery" / "leaderboard.json"
     if path.exists():
         return pd.DataFrame(json.loads(path.read_text(encoding="utf-8")))
     rows = []
@@ -201,8 +194,10 @@ def picks(model_id: str, date, top_n: int = 6, max_per_industry: int = 2, with_o
     return pool.iloc[keep].reset_index(drop=True)
 
 
-#: 有预先算好解释的模型（任务 4.4：测试段按年重训的 XGBoost F69，每行贡献最大的 8 个特征）
-EXPLAINED = {"xgb_F69": "xgb_F69.parquet"}
+#: 预先算好的解释（测试段每行贡献最大的 8 项）：XGBoost 用 TreeSHAP（任务 4.4），随机森林用路径分解，LSTM 用积分梯度（P8）
+EXPLAINED = {"xgb_F69": "xgb_F69.parquet", "rf_F69": "rf_F69.parquet", "lstm_SF69": "lstm_SF69.parquet"}
+EXPLAIN_METHOD = {"xgb_F69": "TreeSHAP（精确）", "rf_F69": "路径分解（Saabas，900 棵树平均）",
+                  "lstm_SF69": "积分梯度（基线 = 截面中位数的股票，3 个种子平均）"}
 RULES = ("DB-K30-b8", "DB-K3-b16", "FH-K6-h4")
 
 
@@ -210,21 +205,24 @@ RULES = ("DB-K30-b8", "DB-K3-b16", "FH-K6-h4")
 def _explain_table(model_id: str) -> pd.DataFrame:
     path = _export(f"explain_{EXPLAINED[model_id]}") or data_dir() / "explain" / EXPLAINED[model_id]
     if not path.exists():
-        raise ApiError(f"还没有 {model_id} 的解释数据（{path}）：先运行 python -m ml.p4_4_shap_stability")
+        raise ApiError(f"还没有 {model_id} 的解释数据（{path}）：先运行 python -m ml.p4_4_shap_stability / ml.p8_explain_rf / ml.p8_explain_lstm")
     return pd.read_parquet(path)
 
 
 def explain(model_id: str, date, ts_code: str, top: int = 8) -> pd.DataFrame:
-    """这只股票当天分数的解释：SHAP 贡献最大的 top 个特征（按 |贡献| 从大到小）。
+    """这只股票当天分数的解释：贡献最大的 top 项（按 |贡献| 从大到小，top 最多 8）。三个模型都有，只覆盖测试段（2023-01-03 ~ 2026-10-16）。
 
-    列：特征、中文名、数值（模型看到的原值）、贡献（SHAP，正 = 让分数变高）、方向（“加分” / “减分”）。
-    另在 `.attrs` 里给出 score（模型分数）和 base（全部样本的平均分数）：score = base + 全部特征的贡献之和，
-    这里只列出最大的 top 个，所以列出的贡献之和不一定等于 score − base。
-    目前只有 `xgb_F69`（推荐展示的模型）有解释，只覆盖测试段（2023-01-03 ~ 2026-10-16），数据来自任务 4.4。
+    列：特征、中文名、数值（模型看到的值）、贡献（正 = 让分数变高）、方向（“加分” / “减分”）。
+    另在 `.attrs` 里给出 score（模型分数）、base（基线分数）和 method（解释方法）：score ≈ base + 全部项的贡献之和，
+    这里只列出最大的 top 项，所以列出的贡献之和不一定等于 score − base。各模型的方法：
+    - xgb_F69：TreeSHAP；数值是特征原值；
+    - rf_F69：路径分解（每次分裂带来的分数变化记到该特征上）；数值是特征原值；
+    - lstm_SF69：积分梯度；解释项除了特征，还有 11 个序列通道（`seq_<通道>`，60 天归因之和，数值是信号日当天的通道值），
+      特征的数值是截面排名等 dense 预处理之后的值；score 来自同配置重训的模型，与 `scores()` 的正式分数一致（最大差 4e-8）。
     """
     _check_model(model_id)
     if model_id not in EXPLAINED:
-        raise ApiError(f"{model_id} 没有预先算好的解释；目前只有 {', '.join(EXPLAINED)} 有（测试段）")
+        raise ApiError(f"{model_id} 没有预先算好的解释")
     t = _explain_table(model_id)
     day = pd.Timestamp(date)
     row = t[(t["trade_date"] == day) & (t["ts_code"] == ts_code)]
@@ -232,23 +230,34 @@ def explain(model_id: str, date, ts_code: str, top: int = 8) -> pd.DataFrame:
         raise ApiError(f"{model_id} 在 {day.date()} 没有 {ts_code} 的解释（不在测试段、不是交易日，或这只票当天不在准入池）")
     r = row.iloc[0]
     n = min(top, sum(1 for c in t.columns if c.startswith("f") and c[1:].isdigit()))
-    cn = feature_info().set_index("名称")["中文名"]
-    out = pd.DataFrame([{"特征": str(r[f"f{k}"]), "中文名": cn.get(str(r[f"f{k}"]), ""), "数值": float(r[f"x{k}"]),
+    out = pd.DataFrame([{"特征": str(r[f"f{k}"]), "中文名": _cn_name(str(r[f"f{k}"])), "数值": float(r[f"x{k}"]),
                          "贡献": float(r[f"v{k}"]), "方向": "加分" if r[f"v{k}"] > 0 else "减分"} for k in range(1, n + 1)])
-    out.attrs.update({"score": float(r["score"]), "base": float(r["base"]), "model_id": model_id, "date": str(day.date()),
+    out.attrs.update({"score": float(r["score"]), "base": float(r["base"]), "method": EXPLAIN_METHOD[model_id], "model_id": model_id,
+                      "date": str(day.date()),
                       "ts_code": ts_code})
     return out
 
 
-def nav(model_id: str, rule: str = "DB-K30-b8") -> pd.DataFrame:
-    """测试期组合净值曲线（任务 P5：仓库模拟器、真实费用、测试段按年重训的分数）。
+def nav(model_id: str, rule: str = "DB-K30-b8", period: str = "test") -> pd.DataFrame:
+    """组合净值曲线（仓库模拟器、真实费用、每年初重训的分数）。
 
     rule：`DB-K30-b8`（20 万，分散，主规则）、`DB-K3-b16`（2 万，集中）、`FH-K6-h4`（20 万，每天买前 6 名拿 4 天）。
-    返回列：date、nav（模型净值，起点 1）、pool_nav（准入池等权净值，不可交易、不扣费用，作对照）。
+    period：`test` = 测试段 2023-01 ~ 2026-10（任务 P5，正式结果，现行印花税）；
+            `long` = 2015 ~ 2026 长期回测（补充分析，印花税按历史税率；2023 年以前仅供参考），多三列指数净值。
+    返回列：date、nav（模型净值，起点 1）、pool_nav（准入池等权净值，不可交易、不扣费用，作对照）；long 另有 hs300、zz500、zz1000。
     """
     _check_model(model_id)
     if rule not in RULES:
         raise ApiError(f"没有规则 {rule}；可选：{', '.join(RULES)}")
+    if period not in ("test", "long"):
+        raise ApiError("period 只能是 test 或 long")
+    if period == "long":
+        path = RESULTS / "delivery" / f"long_nav_{rule}.csv"
+        if not path.exists():
+            raise ApiError(f"还没有长期回测结果（{path}）：先运行 python -m ml.p8_delivery")
+        t = pd.read_csv(path, parse_dates=["date"])
+        return pd.DataFrame({"date": t["date"], "nav": t[model_id], "pool_nav": t["准入池等权"], "hs300": t["沪深300"],
+                             "zz500": t["中证500"], "zz1000": t["中证1000"]})
     path = RESULTS / "p5_backtest" / f"nav_{rule}.csv"
     if not path.exists():
         raise ApiError(f"还没有回测结果（{path}）：先运行 python -m ml.p5_backtest")
@@ -256,8 +265,23 @@ def nav(model_id: str, rule: str = "DB-K30-b8") -> pd.DataFrame:
     return pd.DataFrame({"date": t["date"], "nav": t[model_id], "pool_nav": t["准入池等权"]})
 
 
+def _cn_name(name: str) -> str:
+    """解释项的中文名：特征、LSTM 序列通道（seq_<通道>）、缺失指示（na_<特征>）。"""
+    cn = _feature_info().set_index("名称")["中文名"]
+    if name.startswith("seq_"):
+        return "序列：" + CHANNEL_INFO.get(name[4:], ("",))[0] + "（近 60 天）"
+    if name.startswith("na_"):
+        return "缺失：" + str(cn.get(name[3:], name[3:]))
+    return str(cn.get(name, ""))
+
+
 def feature_info() -> pd.DataFrame:
     """F69 的 69 个特征和 LSTM 的 11 个序列通道：名称、来源、分组、中文名、计算方法、预期方向（新特征有，原特征没有）。"""
+    return _feature_info().copy()
+
+
+@lru_cache(maxsize=1)
+def _feature_info() -> pd.DataFrame:
     from ml.dataset import F28, f69
     from ml.features_extra import feature_table
     rows = [{"名称": f, "来源": "原特征（仓库 F28）", "分组": "仓库原特征", "中文名": F28_INFO[f][0], "计算": F28_INFO[f][1],

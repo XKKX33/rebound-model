@@ -111,7 +111,9 @@ def _names_at_time(codes: pd.Series, when: pd.Series) -> np.ndarray:
     return m["name"].fillna(m["ts_code"].map(cur)).fillna("").to_numpy()
 
 
-def backtests(keys: pd.DataFrame):
+def backtests(keys: pd.DataFrame, models: list[str] | None = None, extras: bool = True):
+    """models 默认 MODELS；extras=False 时不做作者对照和候选名单修正核对（交付版 P8 用），对应的返回值是 None。"""
+    models = models or MODELS
     from rebound.backtest import stats
     from rebound.backtest.costs import CostModel
     from rebound.backtest.market import candidates, load_markets, pool_daily_return
@@ -134,7 +136,7 @@ def backtests(keys: pd.DataFrame):
         return idx[(yy >= y0) & (yy <= y1)]
 
     navs, rows, years_rows, trades_all, cands_cache = {}, [], [], {}, {}
-    for mid in MODELS:
+    for mid in models:
         sc = load_scores(mid)
         sc = sc[sc["trade_date"] <= pd.Timestamp(LAST_SIGNAL)]
         cands_cache[mid] = candidates(m, to_market_index(m, sc, "score", mid))
@@ -162,6 +164,31 @@ def backtests(keys: pd.DataFrame):
             t["持有天数"] = t["exit_day"] - t["entry_day"]
             trades_all[(mid, rule)] = t
             print(f"[{rule}] {mid}：全期年化 {row['全期 2015 ~ 2026｜年化%']:+.1f}%，超额 {row['全期 2015 ~ 2026｜超额%']:+.1f}%", flush=True)
+    author_ours = author_full = fix_df = None
+    if extras:
+        author_ours, author_full, fix_df = _extras(m, cands_cache, pool, dates, idx, d_first, d_last)
+    bench = {"准入池等权": np.r_[1.0, np.cumprod(1 + np.nan_to_num(pool[idx]))]}
+    for n, s in index_close.items():
+        v = s.to_numpy()
+        bench[n] = v[idx[0] - 1:idx[-1] + 1] / v[idx[0] - 1]
+    span = dates[idx[0] - 1:idx[-1] + 1]
+    nav_tabs = {}
+    for rule in RULES:
+        t = pd.DataFrame({mid: navs[(mid, rule)][idx[0] - 1:idx[-1] + 1] / navs[(mid, rule)][idx[0] - 1] for mid in models}, index=span)
+        for n, v in bench.items():
+            t[n] = v
+        t.index.name = "date"
+        nav_tabs[rule] = t
+    return (pd.DataFrame(rows), pd.DataFrame(years_rows), nav_tabs, trades_all, author_ours, author_full,
+            fix_df, ind, cands_cache, m)
+
+
+def _extras(m, cands_cache, pool, dates, idx, d_first, d_last):
+    """作者十年实验对照（作者原模型 × 作者当时的规则）和候选名单修正前后核对（2023 ~ 2026）。"""
+    from rebound.backtest import stats
+    from rebound.backtest.costs import CostModel
+    from rebound.backtest.rules import rule_of
+    from rebound.backtest.sim import simulate
     # 作者十年实验对照：作者原模型 × 作者当时的规则
     res = simulate(m, *cands_cache["xgb_repro_F28"], rule_of(AUTHOR_RULE), CostModel(capital=200_000.0, stamp_before=0.001), d_first, d_last)
     author_ours = {int(y): v for y, v in stats.by_year(res.nav, pool, dates, idx).items()}
@@ -178,20 +205,7 @@ def backtests(keys: pd.DataFrame):
         fix_rows.append({"模型": NAMES[mid], "P5 原来（只用有有效收益的候选）年化超额%": p5.loc[mid, "全段 超额%"],
                          "修正后（全部股票都是候选）年化超额%": per["excess"], "差（百分点）": round(per["excess"] - p5.loc[mid, "全段 超额%"], 2),
                          "P5 原来最大回撤%": p5.loc[mid, "全段 最大回撤%"], "修正后最大回撤%": per["max_dd"]})
-    bench = {"准入池等权": np.r_[1.0, np.cumprod(1 + np.nan_to_num(pool[idx]))]}
-    for n, s in index_close.items():
-        v = s.to_numpy()
-        bench[n] = v[idx[0] - 1:idx[-1] + 1] / v[idx[0] - 1]
-    span = dates[idx[0] - 1:idx[-1] + 1]
-    nav_tabs = {}
-    for rule in RULES:
-        t = pd.DataFrame({mid: navs[(mid, rule)][idx[0] - 1:idx[-1] + 1] / navs[(mid, rule)][idx[0] - 1] for mid in MODELS}, index=span)
-        for n, v in bench.items():
-            t[n] = v
-        t.index.name = "date"
-        nav_tabs[rule] = t
-    return (pd.DataFrame(rows), pd.DataFrame(years_rows), nav_tabs, trades_all, author_ours, author_full,
-            pd.DataFrame(fix_rows), ind, cands_cache, m)
+    return author_ours, author_full, pd.DataFrame(fix_rows)
 
 
 def author_table(ours: dict, full: dict) -> pd.DataFrame:

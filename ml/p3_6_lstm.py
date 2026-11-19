@@ -55,7 +55,7 @@ GRID = [
 
 
 def train(stage: str, variant: str, cfg: dict, seeds: str, out_name: str, epochs: int | None = None,
-          data: str | None = None) -> tuple[np.ndarray, dict]:
+          data: str | None = None, save_model: bool = False) -> tuple[np.ndarray, dict]:
     out = data_dir() / "lstm" / "runs" / out_name
     cmd = [DL_PY, "-X", "utf8", str(ROOT / "ml" / "lstm_train.py"), "--stage", stage, "--variant", variant,
            "--cfg", json.dumps({**cfg, **ROUND2}), "--seeds", seeds, "--max-epochs", str(MAX_EPOCHS), "--out", str(out)]
@@ -63,6 +63,8 @@ def train(stage: str, variant: str, cfg: dict, seeds: str, out_name: str, epochs
         cmd += ["--epochs", str(epochs)]
     if data is not None:
         cmd += ["--data", data]
+    if save_model:
+        cmd += ["--save-model"]
     # 笔记本显卡同时给其他程序用，偶尔会临时显存不足（第 5 组第一次就是这样，单独重跑峰值只有 4.6 GB）：
     # 遇到 out of memory 等 60 秒、同一种子重来，最多 3 次；其他错误直接报。
     env = {**os.environ, "PYTORCH_ALLOC_CONF": "expandable_segments:True"}
@@ -132,7 +134,7 @@ def run_select(log) -> None:
         log(f"[{v}] 最终 3 种子：验证 IC {r['summary']['全部']['ic_mean']:.4f}，各种子 {np.round(r['seed_ic'], 4).tolist()}，最佳 epoch {epochs}")
 
 
-def run_final() -> None:
+def run_final(variants: tuple[str, ...] = ("S", "SF")) -> None:
     """测试段：按年重训（PREREG 补充登记十）。只在所有选择冻结后（任务 3.11）调用。
 
     每年第一个交易日用此前全部已卖出的行重训（参数、epoch 数固定，不看任何测试数据），模型给全部测试行打分；
@@ -149,6 +151,8 @@ def run_final() -> None:
         if not (data_dir() / "lstm" / f"final_{st.name}" / "meta.json").exists():
             prepare(f"final_{st.name}")
     for v, mid in VARIANTS.items():
+        if v not in variants:
+            continue
         S_final, S_once, refits = None, None, []
         for st in plan.refits:
             S, meta = train("final", v, ch[v]["cfg"], "0,1,2", f"{mid}__final_{st.name}", epochs=ch[v]["最终阶段 epoch"],
@@ -359,6 +363,9 @@ def report() -> None:
 def main() -> None:
     if "--report" in sys.argv:
         report()
+        return
+    if "--final-sf" in sys.argv:            # 只重跑 S+F69（2026-11-19 偶发计算错误后，见 PREREG 补充登记十三）
+        run_final(("SF",))
         return
     if "--final" in sys.argv:
         run_final()

@@ -1,28 +1,30 @@
 # ml/：期末项目的数据与模型部分
 
 在队友的反弹模型仓库上新增的目录，不改动仓库原有代码（`rebound/`），只通过 import 复用。
-执行依据是 `期末项目/任务清单_数据与模型.md`（第 11 版：比较 3 个模型——随机森林、XGBoost、LSTM；测试段按年重训；P7 补充 2015 ~ 2026 长期回测）；每一步的详细结果在 `ml/results/<步骤>/report.md`。
+执行依据是 `期末项目/任务清单_数据与模型.md`（第 12 版：比较 3 个模型——随机森林、XGBoost、LSTM；测试段按年重训；P7 补充 2015 ~ 2026 长期回测；P8 交付范围收窄为三个 F69 模型）；每一步的详细结果在 `ml/results/<步骤>/report.md`。
 
-**先看这三个**：报告草稿 [results/REPORT.md](results/REPORT.md)、总排行榜 [results/leaderboard.md](results/leaderboard.md)、给队友的接口说明 [INTERFACE.md](INTERFACE.md)。
+**先看这三个**：交付报告 [results/REPORT.md](results/REPORT.md)、三个模型的详细结果 [results/delivery/report.md](results/delivery/report.md)、给队友的接口说明 [INTERFACE.md](INTERFACE.md)。
+
+**交付范围**（PREREG 补充登记十三）：只有三个用 69 个特征的模型——XGBoost（`xgb_F69`，默认）、随机森林（`rf_F69`）、LSTM（`lstm_SF69`）。
+其他模型（28 个特征的模型、作者原模型、只用序列的 LSTM、集成、分类 / 排序版）是“这三个是怎么选出来的”过程记录，结果留在下面进度表的各步目录里，
+全部模型的比较见 [results/REPORT_全部模型.md](results/REPORT_全部模型.md) 和 [results/leaderboard.md](results/leaderboard.md)。
 
 ## 交接给队友（2026-11-19）
 
 课程不需要提交报告，数据与模型部分的交付物是：
 1. **代码**（本目录 `ml/`，进 Git）：数据、特征、模型、评估、回测、接口、测试，全部可以复现；依赖见 [requirements.txt](requirements.txt)（仓库原有的 `pyproject.toml` 不够）；
-2. **结果**（`ml/results/`，进 Git）：每一步的报告、排行榜、调参记录、图，以及 `REPORT.md`（全部结论的汇总）；
+2. **结果**（`ml/results/`，进 Git）：每一步的报告、排行榜、调参记录、图，以及 `REPORT.md`（三个交付模型的报告）和 `REPORT_全部模型.md`（全部模型的过程记录）；
 3. **接口**：`ml/api.py` + 说明 [INTERFACE.md](INTERFACE.md)，智能体和看板只需要调用它；
-4. **数据包**（不进 Git）：`data/ml/api_export.zip`（约 300 MB，`python -m ml.p6_export` 导出），解压到队友的 `rebound-model/data/ml/` 后接口即可使用，
-   不需要研究库、不需要训练。已在“只有代码 + 数据包”的干净目录里验证过（接口测试 6 项通过）。
-5. **事先登记与全部决策记录**：[PREREG.md](PREREG.md)；**执行记录**：[任务清单_数据与模型.md](任务清单_数据与模型.md)（交接时的副本；原件在仓库外的上一级目录）。
+4. **数据包**（不进 Git）：`data/ml/api_export.zip`（`python -m ml.p6_export` 导出），解压到队友的 `rebound-model/data/ml/` 后得到
+   `api_export/`（接口要读的数据，不需要研究库、不需要训练）和 `deploy/`（三个模型训练好的文件）；
+5. **模型文件和打分脚本**：`data/ml/deploy/`（在数据包里）+ `ml/predict.py`，研究库更新后可以给新的交易日出名单（需要研究库，见 INTERFACE 最后一节）；
+6. **事先登记与全部决策记录**：[PREREG.md](PREREG.md)；**执行记录**：[任务清单_数据与模型.md](任务清单_数据与模型.md)（交接时的副本；原件在仓库外的上一级目录）。
 
 推荐默认展示的模型是 `xgb_F69`，理由见 [INTERFACE.md](INTERFACE.md) 和 `REPORT.md`。
 
 **不包含的**（需要的话找数据负责人）：
-- **训练好的模型文件**：接口只读事先算好的分数，所以不能给数据之外的新日子打分。有分数的最后一个信号日是 2026-10-16，
-  之后的“明天名单”要用仓库原有的 `rebound` 命令，或者用 `ml/` 的代码在最新数据上重训、打分；
-- 解释（`explain`）只覆盖 `xgb_F69` 的测试段；
-- 研究库和约 6 GB 的中间数据（主面板、特征、LSTM 训练数据等），都可以用 `python -m ml.run` 从研究库重新生成。
-- P7 长期回测的逐年分数、交易明细、每日持仓、每日前 30 名（`data/ml/history/`，共约 460 MB）：报告和汇总表在 Git 里，明细需要的话另发，或用 `python -m ml.run history` 重新生成。
+- 研究库和约 6 GB 的中间数据（主面板、特征、LSTM 训练数据等），都可以用 `python -m ml.run` 从研究库重新生成；`ml/predict.py` 给新日子打分时需要研究库；
+- 长期回测的逐年分数、交易明细、每日持仓、每日前 30 名（`data/ml/history/`，约 500 MB）：报告和汇总表在 Git 里，明细需要的话另发。
 
 ## 进度
 
@@ -56,9 +58,10 @@
 | 6.1 早期接口 | 完成 | `api.py`、`INTERFACE.md` | [INTERFACE.md](INTERFACE.md) | 队友可以调用：模型列表、排行榜、某天分数和名单、特征说明 |
 | 6.2 接口定稿 | 完成 | `api.py`、`INTERFACE.md` | [INTERFACE.md](INTERFACE.md) | 增加 explain（测试段 SHAP，xgb_F69）、nav（3 条规则的净值） |
 | 6.3 图表 | 完成 | `p6_figures.py` | [figures/](results/figures/) | 排行榜、逐月 IC、10 组、净值、消融瀑布、SHAP、IC vs 超额 |
-| 6.4 报告草稿 | 完成 | — | [REPORT.md](results/REPORT.md) | 按 RQ1 ~ RQ4 组织，含 8 条局限 |
+| 6.4 报告草稿 | 完成 | — | [REPORT_全部模型.md](results/REPORT_全部模型.md) | 按 RQ1 ~ RQ4 组织，含 8 条局限 |
 | 6.5 一键复现 | 完成 | `run.py` | 见下文“怎么重跑” | `python -m ml.run panel / features / train / evaluate / backtest / report / test / all` |
-| 6.6 测试 | 完成 | `tests/` | — | 54 项通过；仓库原有测试见执行记录 |
+| 6.6 测试 | 完成 | `tests/` | — | 全部通过；仓库原有测试见执行记录 |
+| P8 交付收窄为三个 F69 模型 | 完成 | `p7_history_lstm.py`、`p8_explain_rf.py`、`p8_explain_lstm.py`、`lstm_explain.py`、`p8_deploy.py`、`predict.py`、`lstm_predict.py`、`p8_delivery*.py` | [delivery](results/delivery/report.md) | 三个模型测试 IC 0.119 ~ 0.120，两两分不出；LSTM 长期回测、随机森林和 LSTM 解释、模型文件和打分脚本补齐；numexpr 偶发错误查明并关掉，LSTM S+F69 测试段重跑（0.117 → 0.120，判定不变） |
 
 ## 目录
 
@@ -109,15 +112,22 @@ ml/
 ├─ p7_history_analyze.py    P7 回测、核对、交易明细、图
 ├─ p7_history_report.py     P7 报告
 ├─ p7_starts.py             P7 补充：换起点（2015 ~ 2024 每年起步）
+├─ p7_history_lstm.py       P8：LSTM S+F69 的 2015 ~ 2026 逐年重训（补进长期回测）
+├─ p8_explain_rf.py         P8：随机森林的逐只股票解释（路径分解），给 api.explain
+├─ p8_explain_lstm.py       P8：LSTM 的逐只股票解释（调度）；lstm_explain.py 在 dl-study 环境算积分梯度
+├─ p8_deploy.py             P8：交付用的模型文件（截至数据最后一天的全部已知样本，3 个种子）
+├─ predict.py               P8：用交付模型给某一天打分、出名单（lstm_predict.py 是 LSTM 部分，dl-study 环境）
+├─ p8_delivery.py           P8：交付版结果（三个模型的测试段、长期回测、换起点、图）；p8_delivery_report.py 写报告
 ├─ p6_figures.py            6.3 报告用图（统一放到 results/figures/）
 ├─ p6_export.py             交接：导出接口用的精简数据包 data/ml/api_export（+ zip）
 ├─ run.py                    6.5 一键复现：python -m ml.run <步骤>|all
-├─ tests/                    单元测试（54 项）
+├─ tests/                    单元测试
 └─ results/                  每一步的报告、表格和图（进 Git）
    ├─ registry.jsonl         每次运行的记录（时间、参数、关键数字）
    ├─ p0_setup/  p1_1_data_quality/  p1_2_panel/  p1_3_eda/  p1_4_features/  p1_5_preprocess/  p1_6_seq/
    ├─ p2_protocol/  p3_1_interface/  p3_2_references/  p3_3_xgb_repro/  p3_4_random_forest/  p3_5_xgboost/
    ├─ p3_6_lstm/  p3_9_task_form/  p3_10_ensemble/  p7_history/
+   ├─ delivery/              交付版结果：只含三个 F69 模型（P8）
    ├─ tuning.md              所有模型的调参网格（运行前写定）和结果
    └─ p3_models/<model_id>/  每个模型的指标（select.json）和逐日序列（select_daily.csv）
 
@@ -126,7 +136,10 @@ data/ml/                      大文件（不进 Git，可由脚本重新生成�
 ├─ features_extra.parquet     47 个新特征，与主面板逐行对齐（689 MB）
 ├─ pool_daily_return.parquet  准入池等权日收益
 ├─ seq/                       LSTM 序列张量 X.npy（[股票, 交易日, 11]，float16）、codes / dates / panel_j.npy
-└─ scores/                    每个模型的逐行分数（<model_id>__select.parquet / __final.parquet）
+├─ scores/                    每个模型的逐行分数（<model_id>__select.parquet / __final.parquet）
+├─ explain/                   测试段逐行解释（xgb_F69 / rf_F69 / lstm_SF69.parquet）
+├─ history/                   长期回测的逐年分数、交易明细、持仓、名单
+└─ deploy/                    交付用的模型文件（三个模型各一个目录）和 predict 的输出
 ```
 
 ## 怎么重跑
@@ -148,6 +161,7 @@ data/ml/                      大文件（不进 Git，可由脚本重新生成�
 | `evaluate` | 3.11 测试段（按年重训）与排行榜、4.1 ~ 4.4 特征分析（含 LSTM 积分梯度，GPU） | 约 5 ~ 6 小时 |
 | `backtest` | P5 组合回测、风格归因 | 约 6 分钟 |
 | `history` | P7 长期回测 2015 ~ 2026（补充） | 约 1.5 小时 |
+| `deliver` | P8：LSTM 长期回测、随机森林和 LSTM 的解释、交付模型文件和核对、交付版结果 | 约 1.5 小时 |
 | `report` | 6.3 报告用图、导出接口数据包 | 约 3 分钟 |
 | `test` | 单元测试 | 约 10 秒 |
 
@@ -182,6 +196,15 @@ dl-study 环境 `D:\Anaconda\envs\dl-study\python.exe`（torch + CUDA，8 GB 显
 & 'D:\Anaconda\python.exe' -X utf8 -m ml.p4_4_shap_stability      # 约 25 分钟
 & 'D:\Anaconda\python.exe' -X utf8 -m ml.p5_backtest              # 约 3 分钟
 & 'D:\Anaconda\python.exe' -X utf8 -m ml.p5_style                 # 约 3 分钟
+& 'D:\Anaconda\python.exe' -X utf8 -m ml.p7_history train        # 约 1.5 小时
+& 'D:\Anaconda\python.exe' -X utf8 -m ml.p7_history analyze      # 约 20 分钟
+& 'D:\Anaconda\python.exe' -X utf8 -m ml.p7_starts               # 约 5 分钟
+& 'D:\Anaconda\python.exe' -X utf8 -m ml.p7_history_lstm         # 约 25 分钟（GPU）
+& 'D:\Anaconda\python.exe' -X utf8 -m ml.p8_explain_rf           # 约 30 分钟
+& 'D:\Anaconda\python.exe' -X utf8 -m ml.p8_explain_lstm         # 约 30 分钟（GPU）
+& 'D:\Anaconda\python.exe' -X utf8 -m ml.p8_deploy               # 约 20 分钟
+& 'D:\Anaconda\python.exe' -X utf8 -m ml.predict --check         # 约 2 分钟
+& 'D:\Anaconda\python.exe' -X utf8 -m ml.p8_delivery             # 约 15 分钟
 & 'D:\Anaconda\python.exe' -X utf8 -m ml.p6_figures               # 约 1 分钟
 & 'D:\Anaconda\python.exe' -X utf8 -m ml.p6_export                # 约 2 分钟：交接用的数据包
 & 'D:\Anaconda\python.exe' -X utf8 -m pytest -p no:cacheprovider -o addopts="" -q ml/tests

@@ -49,20 +49,34 @@ def test_feature_info_complete():
     assert isinstance(api.leaderboard(), pd.DataFrame) and len(api.models()) == len(api.MODELS)
 
 
-HAVE_TEST = (data_dir() / "explain" / "xgb_F69.parquet").exists() or (data_dir() / "api_export" / "explain_xgb_F69.parquet").exists()
+def test_only_three_models():
+    assert list(api.MODELS) == ["xgb_F69", "rf_F69", "lstm_SF69"] and api.DEFAULT_MODEL == "xgb_F69"
+    with pytest.raises(api.ApiError):
+        api.scores("xgb_F28", DAY)                                          # 不在交付范围（PREREG 补充登记十三）
+    assert api._cn_name("seq_ret").startswith("序列：日收益") and api._cn_name("na_dd250").startswith("缺失：")
+
+
+HAVE_TEST = all((data_dir() / "explain" / f).exists() or (data_dir() / "api_export" / f"explain_{f}").exists()
+                for f in api.EXPLAINED.values())
 
 
 @pytest.mark.skipif(not HAVE_TEST, reason="没有测试段的解释数据")
-def test_explain_and_nav():
+@pytest.mark.parametrize("mid", ["xgb_F69", "rf_F69", "lstm_SF69"])
+def test_explain(mid):
     day = "2025-03-14"
-    code = api.picks("xgb_F69", day, top_n=1)["ts_code"].iloc[0]
-    e = api.explain("xgb_F69", day, code)
+    code = api.picks(mid, day, top_n=1)["ts_code"].iloc[0]
+    e = api.explain(mid, day, code)
     assert list(e.columns) == ["特征", "中文名", "数值", "贡献", "方向"] and len(e) == 8
     assert e["贡献"].abs().is_monotonic_decreasing                         # 按 |贡献| 从大到小
-    assert e.attrs["score"] > e.attrs["base"]                               # 第一名的分数高于平均
-    with pytest.raises(api.ApiError):
-        api.explain("rf_F69", day, code)                                    # 只有 xgb_F69 有解释
-    n = api.nav("xgb_F69", "DB-K30-b8")
-    assert list(n.columns) == ["date", "nav", "pool_nav"] and n["nav"].iloc[0] == 1.0 and n["nav"].notna().all()
+    assert e.attrs["score"] > e.attrs["base"] and e.attrs["method"]         # 第一名的分数高于基线
+    assert (e["中文名"] != "").all()
+
+
+def test_nav():
+    for period in ("test", "long"):
+        n = api.nav("xgb_F69", "DB-K30-b8", period=period)
+        assert n["nav"].iloc[0] == 1.0 and n["nav"].notna().all() and "pool_nav" in n
     with pytest.raises(api.ApiError):
         api.nav("xgb_F69", "DB-K99-b1")
+    with pytest.raises(api.ApiError):
+        api.nav("xgb_F69", period="2015")

@@ -22,7 +22,8 @@ MODELS = ["xgb_F69", "xgb_F28", "xgb_repro_F28", "rf_F69", "ens_top3"]
 RULES = {"DB-K30-b8": 200_000, "FH-K6-h4": 200_000}
 
 
-def run() -> pd.DataFrame:
+def run(models: list[str] | None = None) -> pd.DataFrame:
+    models = models or MODELS
     from rebound.backtest import stats
     from rebound.backtest.costs import CostModel
     from rebound.backtest.market import candidates, load_markets, pool_daily_return
@@ -34,7 +35,7 @@ def run() -> pd.DataFrame:
     d_last = int(dates.get_indexer([pd.Timestamp(LAST_SIGNAL)])[0])
     d_end = len(dates) - 1
     rows = []
-    for mid in MODELS:
+    for mid in models:
         sc = load_scores(mid)
         cands, rank = candidates(m, to_market_index(m, sc[sc["trade_date"] <= pd.Timestamp(LAST_SIGNAL)], "score", mid))
         for rule, capital in RULES.items():

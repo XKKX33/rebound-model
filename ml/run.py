@@ -6,6 +6,7 @@
     python -X utf8 -m ml.run evaluate     # P3.11 + P4：测试段（按年重训）、排行榜、单因子、消融、解释性 约 5 ~ 6 小时
     python -X utf8 -m ml.run backtest     # P5：组合回测                                             约 2 分钟
     python -X utf8 -m ml.run history      # P7：2015 ~ 2026 长期回测（补充分析）                     约 1.5 小时
+    python -X utf8 -m ml.run deliver      # P8：交付范围的三个模型（LSTM 长期回测、解释、模型文件、交付版结果）约 1.5 小时
     python -X utf8 -m ml.run report       # P6.3：报告用图                                           约 1 分钟
     python -X utf8 -m ml.run test         # 单元测试                                                 约 10 秒
     python -X utf8 -m ml.run all          # 以上全部，按顺序
@@ -77,6 +78,14 @@ STEPS: dict[str, list[tuple[str, list[str]]]] = {
         ("P7 长期回测：回测与分析", _m("ml.p7_history", "analyze")),
         ("P7 补充：换起点", _m("ml.p7_starts")),
     ],
+    "deliver": [
+        ("P8 LSTM 长期回测：逐年重训（GPU）", _m("ml.p7_history_lstm")),
+        ("P8 随机森林解释（路径分解）", _m("ml.p8_explain_rf")),
+        ("P8 LSTM 解释（积分梯度，GPU）", _m("ml.p8_explain_lstm")),
+        ("P8 交付模型文件", _m("ml.p8_deploy")),
+        ("P8 交付模型流程核对", _m("ml.predict", "--check")),
+        ("P8 交付版结果与报告", _m("ml.p8_delivery")),
+    ],
     "report": [
         ("6.3 报告用图", _m("ml.p6_figures")),
         ("交接：导出接口数据包", _m("ml.p6_export")),
@@ -85,7 +94,7 @@ STEPS: dict[str, list[tuple[str, list[str]]]] = {
         ("单元测试", _m("pytest", "-p", "no:cacheprovider", "-o", "addopts=", "-q", "ml/tests")),
     ],
 }
-ORDER = ["panel", "features", "train", "evaluate", "backtest", "history", "report", "test"]
+ORDER = ["panel", "features", "train", "evaluate", "backtest", "history", "deliver", "report", "test"]
 
 
 def main(argv: list[str]) -> None:
