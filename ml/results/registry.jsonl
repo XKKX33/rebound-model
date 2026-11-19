@@ -237,3 +237,10 @@
 {"time": "2026-11-19T05:47:55", "step": "P5_backtest", "n": 85, "seconds": 120.2}
 {"time": "2026-11-19T10:40:55", "step": "style_attribution", "style_only_ic": 0.09307755371240428}
 {"time": "2026-11-19T10:44:44", "step": "P5_backtest", "n": 98, "seconds": 171.0}
+{"time": "2026-11-19T15:16:29", "step": "P7_history_train", "model": "xgb_F69", "seconds": 551.7}
+{"time": "2026-11-19T15:25:06", "step": "P7_history_train", "model": "xgb_repro_F28", "seconds": 517.8}
+{"time": "2026-11-19T15:40:29", "step": "P7_history_train", "model": "xgb_F28", "seconds": 922.8}
+{"time": "2026-11-19T16:04:04", "step": "P7_history_train", "model": "xgb_F69_s5", "seconds": 1414.4}
+{"time": "2026-11-19T16:11:03", "step": "P7_history_train", "model": "xgb_F69_s4", "seconds": 419.3}
+{"time": "2026-11-19T16:38:24", "step": "P7_history_train", "model": "rf_F69", "seconds": 1640.9}
+{"time": "2026-11-19T16:57:52", "step": "P7_history_analyze", "fix_max_abs": 0.22}

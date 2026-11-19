@@ -92,6 +92,20 @@ def test_protocol_a_on_config_dates():
     assert k.loc[p.refits[1].fit_rows, "trade_date"].dt.year.min() == 2020                      # 每次都从头开始
 
 
+def test_history_refits_no_leak_and_full_rows():
+    """长期回测的逐年划分：训练行都在重训日前卖出、训练窗口逐年扩张；评估行 = 当年全部行（含没有有效收益的）。"""
+    k = _keys(days=600, n=5, carry_every=11)
+    k["trade_date"] = pd.bdate_range("2019-06-03", periods=600)[k["di"]]
+    st = ev.history_refits(k, start_year=2020)
+    assert [s.name for s in st] == ["2020", "2021"]                       # 600 个工作日到 2021-09
+    years = k["trade_date"].dt.year.to_numpy()
+    for s in st:
+        assert k.loc[s.fit_rows, "exit_di"].max() < s.fit_di <= k.loc[s.eval_rows, "di"].min()
+        assert (s.eval_rows == (years == int(s.name))).all()             # 当年全部行，包括 ret 为空的
+    assert k.loc[st[-1].eval_rows, "ret_o1o5"].isna().any()                # 最后几天没有有效收益，也要打分
+    assert st[1].fit_rows.sum() > st[0].fit_rows.sum() and (st[1].fit_rows >= st[0].fit_rows).all()
+
+
 # ---- 指标 --------------------------------------------------------------------
 
 

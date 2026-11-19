@@ -22,6 +22,7 @@
   之后的“明天名单”要用仓库原有的 `rebound` 命令，或者用 `ml/` 的代码在最新数据上重训、打分；
 - 解释（`explain`）只覆盖 `xgb_F69` 的测试段；
 - 研究库和约 6 GB 的中间数据（主面板、特征、LSTM 训练数据等），都可以用 `python -m ml.run` 从研究库重新生成。
+- P7 长期回测的逐年分数、交易明细、每日持仓、每日前 30 名（`data/ml/history/`，共约 460 MB）：报告和汇总表在 Git 里，明细需要的话另发，或用 `python -m ml.run history` 重新生成。
 
 ## 进度
 
@@ -51,12 +52,13 @@
 | 4.4 重要性的时间稳定性（选做） | 完成 | `p4_4_shap_stability.py` | [p4_4_shap_stability](results/p4_4_shap_stability/report.md) | 各年重要性排名相关 0.84 ~ 0.94；市场状态类最不稳定 |
 | P5 组合回测（5.1 ~ 5.5） | 完成（测试期） | `p5_backtest.py` | [p5_backtest](results/p5_backtest/report.md) | 主规则年化超额：F69 模型 18% ~ 22%、F28 模型 12% ~ 13%；组合层差别都不显著；复现与作者同一量级 |
 | 风格归因（全面检查时补做） | 完成（测试期） | `p5_style.py` | [p5_style](results/p5_style/report.md) | 模型 IC 约八成可由 4 种风格解释；新特征的增益来自风格；F69 组合扣风格后仍有显著 alpha |
+| P7 长期回测 2015 ~ 2026（补充） | 完成 | `p7_history.py`、`p7_history_analyze.py`、`p7_history_report.py` | [p7_history](results/p7_history/report.md) | 新特征 IC 12 年中 11 年更高；组合层模型间分不出；最大回撤 −40% ~ −56%（2015 股灾）；与作者十年实验一致 |
 | 6.1 早期接口 | 完成 | `api.py`、`INTERFACE.md` | [INTERFACE.md](INTERFACE.md) | 队友可以调用：模型列表、排行榜、某天分数和名单、特征说明 |
 | 6.2 接口定稿 | 完成 | `api.py`、`INTERFACE.md` | [INTERFACE.md](INTERFACE.md) | 增加 explain（测试段 SHAP，xgb_F69）、nav（3 条规则的净值） |
 | 6.3 图表 | 完成 | `p6_figures.py` | [figures/](results/figures/) | 排行榜、逐月 IC、10 组、净值、消融瀑布、SHAP、IC vs 超额 |
 | 6.4 报告草稿 | 完成 | — | [REPORT.md](results/REPORT.md) | 按 RQ1 ~ RQ4 组织，含 8 条局限 |
 | 6.5 一键复现 | 完成 | `run.py` | 见下文“怎么重跑” | `python -m ml.run panel / features / train / evaluate / backtest / report / test / all` |
-| 6.6 测试 | 完成 | `tests/` | — | 53 项通过；仓库原有测试见执行记录 |
+| 6.6 测试 | 完成 | `tests/` | — | 54 项通过；仓库原有测试见执行记录 |
 
 ## 目录
 
@@ -103,15 +105,18 @@ ml/
 ├─ p1_6_build_seq.py         1.6 构建序列张量并核对
 ├─ lstm_probe.py             1.6 LSTM 计算量摸底（dl-study 环境运行，只依赖 numpy、torch）
 ├─ p2_protocol_check.py      P2 评估协议在真实数据上的检查（不训练模型、不碰测试段收益）
+├─ p7_history.py            P7 长期回测：2015 ~ 2026 逐年重训（train）与分析入口（analyze）
+├─ p7_history_analyze.py    P7 回测、核对、交易明细、图
+├─ p7_history_report.py     P7 报告
 ├─ p6_figures.py            6.3 报告用图（统一放到 results/figures/）
 ├─ p6_export.py             交接：导出接口用的精简数据包 data/ml/api_export（+ zip）
 ├─ run.py                    6.5 一键复现：python -m ml.run <步骤>|all
-├─ tests/                    单元测试（53 项）
+├─ tests/                    单元测试（54 项）
 └─ results/                  每一步的报告、表格和图（进 Git）
    ├─ registry.jsonl         每次运行的记录（时间、参数、关键数字）
    ├─ p0_setup/  p1_1_data_quality/  p1_2_panel/  p1_3_eda/  p1_4_features/  p1_5_preprocess/  p1_6_seq/
    ├─ p2_protocol/  p3_1_interface/  p3_2_references/  p3_3_xgb_repro/  p3_4_random_forest/  p3_5_xgboost/
-   ├─ p3_6_lstm/  p3_9_task_form/  p3_10_ensemble/
+   ├─ p3_6_lstm/  p3_9_task_form/  p3_10_ensemble/  p7_history/
    ├─ tuning.md              所有模型的调参网格（运行前写定）和结果
    └─ p3_models/<model_id>/  每个模型的指标（select.json）和逐日序列（select_daily.csv）
 
@@ -141,6 +146,7 @@ data/ml/                      大文件（不进 Git，可由脚本重新生成�
 | `train` | 3.1 ~ 3.3 参照与复现、3.4 随机森林、3.5 XGBoost、3.6 LSTM（GPU）、3.9 任务形式、3.10 集成（都是验证段） | 约 4 ~ 5 小时 |
 | `evaluate` | 3.11 测试段（按年重训）与排行榜、4.1 ~ 4.4 特征分析（含 LSTM 积分梯度，GPU） | 约 5 ~ 6 小时 |
 | `backtest` | P5 组合回测、风格归因 | 约 6 分钟 |
+| `history` | P7 长期回测 2015 ~ 2026（补充） | 约 1.5 小时 |
 | `report` | 6.3 报告用图、导出接口数据包 | 约 3 分钟 |
 | `test` | 单元测试 | 约 10 秒 |
 

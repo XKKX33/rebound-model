@@ -126,6 +126,22 @@ def test_refits(keys: pd.DataFrame, test: np.ndarray, test_start: str) -> list[S
     return out
 
 
+def history_refits(keys: pd.DataFrame, start_year: int = 2015, end: str | None = None) -> list[Stage]:
+    """长期回测（PREREG 补充登记十一）：start_year 起每年第一个交易日重训一次（扩张窗口，训练行 = 卖出日早于重训日的全部行）。
+
+    和 `test_refits` 的区别：eval_rows 是这一年准入池里的**全部行**（包括之后买不进、卖不出、没有有效收益的），
+    因为模拟买卖时这些股票本来就在候选里，要由模拟器按真实规则处理；算 IC 时再只取有有效收益的行。
+    """
+    years = keys["trade_date"].dt.year.to_numpy()
+    last = pd.Timestamp(end) if end else keys["trade_date"].max()
+    out = []
+    for y in range(start_year, last.year + 1):
+        fit = first_di_on_or_after(keys, f"{y}-01-01")
+        rows = (years == y) & (keys["trade_date"] <= last).to_numpy()
+        out.append(Stage(str(y), fit, fit_rows(keys, fit), rows))
+    return out
+
+
 def year_parts(keys: pd.DataFrame, rows: np.ndarray) -> dict[str, np.ndarray]:
     """评估行按自然年再分（PREREG 补充登记二第 4 条：测试段逐年 IC，只描述）。"""
     years = keys["trade_date"].dt.year.to_numpy()

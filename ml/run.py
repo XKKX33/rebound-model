@@ -5,6 +5,7 @@
     python -X utf8 -m ml.run train        # P3.1 ~ 3.10：参照、复现、三个模型调参、任务形式、集成（验证段）约 4 ~ 5 小时（含 GPU）
     python -X utf8 -m ml.run evaluate     # P3.11 + P4：测试段（按年重训）、排行榜、单因子、消融、解释性 约 5 ~ 6 小时
     python -X utf8 -m ml.run backtest     # P5：组合回测                                             约 2 分钟
+    python -X utf8 -m ml.run history      # P7：2015 ~ 2026 长期回测（补充分析）                     约 1.5 小时
     python -X utf8 -m ml.run report       # P6.3：报告用图                                           约 1 分钟
     python -X utf8 -m ml.run test         # 单元测试                                                 约 10 秒
     python -X utf8 -m ml.run all          # 以上全部，按顺序
@@ -71,6 +72,10 @@ STEPS: dict[str, list[tuple[str, list[str]]]] = {
         ("P5 组合回测", _m("ml.p5_backtest")),
         ("风格归因（补充）", _m("ml.p5_style")),
     ],
+    "history": [
+        ("P7 长期回测：逐年重训 2015 ~ 2026", _m("ml.p7_history", "train")),
+        ("P7 长期回测：回测与分析", _m("ml.p7_history", "analyze")),
+    ],
     "report": [
         ("6.3 报告用图", _m("ml.p6_figures")),
         ("交接：导出接口数据包", _m("ml.p6_export")),
@@ -79,7 +84,7 @@ STEPS: dict[str, list[tuple[str, list[str]]]] = {
         ("单元测试", _m("pytest", "-p", "no:cacheprovider", "-o", "addopts=", "-q", "ml/tests")),
     ],
 }
-ORDER = ["panel", "features", "train", "evaluate", "backtest", "report", "test"]
+ORDER = ["panel", "features", "train", "evaluate", "backtest", "history", "report", "test"]
 
 
 def main(argv: list[str]) -> None:
