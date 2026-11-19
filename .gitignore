@@ -23,6 +23,12 @@ build/
 dist/
 .venv/
 
+# Node 辩论侧车（依赖与构建产物不入库）
+debate_agent/node_modules/
+*.tsbuildinfo
+debate_agent/src/**/*.js
+debate_agent/test/**/*.js
+
 # 编辑器 / 系统
 .vscode/
 .idea/

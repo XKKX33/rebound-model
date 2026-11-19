@@ -36,6 +36,7 @@ from rebound.data.sync import AuditReport, DateSync, SkippedDate, SyncReport
 EXIT_REFUSED = 1
 EXIT_STALE = 3
 EXIT_DATA = 4
+EXIT_DEBATE = 5
 
 
 def _parse_date(raw: str) -> date:
@@ -112,8 +113,13 @@ def _build_parser() -> argparse.ArgumentParser:
 
     daily = sub.add_parser("daily", help="收盘后一条命令：同步 → 补训补分 → 选股 → 更新纸面跟踪")
     daily.add_argument("--no-sync", action="store_true", help="不同步，数据不新就直接拒绝")
+    daily.add_argument("--debate", action="store_true", help="选股与跟踪更新后再运行 AI 辩论")
     daily.add_argument("--db", type=Path, default=None, help="数据库路径")
     daily.add_argument("--json", action="store_true", help="输出 JSON")
+
+    from rebound.debate.cli import register_debate_parser
+
+    register_debate_parser(sub, _parse_date)
 
     capital = sub.add_parser("capital", help="本金测算：150 条持股规则 × 三种重训频率，逐日模拟真实账户")
     _add_cost_flags(capital)
@@ -357,7 +363,7 @@ def _run_pick(args: argparse.Namespace, settings: config.Settings) -> int:
 
 
 def _run_daily(args: argparse.Namespace, settings: config.Settings) -> int:
-    """同步 → 闸门 → 补训补分 → 选股 → 更新全部纸面跟踪。哪一步失败就停在那一步。"""
+    """同步 → 闸门 → 补训补分 → 选股 → 更新全部纸面跟踪（可选接 AI 辩论）。"""
     from rebound import track
     from rebound.model.refresh import refresh
 
@@ -371,13 +377,59 @@ def _run_daily(args: argparse.Namespace, settings: config.Settings) -> int:
     refresh(target, log=log)
     result = _pick(settings, target, day, variant=settings.model.variant, cadence=settings.model.cadence)
     tracked = track.refresh_all(target, log=log)
-    if args.json:
-        _dump({"pick": _pick_payload(result), "tracking": {"updated": tracked["updated"],
-                                                          "track_ids": tracked["track_ids"]}})
-    else:
+
+    if not args.debate:
+        if args.json:
+            _dump({"pick": _pick_payload(result), "tracking": {"updated": tracked["updated"],
+                                                              "track_ids": tracked["track_ids"]}})
+        else:
+            _print_pick_text(result)
+            print(f"纸面跟踪：更新了 {tracked['updated']} 个")
+        return 0
+
+    from rebound.debate import service as debate_service
+    from rebound.debate.cli import print_final_summary
+    from rebound.debate.sidecar import SidecarError
+
+    if not args.json:
         _print_pick_text(result)
         print(f"纸面跟踪：更新了 {tracked['updated']} 个")
+        try:
+            out = debate_service.run_debate(target, settings=settings, as_of=day, log=log)
+        except (debate_service.DebateError, SidecarError) as exc:
+            print(f"辩论未出名单：{exc}", file=sys.stderr)
+            return EXIT_DEBATE
+        print()
+        print_final_summary(out["final"], cached=bool(out["cached"]))
+        return 0
+
+    payload: dict[str, Any] = {
+        "pick": _pick_payload(result),
+        "tracking": {"updated": tracked["updated"], "track_ids": tracked["track_ids"]},
+    }
+    try:
+        out = debate_service.run_debate(target, settings=settings, as_of=day, log=log)
+    except (debate_service.DebateError, SidecarError) as exc:
+        payload["debate"] = {"ok": False, "error": str(exc)}
+        _dump(payload)
+        print(f"辩论未出名单：{exc}", file=sys.stderr)
+        return EXIT_DEBATE
+    payload["debate"] = out["final"]
+    _dump(payload)
     return 0
+
+
+def _run_debate(args: argparse.Namespace, settings: config.Settings) -> int:
+    from rebound.debate.cli import run_debate_command
+
+    return run_debate_command(
+        args,
+        settings,
+        target=_target(settings, args.db),
+        fresh_day=_fresh_day,
+        exit_stale=EXIT_STALE,
+        say=_say,
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -528,10 +580,14 @@ _COMMANDS = {
     "daily": _run_daily,
     "capital": _run_capital,
     "track": _run_track,
+    "debate": _run_debate,
 }
 
 
 def main(argv: Sequence[str] | None = None) -> int:
+    from rebound.debate.service import DebateError
+    from rebound.debate.sidecar import SidecarError
+
     args = _build_parser().parse_args(argv)
     if not local_is_beijing():
         print("提醒：本进程没能切成北京时间；新鲜度闸门和同步仍按北京时间判断，其余时间显示可能是本机时区。",
@@ -544,6 +600,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     except fresh.StaleDataError as exc:
         print(str(exc), file=sys.stderr)
         return EXIT_STALE
+    except (DebateError, SidecarError) as exc:
+        print(f"辩论未出名单：{exc}", file=sys.stderr)
+        return EXIT_DEBATE
     except (DataError, config.ConfigError) as exc:
         print(f"出错：{exc}", file=sys.stderr)
         return EXIT_DATA

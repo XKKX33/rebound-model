@@ -40,3 +40,23 @@ pick:
   top_n: 6
   max_per_industry: 2
   candidate_limit: 260
+
+debate:
+  # 送辩只数：当天模型分前 N（不先做行业去重），1~50。
+  candidates: 20
+  # 辩完少于这么多只就不出名单；不小于 pick.top_n，不大于 candidates。
+  min_debated: 12
+  # 每只候选带最近多少根日线，5~60。
+  bars: 20
+  # 同时辩几只（建议按上游并发配额设置，spark-x2.6 默认 2）。
+  concurrency: 2
+  # 单次调用上限（秒）；侧车和看门狗都用它。
+  call_timeout_seconds: 300
+  llm:
+    base_url: https://maas-api.cn-huabei-1.xf-yun.com/v2
+    model: spark-x2.6
+    # 密钥放在项目根的 .env 里，这里只填环境变量名。
+    api_key_env: WORKBENCH_AI_API_KEY
+    reasoning_effort: low
+    temperature: 0.2
+    max_tokens: 16384

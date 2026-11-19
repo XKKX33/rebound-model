@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>反弹模型 · AI 多角色辩论复核台</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <!-- 顶部研报控制台 -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="brand">
+            <span class="brand-mark" aria-hidden="true"></span>
+            <div class="brand-copy">
+              <div class="brand-title">反弹模型 · AI 辩论复核台</div>
+              <div class="brand-sub" id="model-meta-line">加载配置中…</div>
+            </div>
+          </div>
+
+          <div class="controls-group">
+            <label class="ctrl-field">
+              <span class="ctrl-label">数据库</span>
+              <select id="sel-db" class="ctrl-select"></select>
+            </label>
+            <label class="ctrl-field">
+              <span class="ctrl-label">信号日</span>
+              <select id="sel-date" class="ctrl-select mono"></select>
+            </label>
+            <label class="ctrl-field">
+              <span class="ctrl-label">历史运行</span>
+              <select id="sel-run" class="ctrl-select"></select>
+            </label>
+            <label class="ctrl-field ctrl-compact">
+              <span class="ctrl-label">思考强度</span>
+              <select id="sel-effort" class="ctrl-select">
+                <option value="off">off</option>
+                <option value="minimal">minimal</option>
+                <option value="low">low</option>
+                <option value="medium">medium</option>
+                <option value="high">high</option>
+              </select>
+            </label>
+            <label class="ctrl-field ctrl-compact">
+              <span class="ctrl-label">并发</span>
+              <select id="sel-concurrency" class="ctrl-select mono">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="action-buttons">
+            <button id="btn-dry-run" class="btn btn-secondary" type="button">演练预览</button>
+            <button id="btn-start" class="btn btn-primary" type="button">开始 / 续跑辩论</button>
+            <button id="btn-stop" class="btn btn-danger" type="button" hidden>停止</button>
+          </div>
+          <div class="kpi-strip" id="kpi-strip">
+            <span class="status-badge status-idle" id="status-badge">就绪</span>
+            <span class="kpi-item mono" id="kpi-progress">0/0</span>
+            <span class="kpi-sep">·</span>
+            <span class="kpi-item mono" id="kpi-tokens">0 tok</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- 通知条 -->
+      <div id="toast-bar" class="toast-bar" hidden></div>
+
+      <!-- 主工作区：左工作流进度 + 右辩论与终选结果 -->
+      <main class="workspace">
+        <!-- 左侧栏 -->
+        <aside class="left-pane">
+          <!-- 工作流流式路由图卡片 -->
+          <section class="card workflow-card">
+            <div class="card-head">
+              <div>
+                <h2 class="card-title">辩论工作流路由</h2>
+                <p class="card-subtitle" id="workflow-subtitle">点击任意节点可快速定位右侧内容</p>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+                <button id="btn-demo-flow" class="chip" type="button" title="在历史回放中演示流式路由动画">演示流光</button>
+                <span class="pill pill-soft mono" id="workflow-active-pill">待命</span>
+              </div>
+            </div>
+            <div class="workflow-canvas" id="workflow-graph"></div>
+            <div class="workflow-foot" id="workflow-foot">
+              <div class="wf-stat">
+                <span class="wf-stat-label">股票池</span>
+                <span class="wf-stat-val mono" id="wf-pool-size">—</span>
+              </div>
+              <div class="wf-stat">
+                <span class="wf-stat-label">送辩 / 终选</span>
+                <span class="wf-stat-val mono" id="wf-limits">—</span>
+              </div>
+              <div class="wf-stat">
+                <span class="wf-stat-label">看多 / 看空</span>
+                <span class="wf-stat-val mono" id="wf-verdict-split">—</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- 20 只候选股实时进度表 -->
+          <section class="card roster-card">
+            <div class="card-head roster-head">
+              <div class="roster-title-row">
+                <h2 class="card-title">候选股辩论队列</h2>
+                <span class="mono muted-text" id="roster-count-label">0 只</span>
+              </div>
+              <div class="progress-track">
+                <div class="progress-fill" id="roster-progress-fill" style="width: 0%"></div>
+              </div>
+              <div class="roster-toolbar">
+                <div class="filter-pills" id="filter-pills">
+                  <button class="chip active" data-filter="all" type="button">全部</button>
+                  <button class="chip" data-filter="picked" type="button">终选</button>
+                  <button class="chip" data-filter="bull" type="button">看多</button>
+                  <button class="chip" data-filter="bear" type="button">看空</button>
+                  <button class="chip" data-filter="active" type="button">运行中</button>
+                </div>
+                <div class="roster-sort-row">
+                  <select id="sel-sort" class="ctrl-select ctrl-mini">
+                    <option value="rank">按模型名次</option>
+                    <option value="score">按风控评分</option>
+                  </select>
+                  <label class="follow-toggle" title="运行时自动跟随最新流式发言的股票">
+                    <input type="checkbox" id="chk-autofollow" checked />
+                    <span>跟随</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="roster-list" id="roster-list">
+              <div class="empty-hint">请选择交易日或历史运行记录</div>
+            </div>
+          </section>
+        </aside>
+
+        <!-- 右侧主阅读区 -->
+        <section class="right-pane">
+          <div class="right-tabs-bar">
+            <div class="tabs-left">
+              <button class="tab-btn active" id="tab-stock" data-tab="stock" type="button">
+                <span>单股辩论过程</span>
+                <span class="tab-tag mono" id="tab-stock-tag">—</span>
+              </button>
+              <button class="tab-btn" id="tab-final" data-tab="final" type="button">
+                <span>终选辩论结果</span>
+                <span class="tab-tag" id="tab-final-tag">待定稿</span>
+              </button>
+            </div>
+            <div class="tabs-right">
+              <button id="btn-copy-md" class="btn btn-ghost btn-sm" type="button">复制 Markdown</button>
+              <button id="btn-download-json" class="btn btn-ghost btn-sm" type="button">导出 JSON</button>
+            </div>
+          </div>
+
+          <!-- 视图 A：单股辩论过程 -->
+          <div id="view-stock" class="view-container">
+            <div class="empty-state" id="stock-empty">
+              <div class="empty-title">暂未加载候选股数据</div>
+              <p class="empty-desc">可在顶部选择历史辩论记录回放，或点击「演练预览 / 开始辩论」查看实时多角色推理。</p>
+            </div>
+            <div id="stock-content" hidden></div>
+          </div>
+
+          <!-- 视图 B：最终辩论结果总览 -->
+          <div id="view-final" class="view-container" hidden>
+            <div id="final-content"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- 证据悬停气泡 -->
+    <div id="citation-tooltip" class="citation-tooltip" hidden></div>
+
+    <script type="module" src="/static/app.js"></script>
+  </body>
+</html>

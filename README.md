@@ -108,8 +108,31 @@ data/
 ├─ market.duckdb                              行情与每日分数
 ├─ market.models/return_model/<版本>/<重训日>/  模型文件及校验信息
 ├─ market.capital/                            本金测算缓存
-└─ market.tracking/                           纸面账户与冻结清单
+├─ market.tracking/                           纸面账户与冻结清单
+└─ market.debate/                             AI 辩论检查点与冻结名单
 ```
+
+### AI 辩论（可选）
+
+AI 辩论只对当天模型排名前 20 的候选做结构化复核，不改动模型口径、原始选股与纸面跟踪。需要 **Node.js >= 22.19**（本机为 v24.14.0）。
+
+首次准备侧车依赖并在 `.env` 配置大模型密钥（键名默认 `WORKBENCH_AI_API_KEY`）：
+
+```powershell
+cd debate_agent; npm install; cd ..
+& $reboundPython -X utf8 -m rebound debate check
+```
+
+常用命令（支持 `--as-of` 回放、不花钱的 `--dry-run` 演练与断点续跑）：
+
+```powershell
+& $reboundPython -X utf8 -m rebound debate run --dry-run
+& $reboundPython -X utf8 -m rebound debate run
+& $reboundPython -X utf8 -m rebound debate show
+& $reboundPython -X utf8 -m rebound daily --debate
+```
+
+完整协议、角色可见性与局限见 [AI 辩论说明](docs/debate.md)，提示词唯一来源见 [辩论方法论](docs/debate-methodology.md)。
 
 ## 安装与部署
 
@@ -133,6 +156,7 @@ data/
 ```powershell
 & $reboundPython -X utf8 -m pytest -p no:cacheprovider tests
 & $reboundPython -X utf8 -m pytest -p no:cacheprovider experiments
+cd debate_agent; npm test; npm run typecheck; cd ..
 ```
 
 第二条验证实验的算法与报告逻辑；需要研究面板的检查会按测试说明跳过。

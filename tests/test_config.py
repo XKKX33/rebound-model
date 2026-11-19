@@ -96,3 +96,36 @@ def test_token_comes_from_the_selected_project(tmp_path: Path, monkeypatch) -> N
     (tmp_path / ".env").write_text(f"{token_name}=local-test-token\n", encoding="utf-8")
 
     assert resolve_token(settings) == "local-test-token"
+
+
+def test_debate_defaults_when_omitted(tmp_path: Path) -> None:
+    stripped = BASE.split("\ndebate:")[0]
+    settings = _load(tmp_path, stripped)
+    assert settings.debate.candidates == 20
+    assert settings.debate.min_debated == 12
+    assert settings.debate.bars == 20
+    assert settings.debate.concurrency == 5
+    assert settings.debate.call_timeout_seconds == 300
+    assert settings.debate.llm.model == "step-5-preview"
+    assert settings.debate.llm.api_key_env == "WORKBENCH_AI_API_KEY"
+    assert settings.debate.llm.reasoning_effort == "high"
+    assert settings.debate.llm.max_tokens == 16384
+
+
+@pytest.mark.parametrize(("extra", "message"), [
+    ("debate:\n  unknown_key: 1\n", "settings.debate 有不认识的键"),
+    ("debate:\n  candidates: 51\n", "candidates 必须是 1~50"),
+    ("debate:\n  min_debated: 4\n", "不能小于 pick.top_n"),
+    ("debate:\n  candidates: 10\n  min_debated: 12\n", "不能大于 candidates"),
+    ("debate:\n  bars: 4\n", "bars 必须是 5~60"),
+    ("debate:\n  concurrency: 17\n", "concurrency 必须是 1~16"),
+    ("debate:\n  call_timeout_seconds: 0\n", "call_timeout_seconds 必须是 1~10800"),
+    ("debate:\n  llm:\n    bad: 1\n", "settings.debate.llm 有不认识的键"),
+    ("debate:\n  llm:\n    reasoning_effort: extreme\n", "reasoning_effort 只能是"),
+    ("debate:\n  llm:\n    temperature: 2.5\n", "temperature 必须在 0~2"),
+    ("debate:\n  llm:\n    max_tokens: 40000\n", "max_tokens 必须是 1~32768"),
+])
+def test_debate_bad_values_are_refused(tmp_path: Path, extra: str, message: str) -> None:
+    stripped = BASE.split("\ndebate:")[0]
+    with pytest.raises(config.ConfigError, match=message):
+        _load(tmp_path, stripped + "\n" + extra)

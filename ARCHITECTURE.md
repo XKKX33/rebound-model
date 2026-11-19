@@ -20,6 +20,10 @@ flowchart TD
     SCORE --> ART
     CLI --> PICK["select"]
     PICK --> SCORE
+    CLI --> DEBATE["debate (service / runs / snapshot)"]
+    DEBATE --> PICK
+    DEBATE --> SIDECAR["debate.sidecar (NDJSON)"]
+    SIDECAR --> AGENT["debate_agent (Node/TS)"]
     CLI --> CAPITAL["backtest.capital"]
     CLI --> TRACK["track"]
     TRACK --> CAPITAL
@@ -63,6 +67,8 @@ flowchart TD
 | `rebound/backtest/plan.py` | 生成下一交易日和新账户的模拟买卖清单 |
 | `rebound/backtest/capital.py` | 比较 150 条规则和三种重训频率，缓存本金测算 |
 | `rebound/track.py` | 管理纸面账户，重算持仓并冻结每日计划 |
+| `rebound/debate/` | AI 辩论协议、方法论加载、只读候选快照、检查点运行目录、侧车与 CLI 子命令 |
+| `debate_agent/` | Node/TS 辩论侧车（`@earendil-works/pi-ai`），执行 7 角色并发推理与校验 |
 | `tests/` | 用隔离的临时数据验证正式流程 |
 | `experiments/shared/` | 历史研究的特征、标签和模拟器共用实现 |
 | `experiments/decade/` | 十年、重训频率、规则、行业特征及训练窗口实验 |
@@ -82,3 +88,5 @@ flowchart TD
 7. **正式模拟使用可执行的换仓顺序。** 前一晚决定、开盘买、尾盘卖，卖出资金次日再投入；保留老规则名用于回放旧跟踪。
 8. **历史实验保留原口径。** 原研究文件可能使用不同的名称过滤、标签处理或成交时点；比较结论必须同时说明版本。
 9. **生成数据不进入 Git。** 根目录 `/data/` 和大模型、面板文件被忽略，`rebound/data/` 是必须交付的源码。
+10. **AI 只复核模型前 20，不改模型、选股和跟踪。** AI 辩论作为可选旁路存在，失败时退出码为 5，不回落冒充模型名单，也不修改既有选股与跟踪账本。
+11. **提示词只有一个来源。** 方法论正文与 7 个角色职责统一维护在 `docs/debate-methodology.md`，由代码加载装配并参与 `input_hash`。

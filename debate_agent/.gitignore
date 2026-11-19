@@ -1,0 +1,9 @@
+# 依赖目录不进库：pi_ai 的锁定版本靠 package-lock.json 复现，
+# node_modules 本身是几千个文件，进库只会让每次 diff 都不可读。
+node_modules/
+
+# TypeScript 只做类型检查（noEmit），不产出构建物；
+# 万一有人手动 tsc 出 js，也不要进库——运行入口永远是 src/main.ts。
+*.tsbuildinfo
+src/**/*.js
+test/**/*.js

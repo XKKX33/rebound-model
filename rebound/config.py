@@ -27,6 +27,8 @@ __all__ = [
     "ROOT",
     "ConfigError",
     "DataConfig",
+    "DebateConfig",
+    "DebateLlmConfig",
     "ModelConfig",
     "PickConfig",
     "Settings",
@@ -46,6 +48,19 @@ DEFAULT_CADENCE = "M"
 DEFAULT_TOP_N = 6
 DEFAULT_MAX_PER_INDUSTRY = 2
 DEFAULT_CANDIDATE_LIMIT = 260
+
+DEFAULT_DEBATE_CANDIDATES = 20
+DEFAULT_DEBATE_MIN_DEBATED = 12
+DEFAULT_DEBATE_BARS = 20
+DEFAULT_DEBATE_CONCURRENCY = 5
+DEFAULT_DEBATE_TIMEOUT = 300
+DEFAULT_LLM_BASE_URL = "https://api.stepfun.com/step_plan/v1"
+DEFAULT_LLM_MODEL = "step-5-preview"
+DEFAULT_LLM_API_KEY_ENV = "WORKBENCH_AI_API_KEY"
+DEFAULT_LLM_REASONING_EFFORT = "high"
+DEFAULT_LLM_TEMPERATURE = 0.2
+DEFAULT_LLM_MAX_TOKENS = 16384
+REASONING_EFFORTS = frozenset({"off", "minimal", "low", "medium", "high"})
 
 
 class ConfigError(RuntimeError):
@@ -115,11 +130,36 @@ class PickConfig:
 
 
 @dataclass(frozen=True, slots=True)
+class DebateLlmConfig:
+    """AI 辩论使用的大模型接口参数（密钥不放进配置，只写环境变量名）。"""
+
+    base_url: str = DEFAULT_LLM_BASE_URL
+    model: str = DEFAULT_LLM_MODEL
+    api_key_env: str = DEFAULT_LLM_API_KEY_ENV
+    reasoning_effort: str = DEFAULT_LLM_REASONING_EFFORT
+    temperature: float = DEFAULT_LLM_TEMPERATURE
+    max_tokens: int = DEFAULT_LLM_MAX_TOKENS
+
+
+@dataclass(frozen=True, slots=True)
+class DebateConfig:
+    """AI 辩论流水线参数（终选只数与行业上限复用 `pick` 段）。"""
+
+    candidates: int = DEFAULT_DEBATE_CANDIDATES
+    min_debated: int = DEFAULT_DEBATE_MIN_DEBATED
+    bars: int = DEFAULT_DEBATE_BARS
+    concurrency: int = DEFAULT_DEBATE_CONCURRENCY
+    call_timeout_seconds: int = DEFAULT_DEBATE_TIMEOUT
+    llm: DebateLlmConfig = field(default_factory=DebateLlmConfig)
+
+
+@dataclass(frozen=True, slots=True)
 class Settings:
     data: DataConfig
     sync: SyncConfig
     model: ModelConfig = field(default_factory=ModelConfig)
     pick: PickConfig = field(default_factory=PickConfig)
+    debate: DebateConfig = field(default_factory=DebateConfig)
     root: Path = ROOT
     #: 原样保留的段落（目前只有 `tushare`），按名字取：`settings.section("tushare")`。
     sections: Mapping[str, Any] = field(default_factory=dict)
@@ -181,6 +221,99 @@ def _positive_int(value: Any, where: str) -> int:
     return value
 
 
+def _int_in_range(value: Any, where: str, low: int, high: int) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or value < low or value > high:
+        raise ConfigError(f"{where} 必须是 {low}~{high} 之间的整数，收到 {value!r}")
+    return value
+
+
+def _non_empty_str(value: Any, where: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        raise ConfigError(f"{where} 必须是非空字符串，收到 {value!r}")
+    return value.strip()
+
+
+def _parse_debate(raw: Mapping[str, Any], picks: PickConfig, path: Path) -> DebateConfig:
+    import math
+
+    debate = _section(raw, "debate", path, required=False)
+    _check_keys(
+        debate,
+        {"candidates", "min_debated", "bars", "concurrency", "call_timeout_seconds", "llm"},
+        "settings.debate",
+    )
+    candidates = _int_in_range(
+        debate.get("candidates", DEFAULT_DEBATE_CANDIDATES), "settings.debate.candidates", 1, 50
+    )
+    min_debated = _int_in_range(
+        debate.get("min_debated", DEFAULT_DEBATE_MIN_DEBATED), "settings.debate.min_debated", 1, 50
+    )
+    if min_debated < picks.top_n:
+        raise ConfigError(f"settings.debate.min_debated（{min_debated}）不能小于 pick.top_n（{picks.top_n}）")
+    if min_debated > candidates:
+        raise ConfigError(
+            f"settings.debate.min_debated（{min_debated}）不能大于 candidates（{candidates}）"
+        )
+    bars = _int_in_range(debate.get("bars", DEFAULT_DEBATE_BARS), "settings.debate.bars", 5, 60)
+    concurrency = _int_in_range(
+        debate.get("concurrency", DEFAULT_DEBATE_CONCURRENCY), "settings.debate.concurrency", 1, 16
+    )
+    timeout = _int_in_range(
+        debate.get("call_timeout_seconds", DEFAULT_DEBATE_TIMEOUT),
+        "settings.debate.call_timeout_seconds",
+        1,
+        10_800,
+    )
+
+    llm_raw = debate.get("llm")
+    if llm_raw is None:
+        if "llm" in debate:
+            raise ConfigError("settings.debate.llm 不能为空")
+        llm_raw = {}
+    elif not isinstance(llm_raw, dict):
+        raise ConfigError("settings.debate.llm 必须是映射")
+    _check_keys(
+        llm_raw,
+        {"base_url", "model", "api_key_env", "reasoning_effort", "temperature", "max_tokens"},
+        "settings.debate.llm",
+    )
+    effort = _non_empty_str(
+        llm_raw.get("reasoning_effort", DEFAULT_LLM_REASONING_EFFORT),
+        "settings.debate.llm.reasoning_effort",
+    )
+    if effort not in REASONING_EFFORTS:
+        raise ConfigError(
+            f"settings.debate.llm.reasoning_effort 只能是 {sorted(REASONING_EFFORTS)}，收到 {effort!r}"
+        )
+    temp_raw = llm_raw.get("temperature", DEFAULT_LLM_TEMPERATURE)
+    if isinstance(temp_raw, bool) or not isinstance(temp_raw, (int, float)) or not math.isfinite(float(temp_raw)):
+        raise ConfigError(f"settings.debate.llm.temperature 必须是有限数字，收到 {temp_raw!r}")
+    temperature = float(temp_raw)
+    if not 0.0 <= temperature <= 2.0:
+        raise ConfigError(f"settings.debate.llm.temperature 必须在 0~2 之间，收到 {temperature!r}")
+
+    llm = DebateLlmConfig(
+        base_url=_non_empty_str(llm_raw.get("base_url", DEFAULT_LLM_BASE_URL), "settings.debate.llm.base_url"),
+        model=_non_empty_str(llm_raw.get("model", DEFAULT_LLM_MODEL), "settings.debate.llm.model"),
+        api_key_env=_non_empty_str(
+            llm_raw.get("api_key_env", DEFAULT_LLM_API_KEY_ENV), "settings.debate.llm.api_key_env"
+        ),
+        reasoning_effort=effort,
+        temperature=temperature,
+        max_tokens=_int_in_range(
+            llm_raw.get("max_tokens", DEFAULT_LLM_MAX_TOKENS), "settings.debate.llm.max_tokens", 1, 32768
+        ),
+    )
+    return DebateConfig(
+        candidates=candidates,
+        min_debated=min_debated,
+        bars=bars,
+        concurrency=concurrency,
+        call_timeout_seconds=timeout,
+        llm=llm,
+    )
+
+
 def _resolve(root: Path, value: str | Path) -> Path:
     path = Path(value)
     return path if path.is_absolute() else (root / path).resolve()
@@ -197,7 +330,7 @@ def load_settings(path: Path | None = None, *, root: Path | None = None) -> Sett
         path = Path(path).resolve()
         root = path.parent.parent if root is None else Path(root).resolve()
     raw = _read_yaml(path)
-    _check_keys(raw, {"data", "sync", "tushare", "model", "pick"}, str(path))
+    _check_keys(raw, {"data", "sync", "tushare", "model", "pick", "debate"}, str(path))
 
     data = _section(raw, "data", path)
     sync = _section(raw, "sync", path)
@@ -239,6 +372,8 @@ def load_settings(path: Path | None = None, *, root: Path | None = None) -> Sett
     if picks.candidate_limit < picks.top_n:
         raise ConfigError(f"settings.pick.candidate_limit（{picks.candidate_limit}）不能小于 top_n（{picks.top_n}）")
 
+    debate_cfg = _parse_debate(raw, picks, path)
+
     return Settings(
         data=DataConfig(
             db_path=_resolve(root, _require(data, "db_path", "settings.data")),
@@ -256,6 +391,7 @@ def load_settings(path: Path | None = None, *, root: Path | None = None) -> Sett
         ),
         model=ModelConfig(variant=variant, cadence=cadence),
         pick=picks,
+        debate=debate_cfg,
         root=root,
         sections={"tushare": dict(tushare)},
     )
