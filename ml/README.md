@@ -118,6 +118,7 @@ ml/
 ├─ p8_deploy.py             P8：交付用的模型文件（截至数据最后一天的全部已知样本，3 个种子）
 ├─ predict.py               P8：用交付模型给某一天打分、出名单（lstm_predict.py 是 LSTM 部分，dl-study 环境）
 ├─ p8_delivery.py           P8：交付版结果（三个模型的测试段、长期回测、换起点、图）；p8_delivery_report.py 写报告
+├─ p8_starts_nav.py         P8：换起点的每条净值曲线和图（fig5、fig6）
 ├─ p6_figures.py            6.3 报告用图（统一放到 results/figures/）
 ├─ p6_export.py             交接：导出接口用的精简数据包 data/ml/api_export（+ zip）
 ├─ run.py                    6.5 一键复现：python -m ml.run <步骤>|all
@@ -205,6 +206,7 @@ dl-study 环境 `D:\Anaconda\envs\dl-study\python.exe`（torch + CUDA，8 GB 显
 & 'D:\Anaconda\python.exe' -X utf8 -m ml.p8_deploy               # 约 20 分钟
 & 'D:\Anaconda\python.exe' -X utf8 -m ml.predict --check         # 约 2 分钟
 & 'D:\Anaconda\python.exe' -X utf8 -m ml.p8_delivery             # 约 15 分钟
+& 'D:\Anaconda\python.exe' -X utf8 -m ml.p8_starts_nav           # 约 3 分钟：换起点净值曲线和图，之后运行 ml.p8_delivery --report 把图写进报告
 & 'D:\Anaconda\python.exe' -X utf8 -m ml.p6_figures               # 约 1 分钟
 & 'D:\Anaconda\python.exe' -X utf8 -m ml.p6_export                # 约 2 分钟：交接用的数据包
 & 'D:\Anaconda\python.exe' -X utf8 -m pytest -p no:cacheprovider -o addopts="" -q ml/tests

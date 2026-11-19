@@ -85,6 +85,8 @@ STEPS: dict[str, list[tuple[str, list[str]]]] = {
         ("P8 交付模型文件", _m("ml.p8_deploy")),
         ("P8 交付模型流程核对", _m("ml.predict", "--check")),
         ("P8 交付版结果与报告", _m("ml.p8_delivery")),
+        ("P8 换起点净值曲线与图", _m("ml.p8_starts_nav")),
+        ("P8 报告（加入换起点图）", _m("ml.p8_delivery", "--report")),
     ],
     "report": [
         ("6.3 报告用图", _m("ml.p6_figures")),
