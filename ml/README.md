@@ -1,7 +1,7 @@
 # ml/：期末项目的数据与模型部分
 
 在队友的反弹模型仓库上新增的目录，不改动仓库原有代码（`rebound/`），只通过 import 复用。
-执行依据是 `期末项目/任务清单_数据与模型.md`（第 8 版：比较 3 个模型——随机森林、XGBoost、LSTM；测试段按年重训）；每一步的详细结果在 `ml/results/<步骤>/report.md`。
+执行依据是 `期末项目/任务清单_数据与模型.md`（第 11 版：比较 3 个模型——随机森林、XGBoost、LSTM；测试段按年重训；P7 补充 2015 ~ 2026 长期回测）；每一步的详细结果在 `ml/results/<步骤>/report.md`。
 
 **先看这三个**：报告草稿 [results/REPORT.md](results/REPORT.md)、总排行榜 [results/leaderboard.md](results/leaderboard.md)、给队友的接口说明 [INTERFACE.md](INTERFACE.md)。
 
