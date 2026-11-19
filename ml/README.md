@@ -52,7 +52,7 @@
 | 4.4 重要性的时间稳定性（选做） | 完成 | `p4_4_shap_stability.py` | [p4_4_shap_stability](results/p4_4_shap_stability/report.md) | 各年重要性排名相关 0.84 ~ 0.94；市场状态类最不稳定 |
 | P5 组合回测（5.1 ~ 5.5） | 完成（测试期） | `p5_backtest.py` | [p5_backtest](results/p5_backtest/report.md) | 主规则年化超额：F69 模型 18% ~ 22%、F28 模型 12% ~ 13%；组合层差别都不显著；复现与作者同一量级 |
 | 风格归因（全面检查时补做） | 完成（测试期） | `p5_style.py` | [p5_style](results/p5_style/report.md) | 模型 IC 约八成可由 4 种风格解释；新特征的增益来自风格；F69 组合扣风格后仍有显著 alpha |
-| P7 长期回测 2015 ~ 2026（补充） | 完成 | `p7_history.py`、`p7_history_analyze.py`、`p7_history_report.py` | [p7_history](results/p7_history/report.md) | 新特征 IC 12 年中 11 年更高；组合层模型间分不出；最大回撤 −40% ~ −56%（2015 股灾）；与作者十年实验一致 |
+| P7 长期回测 2015 ~ 2026（补充） | 完成 | `p7_history.py`、`p7_history_analyze.py`、`p7_history_report.py` | [p7_history](results/p7_history/report.md)、[换起点](results/p7_history/starts.md) | 新特征 IC 12 年中 11 年更高；最大回撤 −40% ~ −56%（2015 股灾）；不从 2015 年起步时 XGBoost F69 每个起点都最好；与作者十年实验一致 |
 | 6.1 早期接口 | 完成 | `api.py`、`INTERFACE.md` | [INTERFACE.md](INTERFACE.md) | 队友可以调用：模型列表、排行榜、某天分数和名单、特征说明 |
 | 6.2 接口定稿 | 完成 | `api.py`、`INTERFACE.md` | [INTERFACE.md](INTERFACE.md) | 增加 explain（测试段 SHAP，xgb_F69）、nav（3 条规则的净值） |
 | 6.3 图表 | 完成 | `p6_figures.py` | [figures/](results/figures/) | 排行榜、逐月 IC、10 组、净值、消融瀑布、SHAP、IC vs 超额 |
@@ -108,6 +108,7 @@ ml/
 ├─ p7_history.py            P7 长期回测：2015 ~ 2026 逐年重训（train）与分析入口（analyze）
 ├─ p7_history_analyze.py    P7 回测、核对、交易明细、图
 ├─ p7_history_report.py     P7 报告
+├─ p7_starts.py             P7 补充：换起点（2015 ~ 2024 每年起步）
 ├─ p6_figures.py            6.3 报告用图（统一放到 results/figures/）
 ├─ p6_export.py             交接：导出接口用的精简数据包 data/ml/api_export（+ zip）
 ├─ run.py                    6.5 一键复现：python -m ml.run <步骤>|all

@@ -244,3 +244,4 @@
 {"time": "2026-11-19T16:11:03", "step": "P7_history_train", "model": "xgb_F69_s4", "seconds": 419.3}
 {"time": "2026-11-19T16:38:24", "step": "P7_history_train", "model": "rf_F69", "seconds": 1640.9}
 {"time": "2026-11-19T16:57:52", "step": "P7_history_analyze", "fix_max_abs": 0.22}
+{"time": "2026-11-19T17:45:05", "step": "P7_starts", "n": 100}

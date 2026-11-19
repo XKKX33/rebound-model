@@ -190,6 +190,10 @@ def report() -> None:
 
 ![月度收益](fig3_monthly_return.png)
 
+## 九点五、换起点
+
+2015 ~ 2024 每年第一个交易日起步的结果见 [starts.md](starts.md)（补充登记十二）。
+
 ## 十、交易策略说明
 {STRATEGY}
 

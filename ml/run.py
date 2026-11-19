@@ -75,6 +75,7 @@ STEPS: dict[str, list[tuple[str, list[str]]]] = {
     "history": [
         ("P7 长期回测：逐年重训 2015 ~ 2026", _m("ml.p7_history", "train")),
         ("P7 长期回测：回测与分析", _m("ml.p7_history", "analyze")),
+        ("P7 补充：换起点", _m("ml.p7_starts")),
     ],
     "report": [
         ("6.3 报告用图", _m("ml.p6_figures")),
