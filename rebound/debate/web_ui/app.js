@@ -5144,9 +5144,9 @@ function bindMlEvents() {
       renderModelsView();
       return;
     }
-    const startBtn = ev.target.closest?.("[data-nav-start]");
-    if (startBtn) {
-      state.mlNavStart = startBtn.dataset.navStart || "test";
+    const navStartBtn = ev.target.closest?.("[data-nav-start]");
+    if (navStartBtn) {
+      state.mlNavStart = navStartBtn.dataset.navStart || "test";
       if (state.mlNavViewMode === "starts_curve") {
         state.mlNavViewMode = "cagr";
       }
