@@ -88,6 +88,10 @@ STEPS: dict[str, list[tuple[str, list[str]]]] = {
         ("P8 换起点净值曲线与图", _m("ml.p8_starts_nav")),
         ("P8 报告（加入换起点图）", _m("ml.p8_delivery", "--report")),
     ],
+    "rules": [
+        ("P9 交易规则检验：验证段选规则", _m("ml.p9_rule_select")),
+        ("P9 交易规则检验：两条规则全部回测对比", _m("ml.p9_rule_compare")),
+    ],
     "report": [
         ("6.3 报告用图", _m("ml.p6_figures")),
         ("交接：导出接口数据包", _m("ml.p6_export")),
@@ -96,7 +100,7 @@ STEPS: dict[str, list[tuple[str, list[str]]]] = {
         ("单元测试", _m("pytest", "-p", "no:cacheprovider", "-o", "addopts=", "-q", "ml/tests")),
     ],
 }
-ORDER = ["panel", "features", "train", "evaluate", "backtest", "history", "deliver", "report", "test"]
+ORDER = ["panel", "features", "train", "evaluate", "backtest", "history", "deliver", "rules", "report", "test"]
 
 
 def main(argv: list[str]) -> None:
