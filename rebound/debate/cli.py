@@ -11,7 +11,7 @@ from typing import Any, Callable
 
 from rebound import config
 from rebound import params as model_params
-from rebound.debate import runs, service
+from rebound.debate import ml_bridge, runs, service
 from rebound.debate.contracts import AGENT_ROLES, ContractError
 from rebound.debate.methodology import load_methodology
 from rebound.debate.sidecar import Sidecar, SidecarError, resolve_api_key
@@ -27,6 +27,13 @@ def register_debate_parser(sub: argparse._SubParsersAction, parse_date: Callable
     run.add_argument("--as-of", type=parse_date, default=None, help="交易日 YYYY-MM-DD（缺省过新鲜度闸门）")
     run.add_argument("--variant", choices=tuple(model_params.VARIANTS), default=None, help="股票池版本（缺省取配置）")
     run.add_argument("--cadence", choices=tuple(model_params.CADENCES), default=None, help="重训频率（缺省取配置）")
+    run.add_argument(
+        "--model",
+        dest="model_source",
+        choices=ml_bridge.ML_MODEL_IDS,
+        default=None,
+        help="选股模型（xgb_F69 / rf_F69 / lstm_SF69）",
+    )
     run.add_argument("--dry-run", action="store_true", help="只组装请求并跑侧车 --validate，不调模型不落盘")
     run.add_argument("--db", type=Path, default=None, help="数据库路径")
     run.add_argument("--json", action="store_true", help="输出 JSON")
@@ -35,6 +42,13 @@ def register_debate_parser(sub: argparse._SubParsersAction, parse_date: Callable
     show.add_argument("--as-of", type=parse_date, default=None, help="交易日 YYYY-MM-DD（缺省取最近运行日）")
     show.add_argument("--variant", choices=tuple(model_params.VARIANTS), default=None, help="股票池版本（缺省取配置）")
     show.add_argument("--cadence", choices=tuple(model_params.CADENCES), default=None, help="重训频率（缺省取配置）")
+    show.add_argument(
+        "--model",
+        dest="model_source",
+        choices=ml_bridge.ML_MODEL_IDS,
+        default=None,
+        help="选股模型（xgb_F69 / rf_F69 / lstm_SF69）",
+    )
     show.add_argument("--db", type=Path, default=None, help="数据库路径")
     show.add_argument("--json", action="store_true", help="输出 JSON")
 
@@ -179,7 +193,7 @@ def run_debate_command(
 
         return serve_ui(
             settings,
-            default_db=target,
+            default_db=args.db,
             host=args.host,
             port=args.port,
             open_browser=not args.no_open,
@@ -187,26 +201,30 @@ def run_debate_command(
 
     variant = args.variant or settings.model.variant
     cadence = args.cadence or settings.model.cadence
+    model_source = getattr(args, "model_source", None)
     if command == "show":
-        day_str, entries = runs.list_runs(target, variant=variant, cadence=cadence, as_of=args.as_of)
+        day_str, entries = runs.list_runs(
+            target, variant=variant, cadence=cadence, as_of=args.as_of, model_source=model_source
+        )
         if not entries:
-            msg = f"{args.as_of or '当前'} 没有 {variant}-{cadence} 的辩论运行记录"
+            series = runs.series_name(variant, cadence, model_source)
+            msg = f"{args.as_of or '当前'} 没有 {series} 的辩论运行记录"
             print(msg, file=sys.stderr)
             return EXIT_DEBATE
         if args.json:
-            _dump({"as_of": day_str, "variant": variant, "cadence": cadence, "runs": entries})
+            _dump({"as_of": day_str, "variant": variant, "cadence": cadence, "model_source": model_source, "runs": entries})
         else:
             assert day_str is not None
             _print_show_text(day_str, entries)
         return 0
 
-    day = args.as_of if args.as_of is not None else fresh_day(settings, target)
-    if day is None:
+    day = args.as_of if args.as_of is not None else (None if ml_bridge.is_ml_model(model_source) else fresh_day(settings, target))
+    if day is None and not ml_bridge.is_ml_model(model_source):
         return exit_stale
 
     if args.dry_run:
         snap, _receipt = service.dry_run(
-            target, settings=settings, as_of=day, variant=variant, cadence=cadence
+            target, settings=settings, as_of=day, variant=variant, cadence=cadence, model_source=model_source
         )
         if args.json:
             _dump(snap.request.payload())
@@ -216,7 +234,7 @@ def run_debate_command(
 
     log = (lambda _line: None) if args.json else say
     out = service.run_debate(
-        target, settings=settings, as_of=day, variant=variant, cadence=cadence, log=log
+        target, settings=settings, as_of=day, variant=variant, cadence=cadence, model_source=model_source, log=log
     )
     if args.json:
         _dump(out["final"])

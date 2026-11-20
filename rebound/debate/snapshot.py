@@ -17,6 +17,7 @@ import pandas as pd
 from rebound import config as app_config
 from rebound import params as model_params
 from rebound.data.errors import DataError
+from rebound.debate import ml_bridge
 from rebound.debate.contracts import (
     Candidate,
     CandidateBar,
@@ -279,20 +280,44 @@ def build_request(
     as_of: date | None = None,
     variant: str | None = None,
     cadence: str | None = None,
+    model_source: str | None = None,
     methodology: Methodology | None = None,
 ) -> Snapshot:
-    """只读组装一次辩论请求。组装完立刻关闭数据库。"""
+    """只读组装一次辩论请求。支持原版 `return_model`（F28）及三模型 `xgb_F69` / `rf_F69` / `lstm_SF69`（F69/S+F69）。"""
     resolved_variant = variant or settings.model.variant
     resolved_cadence = cadence or settings.model.cadence
-    day_pick = pick_day(
-        db_path,
-        as_of=as_of,
-        variant=resolved_variant,
-        cadence=resolved_cadence,
-        top_n=settings.pick.top_n,
-        max_per_industry=settings.pick.max_per_industry,
-        candidate_limit=settings.pick.candidate_limit,
-    )
+    clean_model = (model_source or "").strip()
+    use_ml = ml_bridge.is_ml_model(clean_model)
+
+    if use_ml:
+        resolved_variant = "nocap"
+        ml_day, ml_pool, ml_picks, ml_fit_date = ml_bridge.build_ml_day_pick(
+            clean_model,
+            as_of,
+            top_n=settings.pick.top_n,
+            max_per_industry=settings.pick.max_per_industry,
+        )
+        day_pick = DayPick(
+            day=ml_day,
+            variant=resolved_variant,
+            cadence=resolved_cadence,
+            fit_date=ml_fit_date,
+            model_id=clean_model,
+            stored=True,
+            differ=0,
+            pool=ml_pool,
+            picks=ml_picks,
+        )
+    else:
+        day_pick = pick_day(
+            db_path,
+            as_of=as_of,
+            variant=resolved_variant,
+            cadence=resolved_cadence,
+            top_n=settings.pick.top_n,
+            max_per_industry=settings.pick.max_per_industry,
+            candidate_limit=settings.pick.candidate_limit,
+        )
     pool_df = day_pick.pool
     if pool_df.empty:
         raise SelectError(f"{day_pick.day} {model_params.VARIANT_NAMES[resolved_variant]}股票池为空")
@@ -315,6 +340,13 @@ def build_request(
     pool_today = today_panel.reindex(pool_codes)
     if pool_today.empty or pool_today["close"].isna().all():
         raise DataError(f"{day} 特征面板缺失股票池行")
+
+    extra_by_code: dict[str, dict[str, float | int]] = {}
+    extra_pct_by_code: dict[str, dict[str, float]] = {}
+    if use_ml:
+        extra_by_code, extra_pct_by_code = ml_bridge.compute_extra_features_for_day(
+            db_path, day, pool_codes, submitted_codes
+        )
 
     pct_table = pd.DataFrame(index=pool_today.index)
     for col in _CONTINUOUS_FEATURES:
@@ -364,6 +396,48 @@ def build_request(
             top_count=top_count,
             max_per_industry=settings.pick.max_per_industry,
         )
+
+        cand_extra: dict[str, float | int] | None = None
+        cand_extra_pct: dict[str, float] | None = None
+        cand_explain: dict[str, Any] | None = None
+        cand_peers: dict[str, dict[str, Any]] | None = None
+        if use_ml:
+            if code in extra_by_code and extra_by_code[code]:
+                cand_extra = extra_by_code[code]
+            if code in extra_pct_by_code and extra_pct_by_code[code]:
+                cand_extra_pct = extra_pct_by_code[code]
+            exp_bundle = ml_bridge.get_stock_explain_all(
+                day.isoformat(),
+                code,
+                explain_only_model=clean_model,
+                top=8,
+                top_n=settings.pick.top_n,
+                max_per_industry=settings.pick.max_per_industry,
+            )
+            models_map = exp_bundle.get("models") if isinstance(exp_bundle, dict) else {}
+            cur_exp = models_map.get(clean_model) if isinstance(models_map, dict) else None
+            if isinstance(cur_exp, dict) and cur_exp.get("explain_available"):
+                cand_explain = {
+                    "method": cur_exp["method"],
+                    "base": cur_exp["base"],
+                    "score": cur_exp["score"],
+                    "top_factors": cur_exp["top_factors"],
+                }
+            peers: dict[str, dict[str, Any]] = {}
+            if isinstance(models_map, dict):
+                for peer_id, pdata in models_map.items():
+                    if peer_id == clean_model or not isinstance(pdata, dict):
+                        continue
+                    if pdata.get("score_available") and pdata.get("rank") is not None and pdata.get("pct") is not None:
+                        peers[peer_id] = {
+                            "name": str(pdata.get("name") or peer_id),
+                            "rank": int(pdata["rank"]),
+                            "pct": float(pdata["pct"]),
+                            "in_model_picks": bool(pdata.get("in_model_picks")),
+                        }
+            if peers:
+                cand_peers = peers
+
         candidates.append(
             Candidate(
                 ts_code=code,
@@ -386,6 +460,10 @@ def build_request(
                     median_r20=med_r20,
                 ),
                 flags=flags,
+                extra_features=cand_extra,
+                extra_feature_pct=cand_extra_pct,
+                explain=cand_explain,
+                peer_models=cand_peers,
             )
         )
 
@@ -416,9 +494,10 @@ def build_request(
         max_tokens=settings.debate.llm.max_tokens,
         temperature=settings.debate.llm.temperature,
     )
+    ml_meta = ml_bridge.ML_MODEL_META.get(clean_model, {}) if use_ml else {}
     context = RunContext(
         as_of=day.isoformat(),
-        model_label="反弹模型",
+        model_label=str(ml_meta.get("name") or "反弹模型") if use_ml else "反弹模型",
         variant=resolved_variant,
         cadence=resolved_cadence,
         fit_date=day_pick.fit_date.isoformat(),
@@ -429,6 +508,8 @@ def build_request(
         final=limits.final,
         max_per_industry=settings.pick.max_per_industry,
         pool=_pool_summary(pool_today),
+        model_source=clean_model if use_ml else None,
+        feature_set=str(ml_meta.get("feature_set")) if use_ml else None,
     )
     cands_tuple = tuple(candidates)
     cand_hash = fingerprint([c.payload() for c in cands_tuple])
@@ -441,7 +522,11 @@ def build_request(
         model_picks=model_picks,
         candidates=cands_tuple,
     )
-    run_id = f"{day.isoformat()}-{resolved_variant}-{resolved_cadence}-{inp_hash[:12]}"
+    run_id = (
+        f"{day.isoformat()}-{resolved_variant}-{resolved_cadence}-{clean_model}-{inp_hash[:12]}"
+        if use_ml
+        else f"{day.isoformat()}-{resolved_variant}-{resolved_cadence}-{inp_hash[:12]}"
+    )
     request = RunRequest(
         run_id=run_id,
         as_of=day.isoformat(),

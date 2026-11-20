@@ -1,6 +1,9 @@
 import {
+  NAV_SERIES_STYLES,
   featureLabel,
   featureUnit,
+  renderNavComparisonChart,
+  renderStartsAnnualizedChart,
   renderStockKlineChart,
   renderWorkflowGraph,
   resolveCitation,
@@ -27,9 +30,10 @@ const FLAG_LABELS = {
 const state = {
   meta: null,
   selectedDb: "",
+  selectedModelSource: "xgb_F69", // "xgb_F69" | "rf_F69" | "lstm_SF69"
   selectedDate: "",
   selectedRunKey: "", // `${as_of}/${hash_prefix}`
-  activeTab: "stock", // "stock" | "final"
+  activeTab: "stock", // "stock" | "final" | "models" | "prompts"
   filter: "all",
   sort: "rank",
   autoFollow: true,
@@ -56,11 +60,11 @@ const state = {
   chatWide: false,
   leftCollapsed: false,
   chatRoles: [
-    { id: "research_copilot", name: "投研复盘助手", desc: "全局复盘视角：解读终选逻辑、跨股对比、排查风险、生成次日开盘清单" },
-    { id: "risk_chair", name: "风控主席 (risk_chair)", desc: "以风控拍板视角回应看多/看空与 0~100 打分依据" },
+    { id: "research_copilot", name: "投研复盘助手", desc: "全局复盘视角：解读终选逻辑、三模型共识与归因对比、排查风险、生成次日开盘清单" },
+    { id: "risk_chair", name: "风控主席 (risk_chair)", desc: "以风控拍板视角回应看多/看空、归因稳健性与 0~100 打分依据" },
     { id: "final_pick", name: "终选人 (final_pick)", desc: "以全局终选视角解释行业上限约束与保留/换出取舍" },
-    { id: "model_analyst", name: "模型解读员 (model_analyst)", desc: "侧重 XGBoost 排名、特征分位与模型盲区拆解" },
-    { id: "chart_analyst", name: "走势分析员 (chart_analyst)", desc: "只看 20 日量价形态、均线支撑压力与 MACD 动能" },
+    { id: "model_analyst", name: "模型解读员 (model_analyst)", desc: "侧重三套 F69 模型（XGBoost/随机森林/LSTM）排名、69 特征分位、Top-8 归因与跨模型分歧拆解" },
+    { id: "chart_analyst", name: "走势分析员 (chart_analyst)", desc: "只看 20 日量价形态、K 线微结构、换手资金与 MACD 动能" },
     { id: "bull", name: "多方辩手 (bull)", desc: "从做多角度深挖 T+1 买进、持有约 5 日的看多依据" },
     { id: "bear", name: "空方辩手 (bear)", desc: "从风控回避角度继续挑刺结构缺陷与买入障碍" },
     { id: "bull_counter", name: "多方反驳手 (bull_counter)", desc: "针对空方质疑做逐条反驳与风险权重评估" },
@@ -75,12 +79,55 @@ const state = {
   chatAbortController: null,
   chatLiveTurn: null,
   chatStoreName: "",
+
+  // 提示词与单股实际 User JSON 查看器
+  promptsData: null,
+  promptsSourcePref: "auto", // "auto" | "frozen" | "workspace"
+  promptsLoading: false,
+  promptsError: "",
+  promptsSelectedId: "model_analyst", // "__methodology__" | debate role id | "chat:<preset>"
+  promptsViewMode: "preset", // "preset" | "system" | "payload"
+  promptsPayloadCode: "",
+  promptsPayloadCompact: false,
+  promptsPayloadCache: {}, // `${runKey}|${roleKey}|${tsCode}` -> payload result
+  promptsPayloadLoadingKey: "",
+  promptModal: {
+    open: false,
+    roleKey: "model_analyst",
+    tsCode: "",
+    pane: "preset", // "preset" | "system" | "payload"
+  },
+
+  // 多模型对比、净值、共识与单股归因（XGBoost F69 / 随机森林 F69 / LSTM S+F69）
+  mlOverview: null,
+  mlOverviewLoading: false,
+  mlOverviewError: "",
+  mlNavCache: {}, // `${rule}|${startKey}` -> nav response
+  mlNavRule: "DB-K30-b8", // 固定主规则（20万本金、最多30只）
+  mlNavStart: "test", // "test" | "2015" .. "2024"
+  mlNavViewMode: "nav", // "nav" | "cagr" | "starts_curve"
+  mlNavDetailTab: "starts", // "starts" | "yearly" | "none"
+  mlNavLog: false,
+  mlNavHiddenKeys: { hs300: true, zz500: true, zz1000: true },
+  mlNavLoadingKey: "",
+  mlConsensus: null,
+  mlConsensusDate: "",
+  mlConsensusWithOutcome: false,
+  mlConsensusLoading: false,
+  mlConsensusError: "",
+  mlExplainCache: {}, // `${as_of}|${ts_code}` -> /api/ml/explain
+  mlExplainLoadingKey: "",
+  mlExplainModelTab: "", // 当前单股归因卡片选中的模型 tab
+  featureGroupFilter: "all", // 单股 69 特征分组筛选
+  mlCatalogGroup: "f69", // 特征字典筛选："f69" | "all" | "extra41" | 具体分组名
+  mlCatalogQuery: "",
 };
 
 const dom = {
   workspace: document.getElementById("workspace"),
   modelMetaLine: document.getElementById("model-meta-line"),
   selDb: document.getElementById("sel-db"),
+  selModelSource: document.getElementById("sel-model-source"),
   selDate: document.getElementById("sel-date"),
   selRun: document.getElementById("sel-run"),
   selEffort: document.getElementById("sel-effort"),
@@ -112,17 +159,34 @@ const dom = {
   btnExpandLeft: document.getElementById("btn-expand-left"),
   tabStock: document.getElementById("tab-stock"),
   tabFinal: document.getElementById("tab-final"),
+  tabModels: document.getElementById("tab-models"),
+  tabPrompts: document.getElementById("tab-prompts"),
   tabStockTag: document.getElementById("tab-stock-tag"),
   tabFinalTag: document.getElementById("tab-final-tag"),
+  tabModelsTag: document.getElementById("tab-models-tag"),
+  tabPromptsTag: document.getElementById("tab-prompts-tag"),
   btnCopyMd: document.getElementById("btn-copy-md"),
   btnDownloadJson: document.getElementById("btn-download-json"),
 
   viewStock: document.getElementById("view-stock"),
   viewFinal: document.getElementById("view-final"),
+  viewModels: document.getElementById("view-models"),
+  viewPrompts: document.getElementById("view-prompts"),
   stockEmpty: document.getElementById("stock-empty"),
   stockContent: document.getElementById("stock-content"),
   finalContent: document.getElementById("final-content"),
+  modelsContent: document.getElementById("models-content"),
+  promptsContent: document.getElementById("prompts-content"),
   citationTooltip: document.getElementById("citation-tooltip"),
+
+  // 快捷提示词与入参弹窗
+  promptModal: document.getElementById("prompt-modal"),
+  promptModalTitle: document.getElementById("prompt-modal-title"),
+  promptModalSubtitle: document.getElementById("prompt-modal-subtitle"),
+  btnModalOpenTab: document.getElementById("btn-modal-open-tab"),
+  btnModalClose: document.getElementById("btn-modal-close"),
+  promptModalTabs: document.getElementById("prompt-modal-tabs"),
+  promptModalBody: document.getElementById("prompt-modal-body"),
 
   // 右侧 AI 投研复盘对话栏
   chatDrawer: document.getElementById("chat-drawer"),
@@ -131,6 +195,7 @@ const dom = {
   btnChatWide: document.getElementById("btn-chat-wide"),
   btnChatClose: document.getElementById("btn-chat-close"),
   selChatRole: document.getElementById("sel-chat-role"),
+  btnChatPromptInfo: document.getElementById("btn-chat-prompt-info"),
   selChatSession: document.getElementById("sel-chat-session"),
   btnChatNew: document.getElementById("btn-chat-new"),
   btnChatDelete: document.getElementById("btn-chat-delete"),
@@ -428,11 +493,27 @@ function renderAll() {
   if (state.activeTab === "stock") {
     dom.viewStock.hidden = false;
     dom.viewFinal.hidden = true;
+    dom.viewModels.hidden = true;
+    dom.viewPrompts.hidden = true;
     renderStockDetail();
-  } else {
+  } else if (state.activeTab === "final") {
     dom.viewStock.hidden = true;
     dom.viewFinal.hidden = false;
+    dom.viewModels.hidden = true;
+    dom.viewPrompts.hidden = true;
     renderFinalView();
+  } else if (state.activeTab === "models") {
+    dom.viewStock.hidden = true;
+    dom.viewFinal.hidden = true;
+    dom.viewModels.hidden = false;
+    dom.viewPrompts.hidden = true;
+    renderModelsView();
+  } else {
+    dom.viewStock.hidden = true;
+    dom.viewFinal.hidden = true;
+    dom.viewModels.hidden = true;
+    dom.viewPrompts.hidden = false;
+    renderPromptsView();
   }
   renderChatLayout();
   renderChatContextStrip();
@@ -488,10 +569,16 @@ function renderTopbarStatus() {
 
 function renderWorkflowCard() {
   const { nodeStates, edgeStates, activeBadges, activeCount } = computeWorkflowGraphState();
+  const reqFeatureSet = state.run?.request?.context?.feature_set;
+  const snapshotSub =
+    reqFeatureSet === "S+F69"
+      ? "69 特征 · 序列 · 归因"
+      : "69 特征 · 归因 · 20 日线";
   renderWorkflowGraph(dom.workflowGraph, {
     nodeStates,
     edgeStates,
     activeBadges,
+    snapshotSub,
     onNodeClick: (nodeId) => {
       if (nodeId === "final_pick") {
         switchTab("final");
@@ -649,12 +736,32 @@ function renderTabsHeader() {
   } else {
     dom.tabFinalTag.textContent = "待定稿";
   }
+  if (state.promptsData?.differs_from_workspace) {
+    dom.tabPromptsTag.textContent = "有变更";
+  } else if (state.promptsData?.source === "frozen") {
+    dom.tabPromptsTag.textContent = "冻结版";
+  } else {
+    dom.tabPromptsTag.textContent = "7+1";
+  }
+  if (state.meta?.ml_available) {
+    dom.tabModelsTag.textContent = "3 模型";
+  } else {
+    dom.tabModelsTag.textContent = "未就绪";
+  }
   dom.tabStock.classList.toggle("active", state.activeTab === "stock");
   dom.tabFinal.classList.toggle("active", state.activeTab === "final");
+  dom.tabModels.classList.toggle("active", state.activeTab === "models");
+  dom.tabPrompts.classList.toggle("active", state.activeTab === "prompts");
 }
 
 function switchTab(tab) {
   state.activeTab = tab;
+  if (tab === "prompts" && !state.promptsData && !state.promptsLoading) {
+    refreshPromptsData();
+  }
+  if (tab === "models") {
+    ensureMlViewLoaded();
+  }
   renderAll();
 }
 
@@ -758,6 +865,7 @@ function renderAnalystCard(code, roleId, title, data, st) {
   }
 
   const candName = (state.run?.request?.candidates || []).find((c) => c.ts_code === code)?.name || code;
+  const promptBtnHtml = `<button class="role-prompt-btn" type="button" data-inspect-role="${esc(roleId)}" data-inspect-code="${esc(code)}" title="查看该角色的预置提示词、完整 System Prompt 与本股实际 User JSON">提示词</button>`;
   const askBtnHtml = data
     ? `<button class="role-ask-btn" type="button" data-ask-code="${esc(code)}" data-ask-role="${esc(roleId)}" data-ask-prompt="${esc(`针对 ${candName}(${code}) 的${title}结论，进一步解释你的核心判断依据和最值得警惕的风险点。`)}" title="打开 AI 对话栏以该角色视角追问">✦ 追问</button>`
     : "";
@@ -770,6 +878,7 @@ function renderAnalystCard(code, roleId, title, data, st) {
           <span class="role-code mono">${roleId}</span>
         </div>
         <div class="role-head-right">
+          ${promptBtnHtml}
           ${askBtnHtml}
           ${stanceHtml}
         </div>
@@ -799,6 +908,7 @@ function renderDebateRoundCard(code, roleId, title, badgeText, accentClass, data
   }
 
   const candName = (state.run?.request?.candidates || []).find((c) => c.ts_code === code)?.name || code;
+  const promptBtnHtml = `<button class="role-prompt-btn" type="button" data-inspect-role="${esc(roleId)}" data-inspect-code="${esc(code)}" title="查看该角色的预置提示词、完整 System Prompt 与本股实际 User JSON">提示词</button>`;
   const askBtnHtml = data
     ? `<button class="role-ask-btn" type="button" data-ask-code="${esc(code)}" data-ask-role="${esc(roleId)}" data-ask-prompt="${esc(`围绕 ${candName}(${code}) 在「${title}」中的核心论点，帮我展开检验它有哪些站得住与站不住的地方。`)}" title="打开 AI 对话栏追问该轮攻防">✦ 追问</button>`
     : "";
@@ -811,6 +921,7 @@ function renderDebateRoundCard(code, roleId, title, badgeText, accentClass, data
           <span class="role-code mono">${roleId}</span>
         </div>
         <div class="role-head-right">
+          ${promptBtnHtml}
           ${askBtnHtml}
           <span class="pill pill-soft">${isLive ? "实时推理中…" : esc(badgeText)}</span>
         </div>
@@ -860,6 +971,7 @@ function renderRiskChairCard(code, verdict, st) {
   }
 
   const candName = (state.run?.request?.candidates || []).find((c) => c.ts_code === code)?.name || code;
+  const promptBtnHtml = `<button class="role-prompt-btn" type="button" data-inspect-role="risk_chair" data-inspect-code="${esc(code)}" title="查看风控主席的预置提示词、完整 System Prompt 与本股实际 User JSON（含 roster）">提示词</button>`;
   const askBtnHtml = verdict
     ? `<button class="role-ask-btn" type="button" data-ask-code="${esc(code)}" data-ask-role="risk_chair" data-ask-prompt="${esc(`针对 ${candName}(${code}) 给出的「${verdict.verdict} ${fmtNum(verdict.score, 0)} 分」裁决，请说明它在全部 20 只送辩股中的横向位置，以及 T+1 开盘前具体什么条件下放弃买入。`)}" title="向风控主席追问打分与操作条件">✦ 追问裁决</button>`
     : "";
@@ -872,6 +984,7 @@ function renderRiskChairCard(code, verdict, st) {
           <span class="role-code mono">risk_chair · 对照全部送辩 roster</span>
         </div>
         <div class="role-head-right">
+          ${promptBtnHtml}
           ${askBtnHtml}
           ${headBadge}
         </div>
@@ -919,19 +1032,22 @@ function renderStockDetail() {
     ["5 日量比", f.vol5 !== undefined ? `${f.vol5} 倍` : "—", `20日量比 ${f.vol20 ?? "—"}`, ""],
   ];
 
-  const allFeatHtml = Object.entries(f)
-    .map(([k, v]) => {
-      const pct = fp[k] !== undefined ? ` (${fp[k]}%)` : "";
-      return `
-        <div class="feat-kv">
-          <span class="feat-k" title="${esc(k)}">${esc(featureLabel(k))}</span>
-          <span class="feat-v mono">${esc(v)}${esc(featureUnit(k))}<span class="muted-text">${pct}</span></span>
-        </div>
-      `;
-    })
-    .join("");
+  const extraF = cand.extra_features || null;
+  const extraFp = cand.extra_feature_pct || {};
+  const hasExtra = Boolean(extraF && Object.keys(extraF).length > 0);
+  const totalFeatCount = Object.keys(f).length + (hasExtra ? Object.keys(extraF).length : 0);
+  const runAsOf = state.run?.as_of || state.run?.request?.as_of || state.selectedDate || "";
+
+  // 触发懒加载三模型归因（在 2023-01-03 ~ 2026-10-16 测试段内即时展示三模型完整归因与百分位对照）
+  if (state.meta?.ml_available && runAsOf) {
+    ensureStockExplain(runAsOf, cand.ts_code);
+  }
+  const attributionHtml = renderStockAttributionCardHtml(cand, runAsOf);
+  const featuresDrawerHtml = renderStockFeaturesDrawerHtml(cand, f, fp, extraF, extraFp, totalFeatCount);
 
   const lastBar = cand.bars?.[cand.bars.length - 1];
+  const ctxModelLabel = state.run?.request?.context?.model_label || "反弹模型";
+  const ctxFeatureSet = state.run?.request?.context?.feature_set || (hasExtra ? "F69" : "F28");
 
   dom.stockContent.innerHTML = `
     <!-- 个股研报头卡 -->
@@ -941,6 +1057,7 @@ function renderStockDetail() {
           <div class="stock-hero-title">
             <h1>${esc(cand.name)}</h1>
             <span class="stock-hero-code mono">${esc(cand.ts_code)}</span>
+            <span class="pill pill-soft mono">${esc(ctxModelLabel)} · ${esc(ctxFeatureSet)}</span>
             ${aiPick ? `<span class="ai-pick-tag mono">★ AI 终选第 ${aiPick.rank} 名</span>` : ""}
           </div>
           <div class="hero-tags">
@@ -982,10 +1099,8 @@ function renderStockDetail() {
         <div id="kline-container"></div>
       </div>
 
-      <details class="features-drawer">
-        <summary>展开查看送入模型的全部 ${Object.keys(f).length} 项量价特征与全池分位</summary>
-        <div class="features-table-grid">${allFeatHtml}</div>
-      </details>
+      ${attributionHtml}
+      ${featuresDrawerHtml}
     </section>
 
     <!-- 阶段一：独立双视角分析 -->
@@ -1059,6 +1174,9 @@ function renderFinalView() {
       <div class="empty-state">
         <div class="empty-title">终选辩论结果尚未生成</div>
         <p class="empty-desc">等待全部候选完成 6 轮辩论并执行终选官 final_pick 后，这里将呈现 AI 重排前 6 名与原模型前 6 名的完整对照。</p>
+        <div style="margin-top:12px">
+          <button class="role-prompt-btn" type="button" data-inspect-role="final_pick" data-inspect-code="-">查看 final_pick 提示词与入参结构</button>
+        </div>
       </div>
     `;
     return;
@@ -1074,7 +1192,10 @@ function renderFinalView() {
             <span class="role-name">终选官正在汇总全局风控结论…</span>
             <span class="role-code mono">final_pick</span>
           </div>
-          <span class="pill pill-soft">流式推理中</span>
+          <div class="role-head-right">
+            <button class="role-prompt-btn" type="button" data-inspect-role="final_pick" data-inspect-code="-">提示词</button>
+            <span class="pill pill-soft">流式推理中</span>
+          </div>
         </div>
         ${renderStreamBoxesHtml("-", "final_pick", true)}
       </article>
@@ -1106,6 +1227,15 @@ function renderFinalView() {
             </div>
           </div>
           <div class="role-head-right">
+            <button
+              class="role-prompt-btn"
+              type="button"
+              data-inspect-role="final_pick"
+              data-inspect-code="-"
+              title="查看终选人 final_pick 的预置提示词、完整 System Prompt 与实际终选 User JSON"
+            >
+              提示词
+            </button>
             <button
               class="role-ask-btn"
               type="button"
@@ -1356,8 +1486,11 @@ function connectSse() {
       state.activeJob.hash_prefix = payload.hash_prefix;
       state.activeJob.run_id = payload.run_id;
     }
+    if (payload.model_source) {
+      state.selectedModelSource = payload.model_source;
+    }
     await refreshMeta({ keepSelection: true });
-    await loadRunDetail(payload.as_of, payload.hash_prefix);
+    await loadRunDetail(payload.as_of, payload.hash_prefix, { modelSource: payload.model_source });
   });
 
   bind("stock.started", (payload) => {
@@ -1499,10 +1632,13 @@ function connectSse() {
 
   bind("job.completed", async (payload) => {
     state.activeJob = payload;
+    if (payload.model_source) {
+      state.selectedModelSource = payload.model_source;
+    }
     showToast(payload.cached ? "命中已冻结运行，已直接载入终选结果。" : "全量辩论与终选已完成并冻结！", "info", 6000);
     await refreshMeta({ keepSelection: true });
     if (payload.as_of && payload.hash_prefix) {
-      await loadRunDetail(payload.as_of, payload.hash_prefix);
+      await loadRunDetail(payload.as_of, payload.hash_prefix, { modelSource: payload.model_source });
       state.activeTab = "final";
       renderAll();
     }
@@ -1530,20 +1666,36 @@ function connectSse() {
 async function refreshMeta({ keepSelection = false } = {}) {
   const qs = new URLSearchParams();
   if (state.selectedDb) qs.set("db", state.selectedDb);
+  if (state.selectedModelSource) qs.set("model_source", state.selectedModelSource);
   const meta = await apiJson(`/api/meta?${qs.toString()}`);
   state.meta = meta;
   state.selectedDb = meta.selected_db;
+  state.selectedModelSource = meta.model_source || "xgb_F69";
   state.activeJob = meta.active || null;
 
   // 顶栏模型摘要
   const cfg = meta.config;
-  dom.modelMetaLine.textContent = `${cfg.model} · 思考 ${cfg.reasoning_effort} · 并发 ${cfg.concurrency} · ${cfg.api_key_configured ? "密钥已就绪" : "缺少密钥"}`;
+  const activeModelMeta = (meta.model_sources || []).find((m) => m.id === state.selectedModelSource);
+  const srcTag = activeModelMeta ? `${activeModelMeta.name} (${activeModelMeta.feature_set})` : state.selectedModelSource;
+  dom.modelMetaLine.textContent = `${srcTag} · ${cfg.model} · 思考 ${cfg.reasoning_effort} · 并发 ${cfg.concurrency} · ${cfg.api_key_configured ? "密钥已就绪" : "缺少密钥"}`;
 
   // 填充数据库下拉
   dom.selDb.innerHTML = meta.dbs
     .map((d) => `<option value="${esc(d.path)}">${esc(d.label)}</option>`)
     .join("");
   dom.selDb.value = state.selectedDb;
+
+  // 填充选股模型源下拉
+  if (dom.selModelSource) {
+    const sources = meta.model_sources || [];
+    dom.selModelSource.innerHTML = sources
+      .map((m) => {
+        const countTag = m.run_count > 0 ? ` (${m.run_count}条历史)` : "";
+        return `<option value="${esc(m.id)}">${esc(m.name)}${countTag}</option>`;
+      })
+      .join("");
+    dom.selModelSource.value = state.selectedModelSource;
+  }
 
   // 填充默认参数（首次）
   if (!keepSelection) {
@@ -1578,30 +1730,41 @@ async function refreshMeta({ keepSelection = false } = {}) {
   renderTopbarStatus();
 }
 
-async function loadRunDetail(asOf, hashPrefix) {
+async function loadRunDetail(asOf, hashPrefix, { modelSource } = {}) {
+  const ms = modelSource || state.selectedModelSource || "xgb_F69";
   const qs = new URLSearchParams({
     db: state.selectedDb,
     as_of: asOf,
     hash: hashPrefix,
+    model_source: ms,
   });
   const detail = await apiJson(`/api/run?${qs.toString()}`);
+  state.selectedModelSource = detail.model_source || ms;
+  if (dom.selModelSource) dom.selModelSource.value = state.selectedModelSource;
   state.selectedDate = asOf;
   state.selectedRunKey = `${asOf}/${hashPrefix}`;
   state.chatExtraAttachedCodes = [];
   state.chatExcludeSelected = false;
   dom.selDate.value = asOf;
   dom.selRun.value = state.selectedRunKey;
+  state.promptsPayloadCache = {};
+  state.promptsSourcePref = "auto";
   hydrateRunDetail(detail);
-  await refreshChatSessions({ preserveActive: false });
+  await Promise.all([
+    refreshChatSessions({ preserveActive: false }),
+    refreshPromptsData(),
+  ]);
 }
 
-async function handleDryRun() {
-  const asOf = dom.selDate.value;
+async function handleDryRun({ modelSource, asOfOverride } = {}) {
+  const asOf = asOfOverride || dom.selDate.value;
+  const ms = modelSource || state.selectedModelSource || "xgb_F69";
   if (!asOf) {
     showToast("请先选择一个交易日", "warn");
     return;
   }
-  showToast(`正在生成 ${asOf} 演练快照（不调大模型）…`, "info", 0);
+  const msLabel = (state.meta?.model_sources || []).find((m) => m.id === ms)?.name || ms;
+  showToast(`正在生成 ${asOf}（${msLabel}）演练快照（F69 首次计算约需十余秒，不调大模型）…`, "info", 0);
   try {
     const res = await apiJson("/api/dry-run", {
       method: "POST",
@@ -1609,6 +1772,7 @@ async function handleDryRun() {
       body: JSON.stringify({
         db: state.selectedDb,
         as_of: asOf,
+        model_source: ms,
         overrides: {
           reasoning_effort: dom.selEffort.value,
           concurrency: Number(dom.selConcurrency.value),
@@ -1616,6 +1780,10 @@ async function handleDryRun() {
       }),
     });
     state.isDryRun = true;
+    state.selectedModelSource = res.model_source || ms;
+    if (dom.selModelSource) dom.selModelSource.value = state.selectedModelSource;
+    state.selectedDate = res.as_of;
+    if (dom.selDate) dom.selDate.value = res.as_of;
     state.selectedRunKey = "";
     dom.selRun.value = "";
     state.streams = {};
@@ -1624,6 +1792,7 @@ async function handleDryRun() {
       as_of: res.as_of,
       variant: res.variant,
       cadence: res.cadence,
+      model_source: res.model_source || ms,
       hash_prefix: res.hash_prefix,
       completed: false,
       official: false,
@@ -1640,16 +1809,22 @@ async function handleDryRun() {
     state.chatExtraAttachedCodes = [];
     state.chatExcludeSelected = false;
     state.activeTab = "stock";
-    showToast(`演练快照就绪：${res.as_of} 共 ${res.request.candidates.length} 只送辩候选，可直接浏览 20 日 K 线与特征。`, "info", 5000);
+    state.promptsPayloadCache = {};
+    state.promptsSourcePref = "auto";
+    showToast(`演练快照就绪：${res.as_of}（${msLabel}）共 ${res.request.candidates.length} 只送辩候选，含 K 线、特征与打分归因。`, "info", 5500);
     renderAll();
-    await refreshChatSessions({ preserveActive: false });
+    await Promise.all([
+      refreshChatSessions({ preserveActive: false }),
+      refreshPromptsData(),
+    ]);
   } catch (err) {
     showToast(`演练失败：${err.message}`, "error", 7000);
   }
 }
 
-async function handleStartRun() {
-  const asOf = dom.selDate.value;
+async function handleStartRun({ modelSource, asOfOverride } = {}) {
+  const asOf = asOfOverride || dom.selDate.value;
+  const ms = modelSource || state.selectedModelSource || "xgb_F69";
   if (!asOf) {
     showToast("请先选择一个交易日", "warn");
     return;
@@ -1661,6 +1836,7 @@ async function handleStartRun() {
       body: JSON.stringify({
         db: state.selectedDb,
         as_of: asOf,
+        model_source: ms,
         overrides: {
           reasoning_effort: dom.selEffort.value,
           concurrency: Number(dom.selConcurrency.value),
@@ -1737,7 +1913,7 @@ function bindCitationHover() {
     if (!chip) return;
     const path = chip.dataset.citation;
     const cand = (state.run?.request?.candidates || []).find((c) => c.ts_code === state.selectedCode);
-    const resolved = resolveCitation(path, cand, state.run?.request?.context);
+    const resolved = resolveCitation(path, cand, state.run?.request?.context, state.mlOverview?.feature_catalog);
     if (!resolved) {
       tip.innerHTML = `<div class="ct-path">${esc(path)}</div><div class="ct-desc">输入快照引用路径</div>`;
     } else {
@@ -1785,13 +1961,45 @@ function bindEvents() {
       await loadRunDetail(state.meta.runs[0].as_of, state.meta.runs[0].hash_prefix);
     } else {
       state.run = null;
+      state.promptsPayloadCache = {};
       renderAll();
-      await refreshChatSessions({ preserveActive: false });
+      await Promise.all([
+        refreshChatSessions({ preserveActive: false }),
+        refreshPromptsData(),
+      ]);
     }
   });
 
+  if (dom.selModelSource) {
+    dom.selModelSource.addEventListener("change", async () => {
+      state.selectedModelSource = dom.selModelSource.value;
+      state.selectedRunKey = "";
+      state.isDryRun = false;
+      state.promptsPayloadCache = {};
+      await refreshMeta({ keepSelection: false });
+      if (state.meta.runs.length > 0) {
+        await loadRunDetail(state.meta.runs[0].as_of, state.meta.runs[0].hash_prefix);
+      } else {
+        state.run = null;
+        if (state.meta?.ml_available) {
+          state.activeTab = "models";
+          ensureMlViewLoaded();
+        }
+        renderAll();
+        await Promise.all([
+          refreshChatSessions({ preserveActive: false }),
+          refreshPromptsData(),
+        ]);
+      }
+    });
+  }
+
   dom.selDate.addEventListener("change", async () => {
     state.selectedDate = dom.selDate.value;
+    if (state.activeTab === "models" && state.meta?.ml_available) {
+      state.mlConsensusDate = state.selectedDate;
+      loadMlConsensus({ asOf: state.selectedDate });
+    }
     const match = (state.meta?.runs || []).find((r) => r.as_of === state.selectedDate);
     if (match) {
       await loadRunDetail(match.as_of, match.hash_prefix);
@@ -1805,8 +2013,8 @@ function bindEvents() {
     await loadRunDetail(asOf, hash);
   });
 
-  dom.btnDryRun.addEventListener("click", handleDryRun);
-  dom.btnStart.addEventListener("click", handleStartRun);
+  dom.btnDryRun.addEventListener("click", () => handleDryRun());
+  dom.btnStart.addEventListener("click", () => handleStartRun());
   dom.btnStop.addEventListener("click", handleStopRun);
   dom.btnCopyMd.addEventListener("click", handleCopyMarkdown);
   dom.btnDownloadJson.addEventListener("click", handleDownloadJson);
@@ -1824,6 +2032,8 @@ function bindEvents() {
 
   dom.tabStock.addEventListener("click", () => switchTab("stock"));
   dom.tabFinal.addEventListener("click", () => switchTab("final"));
+  dom.tabModels.addEventListener("click", () => switchTab("models"));
+  dom.tabPrompts.addEventListener("click", () => switchTab("prompts"));
 
   dom.filterPills.querySelectorAll(".chip").forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -1845,10 +2055,12 @@ function bindEvents() {
 
   bindCitationHover();
   bindChatEvents();
+  bindPromptEvents();
+  bindMlEvents();
 }
 
 // ---------------------------------------------------------------------------
-// 右侧 AI 投研复盘对话栏（档位 B：6 只读工具 + 逐字思考 + 落盘持久化）
+// 右侧 AI 投研复盘对话栏（档位 B：9 只读工具 + 逐字思考 + 落盘持久化）
 // ---------------------------------------------------------------------------
 
 function chatRunScope() {
@@ -1859,6 +2071,7 @@ function chatRunScope() {
     db: state.selectedDb || "",
     variant: run?.variant || state.meta?.variant || "",
     cadence: run?.cadence || state.meta?.cadence || "",
+    model_source: run?.model_source || state.selectedModelSource || "",
     as_of: asOf,
     hash,
   };
@@ -2404,6 +2617,7 @@ async function refreshChatSessions({ preserveActive = false } = {}) {
     if (scope.db) qs.set("db", scope.db);
     if (scope.variant) qs.set("variant", scope.variant);
     if (scope.cadence) qs.set("cadence", scope.cadence);
+    if (scope.model_source) qs.set("model_source", scope.model_source);
     if (scope.as_of) qs.set("as_of", scope.as_of);
     if (scope.hash) qs.set("hash", scope.hash);
 
@@ -2465,6 +2679,7 @@ async function handleDeleteChatSession() {
     if (scope.db) qs.set("db", scope.db);
     if (scope.variant) qs.set("variant", scope.variant);
     if (scope.cadence) qs.set("cadence", scope.cadence);
+    if (scope.model_source) qs.set("model_source", scope.model_source);
     if (scope.as_of) qs.set("as_of", scope.as_of);
     if (scope.hash) qs.set("hash", scope.hash);
 
@@ -2797,6 +3012,2250 @@ function bindChatEvents() {
   });
 }
 
+// ---------------------------------------------------------------------------
+// 提示词与角色设定（视图 C）+ 单股实际 User JSON 白盒弹窗
+// ---------------------------------------------------------------------------
+
+async function copyTextWithToast(text, label = "内容") {
+  if (!text) {
+    showToast(`没有可复制的${label}`, "warn");
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast(`已复制${label}（${text.length.toLocaleString()} 字符）`, "info", 2800);
+  } catch {
+    showToast(`复制失败，请手动选中复制`, "warn", 3200);
+  }
+}
+
+function promptPayloadCacheKey(roleKey, tsCode) {
+  const scope = chatRunScope();
+  const runSig = `${scope.db}|${scope.model_source}|${scope.as_of}|${scope.hash}|${state.isDryRun ? "dry" : "run"}`;
+  return `${runSig}|${roleKey}|${tsCode || ""}`;
+}
+
+function resolveDefaultPayloadCode(roleKey) {
+  if (roleKey === "final_pick") return "-";
+  if (roleKey.startsWith("chat:")) return state.selectedCode || "";
+  const candidates = state.run?.request?.candidates || [];
+  if (state.promptsPayloadCode && candidates.some((c) => c.ts_code === state.promptsPayloadCode)) {
+    return state.promptsPayloadCode;
+  }
+  if (state.selectedCode && candidates.some((c) => c.ts_code === state.selectedCode)) {
+    return state.selectedCode;
+  }
+  return candidates[0]?.ts_code || "";
+}
+
+async function refreshPromptsData({ source } = {}) {
+  if (source) {
+    state.promptsSourcePref = source;
+  }
+  const scope = chatRunScope();
+  const qs = new URLSearchParams();
+  if (scope.db) qs.set("db", scope.db);
+  if (scope.variant) qs.set("variant", scope.variant);
+  if (scope.cadence) qs.set("cadence", scope.cadence);
+  if (scope.model_source) qs.set("model_source", scope.model_source);
+  if (scope.as_of) qs.set("as_of", scope.as_of);
+  if (scope.hash) qs.set("hash", scope.hash);
+  if (state.promptsSourcePref) qs.set("source", state.promptsSourcePref);
+
+  state.promptsLoading = true;
+  state.promptsError = "";
+  if (state.activeTab === "prompts") renderPromptsView();
+  if (state.promptModal.open) renderPromptModal();
+
+  try {
+    state.promptsData = await apiJson(`/api/prompts?${qs.toString()}`);
+  } catch (err) {
+    state.promptsError = err.message || String(err);
+  } finally {
+    state.promptsLoading = false;
+    renderTabsHeader();
+    if (state.activeTab === "prompts") renderPromptsView();
+    if (state.promptModal.open) renderPromptModal();
+  }
+}
+
+/** 若运行中存在尚未刷盘的实时内存进展，优先用最新内存态构造单股 User JSON 预览。 */
+function buildInMemoryLivePayload(roleKey, tsCode) {
+  if (!state.activeJob?.running || !isViewingActiveRun()) return null;
+  if (!state.run?.request || roleKey.startsWith("chat:") || roleKey === "final_pick") return null;
+  const req = state.run.request;
+  const cand = (req.candidates || []).find((c) => c.ts_code === tsCode);
+  if (!cand) return null;
+  const st = state.stockState[tsCode] || { analysts: {}, debate: {}, verdict: null };
+  const payload = { context: req.context, candidate: cand };
+  const missing = [];
+
+  if (["bull", "bear", "bull_counter", "risk_chair"].includes(roleKey)) {
+    const analysts = [];
+    for (const r of ["model_analyst", "chart_analyst"]) {
+      if (st.analysts?.[r]) analysts.push(st.analysts[r]);
+      else missing.push(r);
+    }
+    payload.analyst_views = analysts;
+  }
+  const needRounds =
+    roleKey === "bear"
+      ? ["bull"]
+      : roleKey === "bull_counter"
+        ? ["bull", "bear"]
+        : roleKey === "risk_chair"
+          ? ["bull", "bear", "bull_counter"]
+          : [];
+  if (needRounds.length > 0) {
+    const rounds = [];
+    for (const r of needRounds) {
+      if (st.debate?.[r]) rounds.push(st.debate[r]);
+      else missing.push(r);
+    }
+    payload.debate = rounds;
+  }
+  if (roleKey === "risk_chair") {
+    payload.roster =
+      Array.isArray(req.roster) && req.roster.length > 0
+        ? req.roster
+        : (req.candidates || []).map((c) => ({
+            ts_code: c.ts_code,
+            name: c.name,
+            industry: c.industry,
+            rank: c.model?.rank ?? null,
+            pct: c.model?.pct ?? null,
+            r5: c.features?.r5 ?? null,
+            r20: c.features?.r20 ?? null,
+            from_low60: c.features?.from_low60 ?? null,
+            dev_ma20: c.features?.dev_ma20 ?? null,
+            vol5: c.features?.vol5 ?? null,
+            flags: (c.flags || []).map((f) => f.code),
+          }));
+  }
+
+  const wire = JSON.stringify(payload);
+  return {
+    role: roleKey,
+    ts_code: tsCode,
+    stock_name: cand.name || tsCode,
+    ready: missing.length === 0,
+    missing_deps: missing,
+    top_keys: Object.keys(payload),
+    char_count: wire.length,
+    est_tokens: Math.max(1, Math.round(wire.length * 0.32)),
+    payload,
+  };
+}
+
+async function ensureRolePayload(roleKey, tsCode, { force = false } = {}) {
+  const effectiveCode = roleKey === "final_pick" ? "-" : tsCode || resolveDefaultPayloadCode(roleKey);
+  const liveLocal = buildInMemoryLivePayload(roleKey, effectiveCode);
+  if (liveLocal) {
+    const key = promptPayloadCacheKey(roleKey, effectiveCode);
+    state.promptsPayloadCache[key] = { ok: true, data: liveLocal };
+    if (state.activeTab === "prompts") renderPromptsView();
+    if (state.promptModal.open) renderPromptModal();
+    return;
+  }
+
+  const key = promptPayloadCacheKey(roleKey, effectiveCode);
+  if (!force && state.promptsPayloadCache[key]) return;
+  if (state.promptsPayloadLoadingKey === key) return;
+
+  const scope = chatRunScope();
+  const qs = new URLSearchParams();
+  if (scope.db) qs.set("db", scope.db);
+  if (scope.variant) qs.set("variant", scope.variant);
+  if (scope.cadence) qs.set("cadence", scope.cadence);
+  if (scope.model_source) qs.set("model_source", scope.model_source);
+  if (scope.as_of) qs.set("as_of", scope.as_of);
+  if (scope.hash) qs.set("hash", scope.hash);
+  qs.set("role", roleKey);
+  if (effectiveCode && effectiveCode !== "-") qs.set("ts_code", effectiveCode);
+
+  state.promptsPayloadLoadingKey = key;
+  if (state.activeTab === "prompts") renderPromptsView();
+  if (state.promptModal.open) renderPromptModal();
+
+  try {
+    const data = await apiJson(`/api/prompts/payload?${qs.toString()}`);
+    state.promptsPayloadCache[key] = { ok: true, data };
+  } catch (err) {
+    state.promptsPayloadCache[key] = { ok: false, error: err.message || String(err) };
+  } finally {
+    if (state.promptsPayloadLoadingKey === key) {
+      state.promptsPayloadLoadingKey = "";
+    }
+    if (state.activeTab === "prompts") renderPromptsView();
+    if (state.promptModal.open) renderPromptModal();
+  }
+}
+
+function getSelectedPromptEntity(roleKey) {
+  const data = state.promptsData;
+  if (!data) return null;
+  if (roleKey === "__methodology__") {
+    return { kind: "methodology", item: data.methodology };
+  }
+  if (roleKey.startsWith("chat:")) {
+    const pid = roleKey.slice(5);
+    const found = (data.chat_roles || []).find((r) => r.id === pid) || data.chat_roles?.[0];
+    return found ? { kind: "chat", item: found, tools: data.chat_tools || [] } : null;
+  }
+  const found = (data.debate_roles || []).find((r) => r.id === roleKey) || data.debate_roles?.[0];
+  return found ? { kind: "debate", item: found } : null;
+}
+
+function formatSchemaPretty(rawSchema) {
+  try {
+    return JSON.stringify(JSON.parse(rawSchema), null, 2);
+  } catch {
+    return rawSchema;
+  }
+}
+
+function renderDebatePresetBlocksHtml(roleObj, methodology) {
+  const vis = roleObj.input_visibility || {};
+  const prettySchema = formatSchemaPretty(roleObj.output_schema);
+  return `
+    <div class="prompt-blocks">
+      <section class="prompt-block prompt-block-primary">
+        <div class="prompt-block-head">
+          <div>
+            <span class="prompt-badge prompt-badge-preset">预置职责</span>
+            <strong class="prompt-block-title">## 你的职责（来自 docs/debate-methodology.md）</strong>
+          </div>
+          <button class="btn btn-ghost btn-sm" type="button" data-copy-slot="role_brief">复制职责</button>
+        </div>
+        <pre class="prompt-code-block">${esc(roleObj.role_brief)}</pre>
+      </section>
+
+      ${
+        roleObj.constraint
+          ? `
+        <section class="prompt-block">
+          <div class="prompt-block-head">
+            <div>
+              <span class="prompt-badge prompt-badge-rule">硬性约束</span>
+              <strong class="prompt-block-title">## ${esc(roleObj.constraint.title)}</strong>
+            </div>
+          </div>
+          <div class="prompt-text-body">${esc(roleObj.constraint.body)}</div>
+        </section>
+      `
+          : ""
+      }
+
+      <section class="prompt-block">
+        <div class="prompt-block-head">
+          <div>
+            <span class="prompt-badge prompt-badge-rule">输出契约</span>
+            <strong class="prompt-block-title">## 输出格式（JSON Schema）</strong>
+          </div>
+          <button class="btn btn-ghost btn-sm" type="button" data-copy-slot="output_schema">复制 Schema</button>
+        </div>
+        <pre class="prompt-code-block mono">${esc(prettySchema)}</pre>
+      </section>
+
+      <div class="prompt-two-col">
+        <section class="prompt-block">
+          <div class="prompt-block-head">
+            <div>
+              <span class="prompt-badge prompt-badge-rule">长度约束</span>
+              <strong class="prompt-block-title">## 长度</strong>
+            </div>
+          </div>
+          <div class="prompt-text-body">${esc(roleObj.length_rule)}</div>
+        </section>
+
+        <section class="prompt-block">
+          <div class="prompt-block-head">
+            <div>
+              <span class="prompt-badge prompt-badge-vis">输入视野</span>
+              <strong class="prompt-block-title">实际可见字段与隔离边界</strong>
+            </div>
+          </div>
+          <div class="prompt-text-body">${esc(vis.summary || "")}</div>
+          ${
+            Array.isArray(vis.visible_fields) && vis.visible_fields.length
+              ? `<div class="prompt-field-pills">${vis.visible_fields
+                  .map((f) => `<span class="citation-chip mono">${esc(f)}</span>`)
+                  .join("")}</div>`
+              : ""
+          }
+          ${vis.hidden_note ? `<div class="muted-text" style="margin-top:6px">隔离说明：${esc(vis.hidden_note)}</div>` : ""}
+        </section>
+      </div>
+
+      <section class="prompt-block">
+        <div class="prompt-block-head">
+          <div>
+            <span class="prompt-badge prompt-badge-rule">通用禁令</span>
+            <strong class="prompt-block-title">## 禁令（7 角色共用）</strong>
+          </div>
+        </div>
+        <ul class="prompt-rules-list">
+          ${(roleObj.common_rules || []).map((r) => `<li>${esc(r)}</li>`).join("")}
+        </ul>
+      </section>
+
+      <details class="prompt-collapsible">
+        <summary>
+          <span>共享方法论正文（所有角色 System Prompt 顶部共用 · ${methodology.char_count.toLocaleString()} 字 / 约 ${methodology.est_tokens.toLocaleString()} tok）</span>
+        </summary>
+        <div class="prompt-collapsible-body">
+          <div class="prompt-collapsible-bar">
+            <span class="muted-text mono">${esc(state.promptsData?.methodology_path || "docs/debate-methodology.md")}</span>
+            <button class="btn btn-ghost btn-sm" type="button" data-copy-slot="methodology">复制方法论</button>
+          </div>
+          <pre class="prompt-code-block">${esc(methodology.text)}</pre>
+        </div>
+      </details>
+    </div>
+  `;
+}
+
+function renderChatPresetBlocksHtml(chatRole, tools, methodology) {
+  return `
+    <div class="prompt-blocks">
+      <section class="prompt-block prompt-block-primary">
+        <div class="prompt-block-head">
+          <div>
+            <span class="prompt-badge prompt-badge-preset">对话身份</span>
+            <strong class="prompt-block-title">${esc(chatRole.name)}</strong>
+            ${
+              chatRole.uses_methodology_role_brief
+                ? `<span class="tag-neutral" style="margin-left:6px">自动复用 debate-methodology 角色职责</span>`
+                : `<span class="tag-neutral" style="margin-left:6px">内置复盘助手身份</span>`
+            }
+          </div>
+          <button class="btn btn-ghost btn-sm" type="button" data-copy-slot="chat_identity">复制身份设定</button>
+        </div>
+        <pre class="prompt-code-block">${esc(chatRole.preset_identity)}</pre>
+      </section>
+
+      <section class="prompt-block">
+        <div class="prompt-block-head">
+          <div>
+            <span class="prompt-badge prompt-badge-vis">只读工具</span>
+            <strong class="prompt-block-title">挂载工具清单（共 ${tools.length} 个，绝不改写账本）</strong>
+          </div>
+        </div>
+        <div class="prompt-tools-grid">
+          ${tools
+            .map(
+              (t) => `
+            <div class="prompt-tool-card">
+              <div class="prompt-tool-head">
+                <strong class="mono">${esc(t.name)}</strong>
+                <span class="pill pill-soft">${esc(t.label)}</span>
+              </div>
+              <div class="prompt-tool-desc">${esc(t.description)}</div>
+            </div>
+          `,
+            )
+            .join("")}
+        </div>
+      </section>
+
+      <details class="prompt-collapsible">
+        <summary>
+          <span>共享方法论正文（对话 System Prompt 底座 · ${methodology.char_count.toLocaleString()} 字 / 约 ${methodology.est_tokens.toLocaleString()} tok）</span>
+        </summary>
+        <div class="prompt-collapsible-body">
+          <div class="prompt-collapsible-bar">
+            <span class="muted-text mono">${esc(state.promptsData?.methodology_path || "docs/debate-methodology.md")}</span>
+            <button class="btn btn-ghost btn-sm" type="button" data-copy-slot="methodology">复制方法论</button>
+          </div>
+          <pre class="prompt-code-block">${esc(methodology.text)}</pre>
+        </div>
+      </details>
+    </div>
+  `;
+}
+
+function renderFullSystemPromptHtml(fullText, { subtitle = "", copySlot = "full_system", note = "" } = {}) {
+  const chars = (fullText || "").length;
+  const estTok = Math.max(1, Math.round(chars * 0.45));
+  return `
+    <div class="prompt-blocks">
+      <section class="prompt-block">
+        <div class="prompt-block-head">
+          <div>
+            <span class="prompt-badge prompt-badge-system">System Prompt 原文</span>
+            <strong class="prompt-block-title">${esc(subtitle || "实际发送给大模型的完整 system 消息")}</strong>
+          </div>
+          <div class="prompt-block-tools">
+            <span class="muted-text mono">${chars.toLocaleString()} 字 · 约 ${estTok.toLocaleString()} tok</span>
+            <button class="btn btn-primary btn-sm" type="button" data-copy-slot="${esc(copySlot)}">一键复制全文</button>
+          </div>
+        </div>
+        ${note ? `<div class="prompt-note-banner">${esc(note)}</div>` : ""}
+        <pre class="prompt-code-block prompt-code-tall">${esc(fullText)}</pre>
+      </section>
+    </div>
+  `;
+}
+
+function renderUserPayloadPanelHtml(roleKey, tsCode, { showStockPicker = true, pickerAttr = "data-payload-stock-select" } = {}) {
+  const isChat = roleKey.startsWith("chat:");
+  const isFinal = roleKey === "final_pick";
+  const candidates = state.run?.request?.candidates || [];
+  const effectiveCode = isFinal ? "-" : tsCode || resolveDefaultPayloadCode(roleKey);
+  const cacheKey = promptPayloadCacheKey(roleKey, effectiveCode);
+  const entry = state.promptsPayloadCache[cacheKey];
+  const isLoading = state.promptsPayloadLoadingKey === cacheKey;
+
+  if (!entry && !isLoading) {
+    queueMicrotask(() => ensureRolePayload(roleKey, effectiveCode));
+  }
+
+  const pickerHtml =
+    showStockPicker && !isFinal && candidates.length > 0
+      ? `
+        <label class="prompt-stock-picker">
+          <span class="muted-text">${isChat ? "聚焦挂载个股" : "选择候选股"}</span>
+          <select class="ctrl-select ctrl-mini" ${pickerAttr}>
+            ${isChat ? `<option value="" ${!effectiveCode ? "selected" : ""}>不额外挂载个股</option>` : ""}
+            ${candidates
+              .map(
+                (c) =>
+                  `<option value="${esc(c.ts_code)}" ${c.ts_code === effectiveCode ? "selected" : ""}>#${String(c.model?.rank ?? "").padStart(2, "0")} ${esc(c.name)} (${esc(c.ts_code)})</option>`,
+              )
+              .join("")}
+          </select>
+        </label>
+      `
+      : "";
+
+  if (isLoading && !entry) {
+    return `
+      <div class="prompt-blocks">
+        <div class="prompt-payload-toolbar">${pickerHtml}</div>
+        <div class="pending-placeholder">正在组装实际 User JSON…</div>
+      </div>
+    `;
+  }
+
+  if (entry && !entry.ok) {
+    return `
+      <div class="prompt-blocks">
+        <div class="prompt-payload-toolbar">${pickerHtml}</div>
+        <div class="prompt-warn-banner">
+          <strong>暂无法预览实际 User JSON：</strong>${esc(entry.error)}
+          <div class="muted-text" style="margin-top:4px">请先在顶部选择一次历史运行记录，或点击「演练预览」生成当日候选快照。</div>
+        </div>
+      </div>
+    `;
+  }
+
+  const data = entry?.data;
+  if (!data) {
+    return `
+      <div class="prompt-blocks">
+        <div class="prompt-payload-toolbar">${pickerHtml}</div>
+        <div class="pending-placeholder">正在加载…</div>
+      </div>
+    `;
+  }
+
+  const jsonText = state.promptsPayloadCompact
+    ? JSON.stringify(data.payload)
+    : JSON.stringify(data.payload, null, 2);
+
+  const statusHtml = data.ready
+    ? `<span class="status-badge status-done">${isChat ? "实时常驻上下文已就绪" : "完整入参已就绪"}</span>`
+    : `<span class="status-badge status-running">前序未完 · 缺 ${(data.missing_deps || []).join(" / ")}</span>`;
+
+  return `
+    <div class="prompt-blocks">
+      <div class="prompt-payload-toolbar">
+        <div class="prompt-payload-toolbar-left">
+          ${pickerHtml}
+          ${statusHtml}
+        </div>
+        <div class="prompt-block-tools">
+          <span class="muted-text mono">${data.char_count.toLocaleString()} 字符 · 约 ${data.est_tokens.toLocaleString()} tok</span>
+          <button class="chip ${!state.promptsPayloadCompact ? "active" : ""}" type="button" data-payload-format="pretty">格式化</button>
+          <button class="chip ${state.promptsPayloadCompact ? "active" : ""}" type="button" data-payload-format="compact">单行原文</button>
+          <button class="btn btn-primary btn-sm" type="button" data-copy-slot="user_payload" data-copy-role="${esc(roleKey)}" data-copy-code="${esc(effectiveCode)}">复制 JSON</button>
+        </div>
+      </div>
+
+      ${
+        !data.ready && data.missing_deps?.length
+          ? `<div class="prompt-note-banner">提示：当前股票的前序角色（<strong>${esc(data.missing_deps.join("、"))}</strong>）尚未执行完成，下方展示的是已就绪字段的结构预览；完整跑完后将自动包含对应前序发言。</div>`
+          : ""
+      }
+
+      <section class="prompt-block">
+        <div class="prompt-block-head">
+          <div class="prompt-field-pills" style="margin-top:0">
+            <span class="muted-text">顶层字段：</span>
+            ${(data.top_keys || []).map((k) => `<span class="citation-chip mono">${esc(k)}</span>`).join("")}
+          </div>
+          <span class="muted-text mono">${esc(data.stock_name)} ${data.ts_code && data.ts_code !== "-" ? `(${esc(data.ts_code)})` : ""}</span>
+        </div>
+        <pre class="prompt-code-block prompt-code-tall mono">${esc(jsonText)}</pre>
+      </section>
+    </div>
+  `;
+}
+
+function getCopyTextBySlot(slot, roleKey, tsCode) {
+  const data = state.promptsData;
+  if (!data) return { text: "", label: "内容" };
+  if (slot === "methodology") {
+    return { text: data.methodology?.text || "", label: "共享方法论正文" };
+  }
+  if (slot === "user_payload") {
+    const effectiveCode = roleKey === "final_pick" ? "-" : tsCode || resolveDefaultPayloadCode(roleKey);
+    const entry = state.promptsPayloadCache[promptPayloadCacheKey(roleKey, effectiveCode)];
+    if (!entry?.ok) return { text: "", label: "User JSON" };
+    const text = state.promptsPayloadCompact
+      ? JSON.stringify(entry.data.payload)
+      : JSON.stringify(entry.data.payload, null, 2);
+    return { text, label: `${roleKey} 实际 User JSON` };
+  }
+  const ent = getSelectedPromptEntity(roleKey);
+  if (!ent) return { text: "", label: "内容" };
+  if (ent.kind === "debate") {
+    if (slot === "role_brief") return { text: ent.item.role_brief, label: `${ent.item.name} 预置职责` };
+    if (slot === "output_schema") return { text: formatSchemaPretty(ent.item.output_schema), label: `${ent.item.name} 输出 Schema` };
+    if (slot === "full_system") return { text: ent.item.system_prompt, label: `${ent.item.name} 完整 System Prompt` };
+  }
+  if (ent.kind === "chat") {
+    if (slot === "chat_identity") return { text: ent.item.preset_identity, label: `${ent.item.name} 对话身份设定` };
+    if (slot === "full_system") {
+      const effectiveCode = tsCode || resolveDefaultPayloadCode(roleKey);
+      const entry = state.promptsPayloadCache[promptPayloadCacheKey(roleKey, effectiveCode)];
+      const full = entry?.ok && entry.data.full_system_prompt ? entry.data.full_system_prompt : ent.item.system_prompt_base;
+      return { text: full, label: `${ent.item.name} 对话 System Prompt` };
+    }
+  }
+  return { text: "", label: "内容" };
+}
+
+function renderPromptsView() {
+  if (state.promptsLoading && !state.promptsData) {
+    dom.promptsContent.innerHTML = `<div class="empty-state"><div class="empty-title">正在加载提示词与角色配置…</div></div>`;
+    return;
+  }
+  if (state.promptsError && !state.promptsData) {
+    dom.promptsContent.innerHTML = `<div class="empty-state"><div class="empty-title">加载提示词失败</div><p class="empty-desc">${esc(state.promptsError)}</p></div>`;
+    return;
+  }
+  const data = state.promptsData;
+  if (!data) {
+    dom.promptsContent.innerHTML = `<div class="empty-state"><div class="empty-title">暂无提示词数据</div></div>`;
+    return;
+  }
+
+  const selId = state.promptsSelectedId || "model_analyst";
+  const ent = getSelectedPromptEntity(selId);
+  const debateRoles = data.debate_roles || [];
+  const chatRoles = data.chat_roles || [];
+  const isFrozen = data.source === "frozen";
+
+  const sourceBannerHtml = `
+    <section class="card prompt-source-bar">
+      <div class="prompt-source-info">
+        <span class="status-badge ${isFrozen ? "status-done" : "status-idle"}">
+          ${isFrozen ? `本次运行冻结版 (${esc(data.as_of || "")} · ${esc(data.hash_prefix || "")})` : "当前工作区文档"}
+        </span>
+        <span class="muted-text mono">方法论源：${esc(data.methodology_path)} · 共享规则：${esc(data.rules_path)}</span>
+        ${
+          data.differs_from_workspace
+            ? `<span class="tag-warn">⚠ 冻结版与当前工作区文档存在差异${data.changed_roles?.length ? `（角色：${esc(data.changed_roles.join("、"))}）` : ""}</span>`
+            : ""
+        }
+      </div>
+      ${
+        data.has_frozen
+          ? `
+        <div class="prompt-source-switch">
+          <button class="chip ${isFrozen ? "active" : ""}" type="button" data-prompt-source="frozen">本次冻结版</button>
+          <button class="chip ${!isFrozen ? "active" : ""}" type="button" data-prompt-source="workspace">当前工作区版</button>
+        </div>
+      `
+          : ""
+      }
+    </section>
+  `;
+
+  const navHtml = `
+    <aside class="card prompt-nav">
+      <div class="prompt-nav-group">
+        <div class="prompt-nav-label">公共底座</div>
+        <button class="prompt-nav-item ${selId === "__methodology__" ? "active" : ""}" type="button" data-prompt-select="__methodology__">
+          <span class="prompt-nav-title">共享方法论正文</span>
+          <span class="prompt-nav-meta mono">
+            ${data.methodology_changed ? `<span class="prompt-dot-warn" title="与当前工作区文档不同">●</span>` : ""}
+            ${data.methodology.char_count.toLocaleString()}字
+          </span>
+        </button>
+      </div>
+
+      <div class="prompt-nav-group">
+        <div class="prompt-nav-label">辩论 Agent（${debateRoles.length} 个）</div>
+        ${debateRoles
+          .map(
+            (r) => `
+          <button class="prompt-nav-item ${selId === r.id ? "active" : ""}" type="button" data-prompt-select="${esc(r.id)}">
+            <div>
+              <div class="prompt-nav-title">${esc(r.name)}</div>
+              <div class="prompt-nav-sub mono">${esc(r.id)}</div>
+            </div>
+            <span class="prompt-nav-meta mono">
+              ${r.changed_from_workspace ? `<span class="prompt-dot-warn" title="与当前工作区文档不同">●</span>` : ""}
+              ~${r.est_tokens}t
+            </span>
+          </button>
+        `,
+          )
+          .join("")}
+      </div>
+
+      <div class="prompt-nav-group">
+        <div class="prompt-nav-label">AI 复盘对话视角（${chatRoles.length} 个）</div>
+        ${chatRoles
+          .map((c) => {
+            const key = `chat:${c.id}`;
+            return `
+            <button class="prompt-nav-item ${selId === key ? "active" : ""}" type="button" data-prompt-select="${esc(key)}">
+              <div>
+                <div class="prompt-nav-title">${esc(c.name.replace(/\s*\([^)]+\)$/, ""))}</div>
+                <div class="prompt-nav-sub mono">${esc(c.id)}</div>
+              </div>
+              <span class="prompt-nav-meta mono">~${c.est_tokens}t</span>
+            </button>
+          `;
+          })
+          .join("")}
+      </div>
+    </aside>
+  `;
+
+  let detailHtml = "";
+  if (ent?.kind === "methodology") {
+    detailHtml = `
+      <div class="prompt-detail-head">
+        <div>
+          <h2 class="prompt-detail-title">共享方法论正文</h2>
+          <p class="card-subtitle">所有 7 个辩论 Agent 与对话 Agent 的共同底座，位于 ${esc(data.methodology_path)}，改动正文将自动触发新 input_hash。</p>
+        </div>
+        <div class="prompt-block-tools">
+          <span class="muted-text mono">${data.methodology.char_count.toLocaleString()} 字 · 约 ${data.methodology.est_tokens.toLocaleString()} tok</span>
+          <button class="btn btn-primary btn-sm" type="button" data-copy-slot="methodology">复制方法论</button>
+        </div>
+      </div>
+      <pre class="prompt-code-block prompt-code-tall">${esc(data.methodology.text)}</pre>
+    `;
+  } else if (ent?.kind === "debate") {
+    const r = ent.item;
+    const mode = state.promptsViewMode || "preset";
+    const payloadCode = resolveDefaultPayloadCode(r.id);
+    let paneHtml = "";
+    if (mode === "preset") {
+      paneHtml = renderDebatePresetBlocksHtml(r, data.methodology);
+    } else if (mode === "system") {
+      paneHtml = renderFullSystemPromptHtml(r.system_prompt, {
+        subtitle: `${r.name} (${r.id}) · 实际发送给大模型的完整 System Prompt`,
+        copySlot: "full_system",
+        note: "此全文由「共享方法论正文 + 你的职责 + 硬性约束 + 输出格式 + 长度 + 禁令」拼接而成，与 debate_agent/src/prompts.ts 逐字一致。",
+      });
+    } else {
+      paneHtml = renderUserPayloadPanelHtml(r.id, payloadCode, { showStockPicker: true });
+    }
+
+    detailHtml = `
+      <div class="prompt-detail-head">
+        <div>
+          <div class="prompt-detail-title-row">
+            <h2 class="prompt-detail-title">${esc(r.name)}</h2>
+            <span class="role-code mono">${esc(r.id)}</span>
+            <span class="pill pill-soft">${esc(r.phase_label)}</span>
+          </div>
+          <p class="card-subtitle">System Prompt 共 ${r.char_count.toLocaleString()} 字（约 ${r.est_tokens.toLocaleString()} tok）· ${esc(r.input_visibility?.summary || "")}</p>
+        </div>
+        <div class="prompt-mode-tabs">
+          <button class="chip ${mode === "preset" ? "active" : ""}" type="button" data-prompt-mode="preset">预置提示词（分块）</button>
+          <button class="chip ${mode === "system" ? "active" : ""}" type="button" data-prompt-mode="system">完整 System Prompt</button>
+          <button class="chip ${mode === "payload" ? "active" : ""}" type="button" data-prompt-mode="payload">${r.id === "final_pick" ? "终选实际 User JSON" : "单股实际 User JSON"}</button>
+        </div>
+      </div>
+      ${paneHtml}
+    `;
+  } else if (ent?.kind === "chat") {
+    const c = ent.item;
+    const mode = state.promptsViewMode || "preset";
+    const roleKey = `chat:${c.id}`;
+    const payloadCode = resolveDefaultPayloadCode(roleKey);
+    let paneHtml = "";
+    if (mode === "preset") {
+      paneHtml = renderChatPresetBlocksHtml(c, ent.tools, data.methodology);
+    } else if (mode === "system") {
+      const cacheKey = promptPayloadCacheKey(roleKey, payloadCode);
+      const cached = state.promptsPayloadCache[cacheKey];
+      if (!cached && state.promptsPayloadLoadingKey !== cacheKey) {
+        queueMicrotask(() => ensureRolePayload(roleKey, payloadCode));
+      }
+      const fullText =
+        cached?.ok && cached.data.full_system_prompt ? cached.data.full_system_prompt : c.system_prompt_base;
+      const note =
+        cached?.ok && cached.data.full_system_prompt
+          ? "已包含当前页面的实时常驻运行上下文 JSON（与点击发送时实际送入大模型的 system 消息完全一致）。"
+          : "下方为不含动态常驻上下文的基础 System Prompt；若已加载运行记录，正在同步实时上下文…";
+      paneHtml = renderFullSystemPromptHtml(fullText, {
+        subtitle: `AI 复盘对话 · ${c.name}`,
+        copySlot: "full_system",
+        note,
+      });
+    } else {
+      paneHtml = renderUserPayloadPanelHtml(roleKey, payloadCode, { showStockPicker: true });
+    }
+
+    detailHtml = `
+      <div class="prompt-detail-head">
+        <div>
+          <div class="prompt-detail-title-row">
+            <h2 class="prompt-detail-title">${esc(c.name)}</h2>
+            <span class="role-code mono">${esc(c.id)}</span>
+            <span class="pill pill-soft">对话 Agent · 6 只读工具</span>
+          </div>
+          <p class="card-subtitle">${esc(c.desc)}</p>
+        </div>
+        <div class="prompt-mode-tabs">
+          <button class="chip ${mode === "preset" ? "active" : ""}" type="button" data-prompt-mode="preset">预置身份与工具</button>
+          <button class="chip ${mode === "system" ? "active" : ""}" type="button" data-prompt-mode="system">完整 System Prompt</button>
+          <button class="chip ${mode === "payload" ? "active" : ""}" type="button" data-prompt-mode="payload">常驻上下文 JSON</button>
+        </div>
+      </div>
+      ${paneHtml}
+    `;
+  }
+
+  dom.promptsContent.innerHTML = `
+    ${sourceBannerHtml}
+    <div class="prompt-studio-grid">
+      ${navHtml}
+      <section class="card prompt-detail-card">${detailHtml}</section>
+    </div>
+  `;
+}
+
+function openPromptModal({ roleKey, tsCode = "", pane = "preset" }) {
+  restorePromptModalChrome();
+  state.promptModal = {
+    open: true,
+    roleKey: roleKey || "model_analyst",
+    tsCode: roleKey === "final_pick" ? "-" : tsCode || resolveDefaultPayloadCode(roleKey),
+    pane: pane || "preset",
+  };
+  dom.promptModal.hidden = false;
+  if (!state.promptsData && !state.promptsLoading) {
+    refreshPromptsData();
+  }
+  if (state.promptModal.pane === "payload" || state.promptModal.roleKey.startsWith("chat:")) {
+    ensureRolePayload(state.promptModal.roleKey, state.promptModal.tsCode);
+  }
+  renderPromptModal();
+}
+
+function closePromptModal() {
+  if (!state.promptModal.open) return;
+  state.promptModal.open = false;
+  dom.promptModal.hidden = true;
+}
+
+function renderPromptModal() {
+  if (!state.promptModal.open) return;
+  if (state.promptModal.roleKey === "__ml_explain__") {
+    renderMlExplainModalBody();
+    return;
+  }
+  const { roleKey, tsCode, pane } = state.promptModal;
+  const data = state.promptsData;
+
+  dom.promptModalTabs.querySelectorAll("[data-modal-pane]").forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.modalPane === pane);
+    if (btn.dataset.modalPane === "payload") {
+      btn.textContent = roleKey.startsWith("chat:")
+        ? "常驻上下文 JSON"
+        : roleKey === "final_pick"
+          ? "终选实际 User JSON"
+          : "本股实际 User JSON";
+    }
+  });
+
+  if (state.promptsLoading && !data) {
+    dom.promptModalTitle.textContent = "正在加载提示词…";
+    dom.promptModalSubtitle.textContent = "";
+    dom.promptModalBody.innerHTML = `<div class="pending-placeholder">加载中…</div>`;
+    return;
+  }
+  if (!data) {
+    dom.promptModalTitle.textContent = "加载提示词失败";
+    dom.promptModalSubtitle.textContent = state.promptsError || "";
+    dom.promptModalBody.innerHTML = `<div class="pending-placeholder">${esc(state.promptsError || "暂无数据")}</div>`;
+    return;
+  }
+
+  const ent = getSelectedPromptEntity(roleKey);
+  if (!ent) return;
+
+  const cand = (state.run?.request?.candidates || []).find((c) => c.ts_code === tsCode);
+  const stockTag = cand ? ` · ${cand.name} (${cand.ts_code})` : roleKey === "final_pick" ? " · 全批终选" : "";
+  const sourceLabel = data.source === "frozen" ? `本次冻结版 (${data.as_of})` : "当前工作区文档";
+
+  if (ent.kind === "debate") {
+    const r = ent.item;
+    dom.promptModalTitle.textContent = `${r.name} (${r.id})${stockTag}`;
+    dom.promptModalSubtitle.textContent = `${sourceLabel} · ${r.phase_label} · System Prompt ${r.char_count.toLocaleString()} 字（约 ${r.est_tokens.toLocaleString()} tok）`;
+    if (pane === "preset") {
+      dom.promptModalBody.innerHTML = renderDebatePresetBlocksHtml(r, data.methodology);
+    } else if (pane === "system") {
+      dom.promptModalBody.innerHTML = renderFullSystemPromptHtml(r.system_prompt, {
+        subtitle: `${r.name} (${r.id}) 完整 System Prompt`,
+        copySlot: "full_system",
+      });
+    } else {
+      dom.promptModalBody.innerHTML = renderUserPayloadPanelHtml(r.id, tsCode, {
+        showStockPicker: true,
+        pickerAttr: "data-modal-stock-select",
+      });
+    }
+  } else if (ent.kind === "chat") {
+    const c = ent.item;
+    dom.promptModalTitle.textContent = `AI 复盘对话 · ${c.name}`;
+    dom.promptModalSubtitle.textContent = `${sourceLabel} · ${c.desc}`;
+    if (pane === "preset") {
+      dom.promptModalBody.innerHTML = renderChatPresetBlocksHtml(c, ent.tools, data.methodology);
+    } else if (pane === "system") {
+      const cacheKey = promptPayloadCacheKey(roleKey, tsCode);
+      const cached = state.promptsPayloadCache[cacheKey];
+      const fullText =
+        cached?.ok && cached.data.full_system_prompt ? cached.data.full_system_prompt : c.system_prompt_base;
+      dom.promptModalBody.innerHTML = renderFullSystemPromptHtml(fullText, {
+        subtitle: `${c.name} 完整对话 System Prompt`,
+        copySlot: "full_system",
+        note: cached?.ok && cached.data.full_system_prompt ? "已包含当前运行实时常驻上下文 JSON。" : "基础对话 System Prompt。",
+      });
+    } else {
+      dom.promptModalBody.innerHTML = renderUserPayloadPanelHtml(roleKey, tsCode, {
+        showStockPicker: true,
+        pickerAttr: "data-modal-stock-select",
+      });
+    }
+  }
+}
+
+function bindPromptEvents() {
+  // 卡片右上角「提示词」快捷入口（单股辩论 + 终选）
+  const handleInspectClick = (ev) => {
+    const btn = ev.target.closest?.("[data-inspect-role]");
+    if (!btn) return;
+    ev.stopPropagation();
+    openPromptModal({
+      roleKey: btn.dataset.inspectRole || "model_analyst",
+      tsCode: btn.dataset.inspectCode || "",
+      pane: "preset",
+    });
+  };
+  dom.stockContent.addEventListener("click", handleInspectClick);
+  dom.finalContent.addEventListener("click", handleInspectClick);
+
+  // 对话栏顶部「提示词」按钮
+  if (dom.btnChatPromptInfo) {
+    dom.btnChatPromptInfo.addEventListener("click", () => {
+      openPromptModal({
+        roleKey: `chat:${state.chatRole || "research_copilot"}`,
+        tsCode: state.selectedCode || "",
+        pane: "preset",
+      });
+    });
+  }
+
+  // 主视图「提示词与角色」Tab 内交互委托
+  dom.promptsContent.addEventListener("click", (ev) => {
+    const srcBtn = ev.target.closest?.("[data-prompt-source]");
+    if (srcBtn) {
+      refreshPromptsData({ source: srcBtn.dataset.promptSource });
+      return;
+    }
+    const navBtn = ev.target.closest?.("[data-prompt-select]");
+    if (navBtn) {
+      state.promptsSelectedId = navBtn.dataset.promptSelect;
+      renderPromptsView();
+      return;
+    }
+    const modeBtn = ev.target.closest?.("[data-prompt-mode]");
+    if (modeBtn) {
+      state.promptsViewMode = modeBtn.dataset.promptMode;
+      if (state.promptsViewMode === "payload") {
+        ensureRolePayload(state.promptsSelectedId, resolveDefaultPayloadCode(state.promptsSelectedId));
+      }
+      renderPromptsView();
+      return;
+    }
+    const fmtBtn = ev.target.closest?.("[data-payload-format]");
+    if (fmtBtn) {
+      state.promptsPayloadCompact = fmtBtn.dataset.payloadFormat === "compact";
+      renderPromptsView();
+      return;
+    }
+    const copyBtn = ev.target.closest?.("[data-copy-slot]");
+    if (copyBtn) {
+      const roleKey = copyBtn.dataset.copyRole || state.promptsSelectedId;
+      const code = copyBtn.dataset.copyCode ?? resolveDefaultPayloadCode(roleKey);
+      const { text, label } = getCopyTextBySlot(copyBtn.dataset.copySlot, roleKey, code);
+      copyTextWithToast(text, label);
+    }
+  });
+
+  dom.promptsContent.addEventListener("change", (ev) => {
+    const sel = ev.target.closest?.("[data-payload-stock-select]");
+    if (!sel) return;
+    state.promptsPayloadCode = sel.value;
+    ensureRolePayload(state.promptsSelectedId, state.promptsPayloadCode);
+    renderPromptsView();
+  });
+
+  // 弹窗交互
+  dom.btnModalClose.addEventListener("click", closePromptModal);
+  dom.promptModal.addEventListener("click", (ev) => {
+    if (ev.target === dom.promptModal) closePromptModal();
+  });
+  dom.btnModalOpenTab.addEventListener("click", () => {
+    state.promptsSelectedId = state.promptModal.roleKey;
+    state.promptsViewMode = state.promptModal.pane;
+    if (state.promptModal.tsCode && state.promptModal.tsCode !== "-") {
+      state.promptsPayloadCode = state.promptModal.tsCode;
+    }
+    closePromptModal();
+    switchTab("prompts");
+  });
+  dom.promptModalTabs.addEventListener("click", (ev) => {
+    const btn = ev.target.closest?.("[data-modal-pane]");
+    if (!btn) return;
+    state.promptModal.pane = btn.dataset.modalPane;
+    if (state.promptModal.pane === "payload") {
+      ensureRolePayload(state.promptModal.roleKey, state.promptModal.tsCode);
+    }
+    renderPromptModal();
+  });
+  dom.promptModalBody.addEventListener("click", (ev) => {
+    const fmtBtn = ev.target.closest?.("[data-payload-format]");
+    if (fmtBtn) {
+      state.promptsPayloadCompact = fmtBtn.dataset.payloadFormat === "compact";
+      renderPromptModal();
+      return;
+    }
+    const copyBtn = ev.target.closest?.("[data-copy-slot]");
+    if (copyBtn) {
+      const roleKey = copyBtn.dataset.copyRole || state.promptModal.roleKey;
+      const code = copyBtn.dataset.copyCode ?? state.promptModal.tsCode;
+      const { text, label } = getCopyTextBySlot(copyBtn.dataset.copySlot, roleKey, code);
+      copyTextWithToast(text, label);
+    }
+  });
+  dom.promptModalBody.addEventListener("change", (ev) => {
+    const sel = ev.target.closest?.("[data-modal-stock-select]");
+    if (!sel) return;
+    state.promptModal.tsCode = sel.value;
+    ensureRolePayload(state.promptModal.roleKey, state.promptModal.tsCode);
+    renderPromptModal();
+  });
+
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key === "Escape" && state.promptModal.open) {
+      closePromptModal();
+    }
+  });
+}
+
+// ---------------------------------------------------------------------------
+// 多模型对比与净值（视图 D）+ 单股归因瀑布图 + 69 特征分组面板
+// ---------------------------------------------------------------------------
+
+const ML_MODEL_IDS = ["xgb_F69", "rf_F69", "lstm_SF69"];
+const ML_MODEL_LABELS = {
+  xgb_F69: "XGBoost F69",
+  rf_F69: "随机森林 F69",
+  lstm_SF69: "LSTM S+F69",
+};
+
+async function ensureMlOverview() {
+  if (state.mlOverview || state.mlOverviewLoading) return;
+  state.mlOverviewLoading = true;
+  state.mlOverviewError = "";
+  try {
+    state.mlOverview = await apiJson("/api/ml/overview");
+  } catch (err) {
+    state.mlOverviewError = err.message || String(err);
+  } finally {
+    state.mlOverviewLoading = false;
+    if (state.activeTab === "models") renderModelsView();
+    if (state.activeTab === "stock") renderStockDetail();
+  }
+}
+
+async function ensureMlNav(startKey = state.mlNavStart) {
+  const rule = state.mlNavRule || "DB-K30-b8";
+  const sKey = String(startKey || "test");
+  const key = `${rule}|${sKey}`;
+  if (state.mlNavCache[key] || state.mlNavLoadingKey === key) return;
+  state.mlNavLoadingKey = key;
+  if (state.activeTab === "models") renderModelsView();
+  try {
+    const qs = new URLSearchParams({ rule });
+    if (sKey === "test") {
+      qs.set("period", "test");
+    } else {
+      qs.set("start_year", sKey);
+    }
+    const data = await apiJson(`/api/ml/nav?${qs.toString()}`);
+    state.mlNavCache[key] = { ok: true, data };
+  } catch (err) {
+    state.mlNavCache[key] = { ok: false, error: err.message || String(err) };
+  } finally {
+    if (state.mlNavLoadingKey === key) state.mlNavLoadingKey = "";
+    if (state.activeTab === "models") renderModelsView();
+  }
+}
+
+async function loadMlConsensus({ asOf, withOutcome } = {}) {
+  const targetDate = (asOf ?? state.mlConsensusDate ?? state.selectedDate ?? "").trim();
+  const useOutcome = withOutcome !== undefined ? Boolean(withOutcome) : state.mlConsensusWithOutcome;
+  state.mlConsensusDate = targetDate;
+  state.mlConsensusWithOutcome = useOutcome;
+  state.mlConsensusLoading = true;
+  state.mlConsensusError = "";
+  if (state.activeTab === "models") renderModelsView();
+
+  try {
+    const qs = new URLSearchParams({
+      top_n: "6",
+      with_outcome: useOutcome ? "1" : "0",
+    });
+    if (targetDate) qs.set("as_of", targetDate);
+    const data = await apiJson(`/api/ml/consensus?${qs.toString()}`);
+    state.mlConsensus = data;
+    state.mlConsensusDate = data.as_of;
+  } catch (err) {
+    state.mlConsensusError = err.message || String(err);
+  } finally {
+    state.mlConsensusLoading = false;
+    if (state.activeTab === "models") renderModelsView();
+  }
+}
+
+function ensureMlViewLoaded() {
+  if (!state.meta?.ml_available) return;
+  ensureMlOverview();
+  ensureMlNav(state.mlNavStart);
+  if (!state.mlConsensus && !state.mlConsensusLoading) {
+    const mlSrc = (state.meta?.model_sources || []).find((m) => m.id === "xgb_F69");
+    const defaultDay =
+      (state.selectedDate && mlSrc?.date_max && state.selectedDate <= mlSrc.date_max ? state.selectedDate : "") ||
+      mlSrc?.date_max ||
+      "";
+    loadMlConsensus({ asOf: defaultDay, withOutcome: state.mlConsensusWithOutcome });
+  }
+}
+
+async function ensureStockExplain(asOf, tsCode) {
+  if (!asOf || !tsCode || !state.meta?.ml_available) return;
+  const key = `${asOf}|${tsCode}`;
+  if (state.mlExplainCache[key] || state.mlExplainLoadingKey === key) return;
+  state.mlExplainLoadingKey = key;
+  try {
+    const qs = new URLSearchParams({ as_of: asOf, ts_code: tsCode, top: "8" });
+    const data = await apiJson(`/api/ml/explain?${qs.toString()}`);
+    state.mlExplainCache[key] = { ok: true, data };
+  } catch (err) {
+    state.mlExplainCache[key] = { ok: false, error: err.message || String(err) };
+  } finally {
+    if (state.mlExplainLoadingKey === key) state.mlExplainLoadingKey = "";
+    if (state.activeTab === "stock" && state.selectedCode === tsCode) {
+      renderStockDetail();
+    }
+  }
+}
+
+function renderExplainBarsHtml(expObj) {
+  if (!expObj) return "";
+  if (!expObj.explain_available && !Array.isArray(expObj.top_factors)) {
+    return `<div class="muted-text" style="padding:8px 0">${esc(expObj.explain_error || "该日期不在测试段（2023-01-03 ~ 2026-10-16），无预计算归因")}</div>`;
+  }
+  const factors = expObj.top_factors || [];
+  if (!factors.length) {
+    return `<div class="muted-text" style="padding:8px 0">${esc(expObj.explain_error || "暂无归因数据")}</div>`;
+  }
+  const maxAbs = Math.max(0.0001, ...factors.map((f) => Math.abs(Number(f.contribution) || 0)));
+  const rowsHtml = factors
+    .map((f) => {
+      const c = Number(f.contribution) || 0;
+      const pos = c >= 0;
+      const pctW = Math.max(3, Math.min(100, (Math.abs(c) / maxAbs) * 100));
+      const signStr = `${pos ? "+" : ""}${c.toFixed(4)}`;
+      const valStr = f.value !== null && f.value !== undefined ? Number(f.value).toFixed(4).replace(/\.?0+$/, "") : "—";
+      const isSeq = String(f.feature || "").startsWith("seq_");
+      return `
+        <div class="explain-row">
+          <div class="explain-label" title="${esc(f.feature)} = ${esc(valStr)}">
+            <span class="explain-cn">${esc(f.cn_name || f.feature)}</span>
+            <span class="explain-code mono">${esc(f.feature)}${isSeq ? " · 60日序列" : ""}</span>
+          </div>
+          <div class="explain-val mono muted-text">${esc(valStr)}</div>
+          <div class="explain-bar-cell">
+            <div class="explain-bar-half explain-bar-neg">
+              ${!pos ? `<div class="explain-bar-fill neg" style="width:${pctW.toFixed(1)}%"></div>` : ""}
+            </div>
+            <div class="explain-bar-axis"></div>
+            <div class="explain-bar-half explain-bar-pos">
+              ${pos ? `<div class="explain-bar-fill pos" style="width:${pctW.toFixed(1)}%"></div>` : ""}
+            </div>
+          </div>
+          <div class="explain-contrib mono ${pos ? "val-up" : "val-down"}">${signStr}</div>
+        </div>
+      `;
+    })
+    .join("");
+
+  const baseTxt = expObj.base !== null && expObj.base !== undefined ? Number(expObj.base).toFixed(4) : "—";
+  const scoreTxt = expObj.score !== null && expObj.score !== undefined ? Number(expObj.score).toFixed(4) : "—";
+  return `
+    <div class="explain-meta-line">
+      <span class="pill pill-soft">${esc(expObj.method || "模型归因")}</span>
+      <span class="muted-text mono">基线分 base=${baseTxt} · 模型分 score=${scoreTxt}（红=推高分数，青=拉低分数）</span>
+    </div>
+    <div class="explain-bars-list">${rowsHtml}</div>
+  `;
+}
+
+function renderStockAttributionCardHtml(cand, runAsOf) {
+  const ctxSource = state.run?.request?.context?.model_source || state.selectedModelSource || "xgb_F69";
+  const cacheEntry = state.mlExplainCache[`${runAsOf}|${cand.ts_code}`];
+  const liveModels = cacheEntry?.ok ? cacheEntry.data?.models || {} : {};
+
+  // 合并快照自带归因/同行模型 + 实时三模型归因接口
+  const modelsMap = {};
+  for (const mid of ML_MODEL_IDS) {
+    if (liveModels[mid]) {
+      modelsMap[mid] = liveModels[mid];
+    } else if (mid === ctxSource && cand.explain) {
+      modelsMap[mid] = {
+        model_id: mid,
+        name: ML_MODEL_LABELS[mid],
+        score_available: true,
+        explain_available: true,
+        rank: cand.model?.rank,
+        pct: cand.model?.pct,
+        in_model_picks: cand.model?.in_model_picks,
+        ...cand.explain,
+      };
+    } else if (cand.peer_models?.[mid]) {
+      modelsMap[mid] = {
+        model_id: mid,
+        name: cand.peer_models[mid].name || ML_MODEL_LABELS[mid],
+        score_available: true,
+        explain_available: false,
+        rank: cand.peer_models[mid].rank,
+        pct: cand.peer_models[mid].pct,
+        in_model_picks: cand.peer_models[mid].in_model_picks,
+        explain_error: "正在加载该模型归因…",
+      };
+    }
+  }
+
+  const availIds = ML_MODEL_IDS.filter((m) => modelsMap[m]);
+  if (!availIds.length) {
+    if (state.meta?.ml_available && state.mlExplainLoadingKey === `${runAsOf}|${cand.ts_code}`) {
+      return `<div class="explain-card"><div class="muted-text">正在加载三模型百分位对照与 Top-8 打分归因…</div></div>`;
+    }
+    return "";
+  }
+
+  const defaultTab = ML_MODEL_IDS.includes(ctxSource) && modelsMap[ctxSource] ? ctxSource : availIds[0];
+  const activeMid = modelsMap[state.mlExplainModelTab] ? state.mlExplainModelTab : defaultTab;
+  const activeExp = modelsMap[activeMid];
+
+  const peerTabsHtml = availIds
+    .map((mid) => {
+      const m = modelsMap[mid];
+      const isAct = mid === activeMid;
+      const rankTxt = m.score_available && m.rank ? `#${m.rank} · ${fmtNum(m.pct, 1)}%` : "无当日分";
+      const pickMark = m.in_model_picks ? `<span class="peer-pick-dot" title="入选该模型前6">★</span>` : "";
+      return `
+        <button class="peer-model-tab ${isAct ? "active" : ""}" type="button" data-explain-model="${esc(mid)}">
+          <span class="peer-model-name">${esc(ML_MODEL_LABELS[mid])}${pickMark}</span>
+          <span class="peer-model-rank mono">${esc(rankTxt)}</span>
+        </button>
+      `;
+    })
+    .join("");
+
+  return `
+    <div class="explain-card">
+      <div class="explain-card-head">
+        <div>
+          <strong class="explain-card-title">模型打分归因（Top 8）与三模型百分位对照</strong>
+          <span class="muted-text" style="margin-left:8px">跨模型仅比百分位 pct，不直接比原始 score</span>
+        </div>
+        <div class="peer-model-tabs">${peerTabsHtml}</div>
+      </div>
+      ${renderExplainBarsHtml(activeExp)}
+    </div>
+  `;
+}
+
+function renderStockFeaturesDrawerHtml(cand, f, fp, extraF, extraFp, totalFeatCount) {
+  const catalog = state.mlOverview?.feature_catalog?.by_name || {};
+  const hasExtra = Boolean(extraF && Object.keys(extraF).length > 0);
+  if (!hasExtra) {
+    const allFeatHtml = Object.entries(f)
+      .map(([k, v]) => {
+        const pct = fp[k] !== undefined ? ` (${fp[k]}%)` : "";
+        return `
+          <div class="feat-kv">
+            <span class="feat-k" title="${esc(k)}">${esc(featureLabel(k))}</span>
+            <span class="feat-v mono">${esc(v)}${esc(featureUnit(k))}<span class="muted-text">${pct}</span></span>
+          </div>
+        `;
+      })
+      .join("");
+    return `
+      <details class="features-drawer">
+        <summary>展开查看送入模型的全部 ${Object.keys(f).length} 项量价特征与全池分位</summary>
+        <div class="features-table-grid">${allFeatHtml}</div>
+      </details>
+    `;
+  }
+
+  // 构建 69 特征分组条目（基础量价 28 项 + A~H 扩展 41 项）
+  const entries = [];
+  for (const [k, v] of Object.entries(f)) {
+    const meta = catalog[k];
+    entries.push({
+      key: k,
+      group: "基础量价（28 项）",
+      cn: meta?.cn_name || featureLabel(k),
+      formula: meta?.formula || "",
+      sign: "",
+      val: `${v}${featureUnit(k)}`,
+      pct: fp[k],
+    });
+  }
+  for (const [k, v] of Object.entries(extraF)) {
+    const meta = catalog[k];
+    entries.push({
+      key: k,
+      group: meta?.group || "新增特征",
+      cn: meta?.cn_name || k,
+      formula: meta?.formula || "",
+      sign: meta?.expected_sign || "",
+      val: String(v),
+      pct: extraFp[k],
+    });
+  }
+
+  const groups = ["all", ...Array.from(new Set(entries.map((e) => e.group)))];
+  const curGroup = groups.includes(state.featureGroupFilter) ? state.featureGroupFilter : "all";
+  const filtered = curGroup === "all" ? entries : entries.filter((e) => e.group === curGroup);
+
+  const pillsHtml = groups
+    .map((g) => {
+      const cnt = g === "all" ? entries.length : entries.filter((e) => e.group === g).length;
+      const lbl = g === "all" ? `全部 (${cnt})` : `${g} (${cnt})`;
+      return `<button class="chip ${curGroup === g ? "active" : ""}" type="button" data-feat-group="${esc(g)}">${esc(lbl)}</button>`;
+    })
+    .join("");
+
+  const gridHtml = filtered
+    .map((item) => {
+      const pctTxt = item.pct !== undefined ? ` (${item.pct}%)` : "";
+      const signBadge =
+        item.sign === "+"
+          ? `<span class="feat-sign pos" title="预期正向">+</span>`
+          : item.sign === "-"
+            ? `<span class="feat-sign neg" title="预期负向">−</span>`
+            : "";
+      const tip = [item.key, item.formula].filter(Boolean).join(" · ");
+      return `
+        <div class="feat-kv" title="${esc(tip)}">
+          <span class="feat-k">${esc(item.cn)}${signBadge}</span>
+          <span class="feat-v mono">${esc(item.val)}<span class="muted-text">${pctTxt}</span></span>
+        </div>
+      `;
+    })
+    .join("");
+
+  return `
+    <details class="features-drawer" ${curGroup !== "all" ? "open" : ""}>
+      <summary>展开查看送入模型的全部 ${totalFeatCount} 项 F69 特征（原 28 项 + 新增 ${Object.keys(extraF).length} 项 · A~H 维度）</summary>
+      <div class="feat-group-bar">${pillsHtml}</div>
+      <div class="features-table-grid">${gridHtml}</div>
+    </details>
+  `;
+}
+
+function fmtPctSigned(v, digits = 1) {
+  if (typeof v !== "number" || !Number.isFinite(v)) return "—";
+  return `${v > 0 ? "+" : ""}${v.toFixed(digits)}%`;
+}
+
+function fmtWan(yuan, digits = 1) {
+  if (typeof yuan !== "number" || !Number.isFinite(yuan)) return "—";
+  return `${(yuan / 10000).toFixed(digits)}万`;
+}
+
+function renderStartsSummaryTableHtml(startsSummary) {
+  if (!startsSummary?.available || !Array.isArray(startsSummary.rows) || !startsSummary.rows.length) {
+    return `<div class="muted-text" style="padding:10px 0">暂无换起点汇总数据</div>`;
+  }
+  const activeYr = state.mlNavStart === "test" ? null : Number(state.mlNavStart);
+  const rowsHtml = startsSummary.rows
+    .map((r) => {
+      const isSelected = activeYr === r.start_year;
+      const cellFor = (mid) => {
+        const m = r.models?.[mid];
+        if (!m) return `<td class="mono muted-text">—</td>`;
+        const isBest = r.best_model_id === mid;
+        const cagrCls = (m.cagr ?? 0) >= 0 ? "val-up" : "val-down";
+        return `
+          <td class="mono ${isBest ? "ml-cell-best" : ""}">
+            <div><strong class="${cagrCls}">${fmtPctSigned(m.cagr, 1)}</strong>${isBest ? " ★" : ""} <span class="muted-text">(${fmtWan(m.end_capital)})</span></div>
+            <div class="muted-text" style="font-size:10.5px">超额 ${fmtPctSigned(m.annual_excess, 1)} · 回撤 ${fmtPctSigned(m.max_drawdown, 1)}</div>
+          </td>
+        `;
+      };
+      return `
+        <tr class="ml-clickable-row ${isSelected ? "ml-row-selected" : ""}" data-select-start-year="${r.start_year}" title="点击将上方曲线切换至 ${r.start_year} 年独立起步">
+          <td class="mono">
+            <strong>${r.start_year}</strong>
+            ${r.is_oos ? `<span class="tag-pick" style="font-size:10px;margin-left:4px">样本外</span>` : ""}
+          </td>
+          <td class="mono muted-text">${esc(r.start_date)} <span style="font-size:10.5px">(${fmtNum(r.hold_years, 1)}年)</span></td>
+          ${cellFor("xgb_F69")}
+          ${cellFor("rf_F69")}
+          ${cellFor("lstm_SF69")}
+          <td class="mono ${(r.pool_cagr ?? 0) >= 0 ? "val-up" : "val-down"}">${fmtPctSigned(r.pool_cagr, 1)}</td>
+          <td><span class="pill pill-soft">${esc(r.best_model_name || "—")}</span></td>
+        </tr>
+      `;
+    })
+    .join("");
+
+  const sAll = startsSummary.summary?.all_10 || {};
+  const sEx = startsSummary.summary?.ex_2015 || {};
+  const summaryRowsHtml = `
+    <tr class="ml-summary-row">
+      <td colspan="2"><strong>10 个起点中位数（2015~2024）</strong></td>
+      ${ML_MODEL_IDS.map((mid) => `<td class="mono"><strong>${fmtPctSigned(sAll[mid]?.median_cagr, 1)}</strong> <span class="muted-text">(回撤 ${fmtPctSigned(sAll[mid]?.median_dd, 1)})</span></td>`).join("")}
+      <td class="mono">${fmtPctSigned(sAll.pool_nav?.median_cagr, 1)}</td>
+      <td class="muted-text mono" style="font-size:11px">最高次数：X ${sAll.xgb_F69?.best_count ?? 0} / R ${sAll.rf_F69?.best_count ?? 0} / L ${sAll.lstm_SF69?.best_count ?? 0}</td>
+    </tr>
+    <tr class="ml-summary-row">
+      <td colspan="2"><strong>2016~2024 中位数（不含 2015 股灾）</strong></td>
+      ${ML_MODEL_IDS.map((mid) => `<td class="mono"><strong>${fmtPctSigned(sEx[mid]?.median_cagr, 1)}</strong> <span class="muted-text">(最差 ${fmtPctSigned(sEx[mid]?.min_cagr, 1)})</span></td>`).join("")}
+      <td class="mono">${fmtPctSigned(sEx.pool_nav?.median_cagr, 1)}</td>
+      <td class="muted-text mono" style="font-size:11px">最高次数：X ${sEx.xgb_F69?.best_count ?? 0} / R ${sEx.rf_F69?.best_count ?? 0} / L ${sEx.lstm_SF69?.best_count ?? 0}</td>
+    </tr>
+  `;
+
+  return `
+    <div class="ml-table-wrap">
+      <table class="ml-table">
+        <thead>
+          <tr>
+            <th>起步年</th>
+            <th>起步日 (持有年数)</th>
+            <th>XGBoost F69 年化 (期末 / 超额 / 回撤)</th>
+            <th>随机森林 F69 年化 (期末 / 超额 / 回撤)</th>
+            <th>LSTM S+F69 年化 (期末 / 超额 / 回撤)</th>
+            <th>准入池年化</th>
+            <th>年化最高</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml}
+          ${summaryRowsHtml}
+        </tbody>
+      </table>
+    </div>
+    <div class="muted-text" style="margin-top:6px;font-size:11.5px">${esc(startsSummary.note || "")}</div>
+  `;
+}
+
+function renderYearlyBreakdownTableHtml(navData) {
+  const rows = navData?.yearly_breakdown || [];
+  if (!rows.length) {
+    return `<div class="muted-text" style="padding:10px 0">暂无逐年明细数据</div>`;
+  }
+  const rowsHtml = rows
+    .map((r) => {
+      const cellFor = (mid) => {
+        const m = r.models?.[mid];
+        if (!m || m.return_pct === null || m.return_pct === undefined) return `<td class="mono muted-text">—</td>`;
+        const cls = m.return_pct >= 0 ? "val-up" : "val-down";
+        return `
+          <td class="mono">
+            <div><strong class="${cls}">${fmtPctSigned(m.return_pct, 1)}</strong> <span class="muted-text">(${fmtWan(m.end_capital)})</span></div>
+            <div class="muted-text" style="font-size:10.5px">年内回撤 ${fmtPctSigned(m.max_drawdown, 1)}</div>
+          </td>
+        `;
+      };
+      const b = r.benchmarks || {};
+      const bCell = (k) => {
+        const v = b[k];
+        if (v === null || v === undefined) return `<td class="mono muted-text">—</td>`;
+        return `<td class="mono ${v >= 0 ? "val-up" : "val-down"}">${fmtPctSigned(v, 1)}</td>`;
+      };
+      return `
+        <tr>
+          <td class="mono"><strong>${r.year}</strong>${r.is_partial ? `<span class="muted-text" style="font-size:10px"> (至今)</span>` : ""}</td>
+          <td class="mono muted-text">${esc(r.end_date)}</td>
+          ${cellFor("xgb_F69")}
+          ${cellFor("rf_F69")}
+          ${cellFor("lstm_SF69")}
+          ${bCell("pool_nav")}
+          ${bCell("hs300")}
+          ${bCell("zz500")}
+          ${bCell("zz1000")}
+        </tr>
+      `;
+    })
+    .join("");
+
+  return `
+    <div class="ml-table-wrap">
+      <table class="ml-table">
+        <thead>
+          <tr>
+            <th>年份</th>
+            <th>年末日期</th>
+            <th>XGBoost F69 (年收益 / 期末 / 回撤)</th>
+            <th>随机森林 F69 (年收益 / 期末 / 回撤)</th>
+            <th>LSTM S+F69 (年收益 / 期末 / 回撤)</th>
+            <th>准入池等权</th>
+            <th>沪深 300</th>
+            <th>中证 500</th>
+            <th>中证 1000</th>
+          </tr>
+        </thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+    </div>
+    <div class="muted-text" style="margin-top:6px;font-size:11.5px">
+      口径：起始本金 20 万元，年末资金为账户总值（已扣全部费用）；年收益率 = 本年末资金 ÷ 上年末资金 − 1，年内最大回撤按逐日净值计算。
+    </div>
+  `;
+}
+
+function renderModelsView() {
+  if (!state.meta?.ml_available) {
+    dom.modelsContent.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-title">未检测到三模型数据包（data/ml/api_export/）</div>
+        <p class="empty-desc">请将 api_export.zip 解压至 data/ml/，得到 data/ml/api_export/ 与 data/ml/deploy/ 后刷新页面。</p>
+      </div>
+    `;
+    return;
+  }
+
+  if (state.mlOverviewLoading && !state.mlOverview) {
+    dom.modelsContent.innerHTML = `<div class="empty-state"><div class="empty-title">正在加载三模型排行榜与净值数据…</div></div>`;
+    return;
+  }
+
+  const ov = state.mlOverview;
+  const lb = ov?.leaderboard || [];
+  const startsSummary = ov?.starts_summary || null;
+  const startYears = ov?.available_start_years || [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024];
+  const curStart = String(state.mlNavStart || "test");
+  const viewMode = state.mlNavViewMode || "nav";
+  const detailTab = state.mlNavDetailTab || "starts";
+  const navKey = `${state.mlNavRule}|${curStart}`;
+  const navEntry = state.mlNavCache[navKey];
+  const navData = navEntry?.ok ? navEntry.data : null;
+  const curStartLabel = curStart === "test" ? "正式测试段" : `${curStart}起`;
+
+  const disciplineHtml = (ov?.discipline_notes || [])
+    .map((n) => `<li>${esc(n)}</li>`)
+    .join("");
+
+  const lbRowsHtml = lb
+    .map((row) => {
+      const mid = row.model_id;
+      const isDef = mid === "xgb_F69";
+      const st = navData?.series?.[mid]?.stats;
+      return `
+        <tr class="${state.selectedModelSource === mid ? "ml-row-selected" : ""}">
+          <td>
+            <div class="ml-model-cell">
+              <span class="ml-color-dot" style="background:${(NAV_SERIES_STYLES[mid] || {}).color || "#2563eb"}"></span>
+              <strong>${esc(row["模型"] || mid)}</strong>
+              ${isDef ? `<span class="tag-pick" style="font-size:10px">默认</span>` : ""}
+            </div>
+            <div class="muted-text mono">${esc(mid)}</div>
+          </td>
+          <td class="mono"><strong>${fmtNum(row["测试 IC 全段"], 3)}</strong><div class="muted-text">${esc(row["测试 IC 全段 区间"] || "")}</div></td>
+          <td class="mono">${fmtNum(row["测试 IC T1"], 3)} / ${fmtNum(row["测试 IC T2"], 3)}</td>
+          <td class="mono">${fmtNum(row["测试 ICIR"], 2)} <span class="muted-text">(t=${fmtNum(row["测试 NW t"], 1)})</span></td>
+          <td class="mono">${fmtPctSigned((row["测试前30超额"] || 0) * 100, 2)}</td>
+          <td class="mono">${fmtPctSigned((row["测试多空"] || 0) * 100, 2)}</td>
+          <td class="mono">${fmtNum(row["测试 IC 2023"], 3)} / ${fmtNum(row["测试 IC 2024"], 3)} / ${fmtNum(row["测试 IC 2025"], 3)} / ${fmtNum(row["测试 IC 2026"], 3)}</td>
+          <td class="mono">
+            ${
+              st
+                ? `<span class="val-up">${fmtPctSigned(st.cagr, 1)}</span> / <span class="val-down">${fmtPctSigned(st.max_drawdown, 1)}</span>`
+                : "—"
+            }
+          </td>
+          <td>
+            <button class="role-prompt-btn" type="button" data-switch-model="${esc(mid)}">切换使用</button>
+          </td>
+        </tr>
+      `;
+    })
+    .join("");
+
+  // 起点切换条（固定主规则 DB-K30-b8）
+  const startBarHtml = `
+    <div class="ml-start-bar">
+      <button class="chip ${curStart === "test" ? "active" : ""}" type="button" data-nav-start="test" title="正式测试段（2023-01-10 ~ 2026-10-19，现行印花税）">
+        测试段 2023~2026
+      </button>
+      <span class="ml-start-sep" aria-hidden="true"></span>
+      <span class="muted-text" style="font-size:11.5px;white-space:nowrap">换起点(20万独立起步→至今)：</span>
+      <div class="filter-pills">
+        ${startYears
+          .map((yr) => {
+            const yrStr = String(yr);
+            const isOos = yr >= 2023;
+            return `<button class="chip ${curStart === yrStr ? "active" : ""} ${isOos ? "chip-oos" : ""}" type="button" data-nav-start="${yrStr}" title="${yr} 年首交易日拿 20 万现金起步至 2026-10-23${isOos ? "（样本外）" : "（含2023年前历史，仅供参考）"}">${yr}起</button>`;
+          })
+          .join("")}
+      </div>
+    </div>
+  `;
+
+  // 净值 / 动态年化 / 10起点年化对比主体
+  let navChartSectionHtml = `<div class="pending-placeholder">正在加载主规则 DB-K30-b8 曲线数据…</div>`;
+  if (viewMode === "starts_curve") {
+    if (!startsSummary?.available) {
+      navChartSectionHtml = `<div class="prompt-warn-banner">未检测到换起点汇总数据（ml/results/delivery/long_starts.csv）</div>`;
+    } else {
+      const sAll = startsSummary.summary?.all_10 || {};
+      const startsIds = [
+        { id: "xgb_F69", label: "XGBoost F69" },
+        { id: "rf_F69", label: "随机森林 F69" },
+        { id: "lstm_SF69", label: "LSTM S+F69" },
+        { id: "pool_nav", label: "准入池等权（基准）" },
+      ];
+      const legendHtml = startsIds
+        .map((it) => {
+          const hidden = Boolean(state.mlNavHiddenKeys[it.id]);
+          const col = (NAV_SERIES_STYLES[it.id] || {}).color || "#2563eb";
+          const med = sAll[it.id]?.median_cagr;
+          const wins = sAll[it.id]?.best_count;
+          const winTxt = wins !== undefined ? ` · 最高 ${wins}/10次` : "";
+          return `
+            <button class="nav-legend-chip ${hidden ? "is-hidden" : ""}" type="button" data-nav-toggle="${esc(it.id)}">
+              <span class="ml-color-dot" style="background:${col}"></span>
+              <span>${esc(it.label)}</span>
+              <span class="mono">中位年化 ${fmtPctSigned(med, 1)}</span>
+              <span class="muted-text mono">${esc(winTxt)}</span>
+            </button>
+          `;
+        })
+        .join("");
+      navChartSectionHtml = `
+        <div class="nav-legend-row">${legendHtml}</div>
+        <div class="nav-readout mono" id="nav-hover-readout">
+          主规则 DB-K30-b8 · 2015 ~ 2024 每年首交易日拿 20 万独立起步 → 至今（${esc(startsSummary.end_date)}）年化收益率 · 移动鼠标查看各年详情，点击任意年份切入逐日曲线
+        </div>
+        <div class="nav-chart-wrap" id="ml-nav-chart-container"></div>
+        <div class="muted-text" style="margin-top:6px;font-size:11.5px">${esc(startsSummary.note || "")}</div>
+      `;
+    }
+  } else if (navEntry && !navEntry.ok) {
+    navChartSectionHtml = `<div class="prompt-warn-banner">${esc(navEntry.error)}</div>`;
+  } else if (navData) {
+    const seriesEntries = Object.values(navData.series || {});
+    const legendHtml = seriesEntries
+      .map((s) => {
+        const hidden = Boolean(state.mlNavHiddenKeys[s.id]);
+        const col = (NAV_SERIES_STYLES[s.id] || {}).color || "#2563eb";
+        const cagrTxt = s.stats?.cagr !== null && s.stats?.cagr !== undefined ? `年化 ${fmtPctSigned(s.stats.cagr, 1)}` : "—";
+        const retTxt = s.stats?.total_return !== null && s.stats?.total_return !== undefined ? `累计 ${fmtPctSigned(s.stats.total_return, 1)}` : "";
+        const ddTxt = s.stats?.max_drawdown !== null && s.stats?.max_drawdown !== undefined ? `回撤 ${fmtPctSigned(s.stats.max_drawdown, 1)}` : "";
+        const isIdx = s.kind === "index";
+        return `
+          <button class="nav-legend-chip ${hidden ? "is-hidden" : ""}" type="button" data-nav-toggle="${esc(s.id)}" title="${isIdx ? "点击叠加或隐藏该市场指数基准" : "点击隐藏或显示该曲线"}">
+            <span class="ml-color-dot" style="background:${col}"></span>
+            <span>${esc(s.label)}</span>
+            <span class="mono"><strong>${esc(cagrTxt)}</strong></span>
+            ${!isIdx ? `<span class="muted-text mono">${esc(retTxt)} · ${esc(ddTxt)}</span>` : `<span class="muted-text mono">${esc(retTxt)}</span>`}
+          </button>
+        `;
+      })
+      .join("");
+    const modeHint =
+      viewMode === "cagr"
+        ? `截至当日年化收益率曲线（满 ${navData.cagr_min_days || 60} 交易日起按 242 日/年折算）`
+        : "逐日净值曲线（起点=1 · 对应 20 万本金）";
+    navChartSectionHtml = `
+      <div class="nav-legend-row">${legendHtml}</div>
+      <div class="nav-readout mono" id="nav-hover-readout">
+        区间：${esc(navData.date_start)} ~ ${esc(navData.date_end)}（${navData.trading_days ?? navData.count} 个交易日 / ${fmtNum(navData.hold_years, 1)} 年）· ${esc(modeHint)} · 移动鼠标查看逐日详情
+      </div>
+      <div class="nav-chart-wrap" id="ml-nav-chart-container"></div>
+      <div class="muted-text" style="margin-top:6px;font-size:11.5px">${esc(navData.note || "")}</div>
+    `;
+  }
+
+  // 下方明细表区（换起点年化表 / 当前起点逐年明细）
+  let navDetailBodyHtml = "";
+  if (detailTab === "starts") {
+    navDetailBodyHtml = renderStartsSummaryTableHtml(startsSummary);
+  } else if (detailTab === "yearly") {
+    navDetailBodyHtml = navData
+      ? renderYearlyBreakdownTableHtml(navData)
+      : `<div class="muted-text" style="padding:10px 0">正在加载当前起点逐年明细…</div>`;
+  }
+
+  const navDetailSectionHtml = `
+    <div class="ml-nav-detail-wrap">
+      <div class="ml-nav-detail-head">
+        <div class="filter-pills">
+          <button class="chip ${detailTab === "starts" ? "active" : ""}" type="button" data-nav-detail="starts">换起点年化对比表 (2015~2024)</button>
+          <button class="chip ${detailTab === "yearly" ? "active" : ""}" type="button" data-nav-detail="yearly">当前起点逐年收益与回撤 (${esc(curStartLabel)})</button>
+          <button class="chip ${detailTab === "none" ? "active" : ""}" type="button" data-nav-detail="none">收起明细表</button>
+        </div>
+        ${
+          detailTab === "starts"
+            ? `<span class="muted-text" style="font-size:11.5px">点击任意起步年行，即可把上方曲线切换至该年起步</span>`
+            : ""
+        }
+      </div>
+      ${navDetailBodyHtml}
+    </div>
+  `;
+
+  // 同日三模型选股共识区
+  const cons = state.mlConsensus;
+  let consensusBodyHtml = "";
+  if (state.mlConsensusLoading && !cons) {
+    consensusBodyHtml = `<div class="pending-placeholder">正在加载当日三模型选股共识…</div>`;
+  } else if (state.mlConsensusError) {
+    consensusBodyHtml = `<div class="prompt-warn-banner">${esc(state.mlConsensusError)}</div>`;
+  } else if (cons) {
+    const ovp = cons.pairwise_overlap || {};
+    const colsHtml = ML_MODEL_IDS.map((mid) => {
+      const mData = cons.models?.[mid];
+      const picks = mData?.picks || [];
+      return `
+        <div class="consensus-model-col">
+          <div class="consensus-col-head">
+            <div class="ml-model-cell">
+              <span class="ml-color-dot" style="background:${(NAV_SERIES_STYLES[mid] || {}).color}"></span>
+              <strong>${esc(ML_MODEL_LABELS[mid])}</strong>
+            </div>
+            <div style="display:flex;gap:5px">
+              <button class="role-prompt-btn" type="button" data-ml-dry-run="${esc(mid)}" title="使用该模型在 ${esc(cons.as_of)} 生成 69 特征 + 归因演练快照">演练</button>
+              <button class="role-ask-btn" type="button" data-ml-start-run="${esc(mid)}" title="使用该模型在 ${esc(cons.as_of)} 启动 7 角色 AI 辩论">辩论</button>
+            </div>
+          </div>
+          <div class="consensus-picks-list">
+            ${picks
+              .map((p) => {
+                const cBadge =
+                  p.consensus_count === 3
+                    ? `<span class="cons-badge cons-3">三模型共识</span>`
+                    : p.consensus_count === 2
+                      ? `<span class="cons-badge cons-2">双模型</span>`
+                      : `<span class="cons-badge cons-1">独选</span>`;
+                const outHtml =
+                  cons.with_outcome && p.ret_o1o5_pct !== null && p.ret_o1o5_pct !== undefined
+                    ? `<span class="mono ${p.ret_o1o5_pct >= 0 ? "val-up" : "val-down"}" title="事后 T+1→T+5 开盘收益（仅复盘）">${fmtPctSigned(p.ret_o1o5_pct, 1)}</span>`
+                    : "";
+                return `
+                  <div class="consensus-pick-item" data-ml-inspect-stock="${esc(p.ts_code)}" data-ml-inspect-model="${esc(mid)}">
+                    <div class="consensus-pick-top">
+                      <div>
+                        <span class="mono muted-text">#${p.rank}</span>
+                        <strong>${esc(p.name)}</strong>
+                        <span class="mono muted-text">${esc(p.ts_code)}</span>
+                      </div>
+                      ${cBadge}
+                    </div>
+                    <div class="consensus-pick-sub">
+                      <span>${esc(p.industry)}</span>
+                      <span class="mono">pct ${fmtNum(p.pct, 1)}% ${outHtml}</span>
+                    </div>
+                  </div>
+                `;
+              })
+              .join("")}
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    const tableRowsHtml = (cons.consensus_rows || [])
+      .map((r) => {
+        const cellFor = (mid) => {
+          const d = r.models?.[mid];
+          if (!d) return `<td class="mono muted-text">—</td>`;
+          return `<td class="mono ${d.in_picks ? "ml-cell-picked" : ""}">#${d.rank} (${fmtNum(d.pct, 1)}%)${d.in_picks ? " ★" : ""}</td>`;
+        };
+        const outCol = cons.with_outcome
+          ? `<td class="mono ${r.ret_o1o5_pct >= 0 ? "val-up" : "val-down"}">${fmtPctSigned(r.ret_o1o5_pct, 2)} <span class="muted-text">(超额 ${fmtPctSigned(r.excess_o1o5_pct, 2)})</span></td>`
+          : "";
+        return `
+          <tr class="ml-clickable-row" data-ml-inspect-stock="${esc(r.ts_code)}" data-ml-inspect-model="${esc(r.picked_by?.[0] || "xgb_F69")}">
+            <td><strong>${esc(r.name)}</strong> <span class="mono muted-text">${esc(r.ts_code)}</span></td>
+            <td>${esc(r.industry)}</td>
+            <td><span class="cons-badge cons-${r.consensus_count}">${r.consensus_count}/3 模型入选</span></td>
+            ${cellFor("xgb_F69")}
+            ${cellFor("rf_F69")}
+            ${cellFor("lstm_SF69")}
+            <td class="mono"><strong>${fmtNum(r.avg_pct, 1)}%</strong></td>
+            ${outCol}
+          </tr>
+        `;
+      })
+      .join("");
+
+    consensusBodyHtml = `
+      <div class="consensus-overlap-strip">
+        <span class="pill pill-soft mono">三模型全共识：${ovp.all_three ?? 0} 只</span>
+        <span class="pill pill-soft mono">XGB ∩ RF：${ovp.xgb_rf ?? 0}</span>
+        <span class="pill pill-soft mono">XGB ∩ LSTM：${ovp.xgb_lstm ?? 0}</span>
+        <span class="pill pill-soft mono">RF ∩ LSTM：${ovp.rf_lstm ?? 0}</span>
+        ${
+          cons.with_outcome
+            ? `<span class="tag-warn">⚠ 复盘模式已开启：右侧 T+1→T+5 收益为事后已知信息，切勿作为信号日预测依据</span>`
+            : `<span class="muted-text">点击任意股票可即时弹出三模型 Top-8 打分归因对比</span>`
+        }
+      </div>
+      <div class="consensus-cols-grid">${colsHtml}</div>
+      <div class="ml-table-wrap" style="margin-top:12px">
+        <table class="ml-table">
+          <thead>
+            <tr>
+              <th>股票</th>
+              <th>行业</th>
+              <th>共识度</th>
+              <th>XGBoost F69</th>
+              <th>随机森林 F69</th>
+              <th>LSTM S+F69</th>
+              <th>三模型均分位</th>
+              ${cons.with_outcome ? `<th>事后 T+1→T+5 收益（仅复盘）</th>` : ""}
+            </tr>
+          </thead>
+          <tbody>${tableRowsHtml}</tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  dom.modelsContent.innerHTML = `
+    <section class="card ml-discipline-banner">
+      <div class="ml-discipline-title">统计纪律与跨模型口径说明</div>
+      <ul class="prompt-rules-list">${disciplineHtml}</ul>
+    </section>
+
+    <section class="card ml-section-card">
+      <div class="card-head" style="padding:0 0 10px">
+        <div>
+          <h2 class="card-title">三模型正式测试段排行榜（2023-01 ~ 2026-10，每年初重训）</h2>
+          <p class="card-subtitle">同一套 F69 特征与准入池（LSTM 另含 60×11 日线序列）；三者差异统计上均不显著</p>
+        </div>
+      </div>
+      <div class="ml-table-wrap">
+        <table class="ml-table">
+          <thead>
+            <tr>
+              <th>模型</th>
+              <th>测试 IC [95% 区间]</th>
+              <th>T1 / T2 IC</th>
+              <th>ICIR (NW t)</th>
+              <th>前 30 超额</th>
+              <th>多空收益</th>
+              <th>逐年 IC (23/24/25/26)</th>
+              <th>主规则(${esc(curStartLabel)}) 年化 / 回撤</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>${lbRowsHtml}</tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card ml-section-card">
+      <div class="ml-nav-head">
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <h2 class="card-title">组合净值与换起点年化对比</h2>
+            <span class="pill pill-soft mono">主规则 DB-K30-b8 · 20万本金 · 最多30只</span>
+          </div>
+          <p class="card-subtitle">仓库真实费用与涨跌停模拟器回测 · 切换不同起步年查看至今曲线，点击图例可叠加沪深300等指数或隐藏任意曲线</p>
+        </div>
+        <div class="ml-nav-controls">
+          <div class="filter-pills">
+            <button class="chip ${viewMode === "nav" ? "active" : ""}" type="button" data-nav-mode="nav">净值曲线 (起点=1)</button>
+            <button class="chip ${viewMode === "cagr" ? "active" : ""}" type="button" data-nav-mode="cagr">动态年化曲线 (%)</button>
+            <button class="chip ${viewMode === "starts_curve" ? "active" : ""}" type="button" data-nav-mode="starts_curve">10起点年化对比</button>
+          </div>
+          ${
+            viewMode === "nav"
+              ? `<label class="follow-toggle" title="长期净值建议使用对数坐标以便观察回撤比例">
+                  <input type="checkbox" id="chk-nav-log" ${state.mlNavLog ? "checked" : ""} />
+                  <span>对数坐标</span>
+                </label>`
+              : ""
+          }
+        </div>
+      </div>
+      ${startBarHtml}
+      ${navChartSectionHtml}
+      ${navDetailSectionHtml}
+    </section>
+
+    <section class="card ml-section-card">
+      <div class="ml-nav-head">
+        <div>
+          <h2 class="card-title">同日三模型 Top 6 选股共识与分歧</h2>
+          <p class="card-subtitle">支持 2021-01-04 ~ 2026-10-16 任意有分数的交易日 · 可一键发起对应模型的 69 特征演练或 AI 辩论</p>
+        </div>
+        <div class="ml-nav-controls">
+          <label class="prompt-stock-picker">
+            <span class="muted-text">对比日期</span>
+            <input type="date" id="inp-consensus-date" class="ctrl-select ctrl-mini mono" value="${esc(state.mlConsensusDate || cons?.as_of || "")}" min="2021-01-04" max="2026-10-16" />
+          </label>
+          <button class="btn btn-secondary btn-sm" type="button" id="btn-consensus-go">加载</button>
+          <label class="follow-toggle" title="显示 T+1 开盘买、T+5 开盘卖的事后收益（仅限复盘）">
+            <input type="checkbox" id="chk-consensus-outcome" ${state.mlConsensusWithOutcome ? "checked" : ""} />
+            <span>复盘事后收益</span>
+          </label>
+        </div>
+      </div>
+      ${consensusBodyHtml}
+    </section>
+
+    ${renderFeatureCatalogSectionHtml(ov?.feature_catalog)}
+  `;
+
+  const chartEl = document.getElementById("ml-nav-chart-container");
+  const readoutEl = document.getElementById("nav-hover-readout");
+  if (chartEl) {
+    if (viewMode === "starts_curve" && startsSummary?.available) {
+      const visibleKeys = ["xgb_F69", "rf_F69", "lstm_SF69", "pool_nav"].filter((k) => !state.mlNavHiddenKeys[k]);
+      const activeYr = curStart === "test" ? null : Number(curStart);
+      renderStartsAnnualizedChart(chartEl, startsSummary, {
+        visibleKeys,
+        activeStartYear: activeYr,
+        onHover: (snap) => {
+          if (!readoutEl) return;
+          if (!snap) {
+            readoutEl.textContent = `主规则 DB-K30-b8 · 2015 ~ 2024 每年首交易日拿 20 万独立起步 → 至今（${startsSummary.end_date}）年化收益率 · 移动鼠标查看各年详情，点击任意年份切入逐日曲线`;
+            return;
+          }
+          const r = snap.row;
+          readoutEl.innerHTML =
+            `<strong>${r.start_year}年起步</strong>（${esc(r.start_date)} → ${esc(r.end_date)} · ${fmtNum(r.hold_years, 1)}年）· ` +
+            snap.items
+              .map(
+                (it) =>
+                  `<span style="color:${it.color};font-weight:600">${esc(it.label)} ${fmtPctSigned(it.cagr, 1)}</span>`,
+              )
+              .join(" · ") +
+            ` <span class="muted-text">（点击切入该年逐日曲线）</span>`;
+        },
+        onSelectYear: (yr) => {
+          state.mlNavStart = String(yr);
+          state.mlNavViewMode = "cagr";
+          ensureMlNav(state.mlNavStart);
+          renderModelsView();
+        },
+      });
+    } else if (navData) {
+      const visibleKeys = Object.keys(navData.series || {}).filter((k) => !state.mlNavHiddenKeys[k]);
+      const defaultReadout = `区间：${navData.date_start} ~ ${navData.date_end}（${navData.trading_days ?? navData.count} 个交易日 / ${fmtNum(navData.hold_years, 1)} 年）· ${viewMode === "cagr" ? `截至当日年化收益率曲线（满 ${navData.cagr_min_days || 60} 交易日起按 242 日/年折算）` : "逐日净值曲线（起点=1 · 对应 20 万本金）"} · 移动鼠标查看逐日详情`;
+      renderNavComparisonChart(chartEl, navData, {
+        visibleKeys,
+        mode: viewMode === "cagr" ? "cagr" : "nav",
+        logScale: state.mlNavLog,
+        onHover: (snap) => {
+          if (!readoutEl) return;
+          if (!snap) {
+            readoutEl.textContent = defaultReadout;
+            return;
+          }
+          readoutEl.innerHTML =
+            `<strong>${esc(snap.date)}</strong> · ` +
+            snap.items
+              .map((it) => {
+                const cagrPart = it.cagrPct !== null ? `年化 ${fmtPctSigned(it.cagrPct, 1)}` : `前${navData.cagr_min_days || 60}日观察期`;
+                const capPart = it.kind === "model" ? `${it.capitalWan.toFixed(1)}万 · ` : "";
+                if (viewMode === "cagr") {
+                  return `<span style="color:${it.color};font-weight:600">${esc(it.label)} ${cagrPart}</span> <span class="muted-text">(${capPart}${it.nav.toFixed(3)})</span>`;
+                }
+                return `<span style="color:${it.color};font-weight:600">${esc(it.label)} ${it.nav.toFixed(3)}</span> <span class="muted-text">(${capPart}${fmtPctSigned(it.retPct, 1)} · ${cagrPart})</span>`;
+              })
+              .join(" · ");
+        },
+      });
+    }
+  }
+}
+
+function catalogGroupDisplayLabel(group) {
+  if (group === "仓库原特征") return "基础量价";
+  if (group === "日线序列") return "LSTM 序列通道";
+  return group;
+}
+
+function getFilteredCatalogItems(catalog) {
+  const items = catalog?.items || [];
+  const grp = state.mlCatalogGroup || "f69";
+  const q = (state.mlCatalogQuery || "").trim().toLowerCase();
+
+  return items.filter((it) => {
+    if (grp === "f69" && it.group === "日线序列") return false;
+    if (grp === "extra41" && (it.group === "仓库原特征" || it.group === "日线序列")) return false;
+    if (grp !== "all" && grp !== "f69" && grp !== "extra41" && it.group !== grp) return false;
+    if (!q) return true;
+    const hay = `${it.name} ${it.cn_name} ${it.group} ${it.formula} ${it.reason}`.toLowerCase();
+    return hay.includes(q);
+  });
+}
+
+function renderCatalogRowsHtml(items) {
+  if (!items.length) {
+    return `<tr><td colspan="7" class="muted-text" style="text-align:center;padding:18px">没有匹配的特征项，请调整分组或关键词</td></tr>`;
+  }
+  return items
+    .map((it, idx) => {
+      const sign = it.expected_sign || "";
+      let signHtml = `<span class="muted-text">—</span>`;
+      if (sign === "+") signHtml = `<span class="feat-sign pos" title="预期值越大收益越高">+ 正向</span>`;
+      else if (sign === "-") signHtml = `<span class="feat-sign neg" title="预期值越小收益越高">− 负向</span>`;
+      else if (sign) signHtml = `<span class="feat-sign neutral">${esc(sign)}</span>`;
+      const isSeq = it.group === "日线序列";
+      const codeName = isSeq ? `seq_${it.name}` : it.name;
+      return `
+        <tr>
+          <td class="mono muted-text">${idx + 1}</td>
+          <td class="mono"><strong>${esc(codeName)}</strong></td>
+          <td><strong>${esc(it.cn_name)}</strong></td>
+          <td><span class="pill pill-soft">${esc(catalogGroupDisplayLabel(it.group))}</span></td>
+          <td class="ml-catalog-wrap-cell mono">${esc(it.formula || "—")}</td>
+          <td>${signHtml}</td>
+          <td class="ml-catalog-wrap-cell muted-text">${esc(it.reason || (it.group === "仓库原特征" ? "基础量价与均线/MACD 指标" : isSeq ? "LSTM 近 60 个交易日逐日序列输入通道" : "—"))}</td>
+        </tr>
+      `;
+    })
+    .join("");
+}
+
+function renderFeatureCatalogSectionHtml(catalog) {
+  if (!catalog?.available || !Array.isArray(catalog.items) || !catalog.items.length) {
+    return "";
+  }
+  const allItems = catalog.items;
+  const f69Count = allItems.filter((it) => it.group !== "日线序列").length;
+  const extra41Count = allItems.filter((it) => it.group !== "仓库原特征" && it.group !== "日线序列").length;
+  const seqCount = allItems.filter((it) => it.group === "日线序列").length;
+  const curGrp = state.mlCatalogGroup || "f69";
+  const filtered = getFilteredCatalogItems(catalog);
+
+  const pills = [
+    { key: "f69", label: `F69 全部特征 (${f69Count})` },
+    { key: "extra41", label: `A~H 新增 (${extra41Count})` },
+    ...(catalog.groups || []).map((g) => ({
+      key: g,
+      label: `${catalogGroupDisplayLabel(g)} (${allItems.filter((it) => it.group === g).length})`,
+    })),
+    { key: "all", label: `含序列全部 (${allItems.length})` },
+  ];
+
+  const pillsHtml = pills
+    .map(
+      (p) =>
+        `<button class="chip ${curGrp === p.key ? "active" : ""}" type="button" data-catalog-group="${esc(p.key)}">${esc(p.label)}</button>`,
+    )
+    .join("");
+
+  return `
+    <section class="card ml-section-card" id="ml-feature-catalog-card">
+      <div class="ml-nav-head">
+        <div>
+          <h2 class="card-title">F69 特征与 LSTM 序列通道字典</h2>
+          <p class="card-subtitle">三套模型共用 ${f69Count} 项特征（28 基础量价 + ${extra41Count} 项 A~H 扩展特征），LSTM 另加近 60 日 × ${seqCount} 个日线序列通道</p>
+        </div>
+        <div class="ml-nav-controls">
+          <input
+            type="search"
+            id="inp-feat-catalog-search"
+            class="ctrl-select ctrl-mini ml-catalog-search"
+            placeholder="搜索特征名 / 中文名 / 公式…"
+            value="${esc(state.mlCatalogQuery || "")}"
+          />
+          <span class="pill pill-soft mono" id="ml-catalog-count">显示 ${filtered.length} / ${allItems.length}</span>
+        </div>
+      </div>
+
+      <div class="feat-group-bar" id="ml-catalog-group-bar">${pillsHtml}</div>
+
+      <div class="ml-table-wrap ml-catalog-scroll">
+        <table class="ml-table ml-catalog-table">
+          <thead>
+            <tr>
+              <th style="width:42px">#</th>
+              <th style="width:140px">特征名</th>
+              <th style="width:160px">中文名</th>
+              <th style="width:145px">分组</th>
+              <th>计算口径</th>
+              <th style="width:82px">预期方向</th>
+              <th>构造理由 / 经济含义</th>
+            </tr>
+          </thead>
+          <tbody id="ml-feat-catalog-tbody">${renderCatalogRowsHtml(filtered)}</tbody>
+        </table>
+      </div>
+    </section>
+  `;
+}
+
+function patchFeatureCatalogTable() {
+  const catalog = state.mlOverview?.feature_catalog;
+  if (!catalog?.available) return;
+  const tbody = document.getElementById("ml-feat-catalog-tbody");
+  const countEl = document.getElementById("ml-catalog-count");
+  const barEl = document.getElementById("ml-catalog-group-bar");
+  const filtered = getFilteredCatalogItems(catalog);
+  if (tbody) tbody.innerHTML = renderCatalogRowsHtml(filtered);
+  if (countEl) countEl.textContent = `显示 ${filtered.length} / ${catalog.items.length}`;
+  if (barEl) {
+    barEl.querySelectorAll("[data-catalog-group]").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.catalogGroup === (state.mlCatalogGroup || "f69"));
+    });
+  }
+}
+
+async function openMlStockExplainModal(asOf, tsCode, initialModel = "xgb_F69") {
+  // 复用快捷弹窗展示三模型归因对照（简洁清晰，不额外堆叠弹窗）
+  state.promptModal = {
+    open: true,
+    roleKey: "__ml_explain__",
+    tsCode,
+    pane: initialModel,
+    asOf,
+  };
+  dom.promptModal.hidden = false;
+  dom.promptModalTitle.textContent = `${tsCode} · 三模型打分归因与百分位对照 (${asOf})`;
+  dom.promptModalSubtitle.textContent = "TreeSHAP（XGBoost）· 路径分解 Saabas（随机森林）· 积分梯度（LSTM 含 60×11 序列通道）";
+  dom.btnModalOpenTab.hidden = true;
+  dom.promptModalTabs.innerHTML = ML_MODEL_IDS.map(
+    (mid) => `<button class="chip ${mid === initialModel ? "active" : ""}" data-ml-modal-model="${esc(mid)}" type="button">${esc(ML_MODEL_LABELS[mid])}</button>`,
+  ).join("");
+  dom.promptModalBody.innerHTML = `<div class="pending-placeholder">正在读取三模型归因…</div>`;
+
+  await ensureStockExplain(asOf, tsCode);
+  renderMlExplainModalBody();
+}
+
+function renderMlExplainModalBody() {
+  if (!state.promptModal.open || state.promptModal.roleKey !== "__ml_explain__") return;
+  const { asOf, tsCode, pane } = state.promptModal;
+  const entry = state.mlExplainCache[`${asOf}|${tsCode}`];
+  dom.promptModalTabs.querySelectorAll("[data-ml-modal-model]").forEach((b) => {
+    b.classList.toggle("active", b.dataset.mlModalModel === pane);
+  });
+  if (!entry) {
+    dom.promptModalBody.innerHTML = `<div class="pending-placeholder">加载中…</div>`;
+    return;
+  }
+  if (!entry.ok) {
+    dom.promptModalBody.innerHTML = `<div class="prompt-warn-banner">${esc(entry.error)}</div>`;
+    return;
+  }
+  const d = entry.data;
+  dom.promptModalTitle.textContent = `${d.name || tsCode} (${tsCode}) · 三模型打分归因 (${asOf})`;
+  const models = d.models || {};
+  const cur = models[pane] || models.xgb_F69;
+  const summaryRow = ML_MODEL_IDS.map((mid) => {
+    const m = models[mid];
+    if (!m || !m.score_available) return `<span class="tag-neutral">${esc(ML_MODEL_LABELS[mid])}：无当日分</span>`;
+    return `<span class="tag-neutral mono">${esc(ML_MODEL_LABELS[mid])}：第 ${m.rank} 名 · ${fmtNum(m.pct, 1)}%${m.in_model_picks ? " ★前6" : ""}</span>`;
+  }).join("");
+  dom.promptModalBody.innerHTML = `
+    <div class="hero-tags" style="margin-bottom:12px">${summaryRow}</div>
+    ${renderExplainBarsHtml(cur)}
+  `;
+}
+
+function restorePromptModalChrome() {
+  dom.btnModalOpenTab.hidden = false;
+  dom.promptModalTabs.innerHTML = `
+    <button class="chip active" data-modal-pane="preset" type="button">预置提示词（分块）</button>
+    <button class="chip" data-modal-pane="system" type="button">完整 System Prompt</button>
+    <button class="chip" data-modal-pane="payload" type="button">实际 User JSON</button>
+  `;
+}
+
+function bindMlEvents() {
+  // 单股详情页内：切换归因模型 Tab、切换 69 特征分组
+  dom.stockContent.addEventListener("click", (ev) => {
+    const expBtn = ev.target.closest?.("[data-explain-model]");
+    if (expBtn) {
+      state.mlExplainModelTab = expBtn.dataset.explainModel;
+      renderStockDetail();
+      return;
+    }
+    const grpBtn = ev.target.closest?.("[data-feat-group]");
+    if (grpBtn) {
+      state.featureGroupFilter = grpBtn.dataset.featGroup;
+      renderStockDetail();
+    }
+  });
+
+  // 「模型对比与净值」Tab 内交互委托
+  dom.modelsContent.addEventListener("click", async (ev) => {
+    const swBtn = ev.target.closest?.("[data-switch-model]");
+    if (swBtn) {
+      const mid = swBtn.dataset.switchModel;
+      if (dom.selModelSource) {
+        dom.selModelSource.value = mid;
+        dom.selModelSource.dispatchEvent(new Event("change"));
+      }
+      return;
+    }
+    const modeBtn = ev.target.closest?.("[data-nav-mode]");
+    if (modeBtn) {
+      state.mlNavViewMode = modeBtn.dataset.navMode || "nav";
+      if (state.mlNavViewMode !== "starts_curve") {
+        ensureMlNav(state.mlNavStart);
+      }
+      renderModelsView();
+      return;
+    }
+    const startBtn = ev.target.closest?.("[data-nav-start]");
+    if (startBtn) {
+      state.mlNavStart = startBtn.dataset.navStart || "test";
+      if (state.mlNavViewMode === "starts_curve") {
+        state.mlNavViewMode = "cagr";
+      }
+      ensureMlNav(state.mlNavStart);
+      renderModelsView();
+      return;
+    }
+    const detailBtn = ev.target.closest?.("[data-nav-detail]");
+    if (detailBtn) {
+      state.mlNavDetailTab = detailBtn.dataset.navDetail || "starts";
+      if (state.mlNavDetailTab === "yearly") {
+        ensureMlNav(state.mlNavStart);
+      }
+      renderModelsView();
+      return;
+    }
+    const startRow = ev.target.closest?.("[data-select-start-year]");
+    if (startRow) {
+      const yr = startRow.dataset.selectStartYear;
+      if (yr) {
+        state.mlNavStart = String(yr);
+        if (state.mlNavViewMode === "starts_curve") {
+          state.mlNavViewMode = "cagr";
+        }
+        ensureMlNav(state.mlNavStart);
+        renderModelsView();
+      }
+      return;
+    }
+    const legBtn = ev.target.closest?.("[data-nav-toggle]");
+    if (legBtn) {
+      const k = legBtn.dataset.navToggle;
+      state.mlNavHiddenKeys[k] = !state.mlNavHiddenKeys[k];
+      renderModelsView();
+      return;
+    }
+    const catGrpBtn = ev.target.closest?.("[data-catalog-group]");
+    if (catGrpBtn) {
+      state.mlCatalogGroup = catGrpBtn.dataset.catalogGroup;
+      patchFeatureCatalogTable();
+      return;
+    }
+    const goBtn = ev.target.closest?.("#btn-consensus-go");
+    if (goBtn) {
+      const inp = document.getElementById("inp-consensus-date");
+      if (inp?.value) {
+        loadMlConsensus({ asOf: inp.value, withOutcome: state.mlConsensusWithOutcome });
+      }
+      return;
+    }
+    const dryBtn = ev.target.closest?.("[data-ml-dry-run]");
+    if (dryBtn) {
+      ev.stopPropagation();
+      const mid = dryBtn.dataset.mlDryRun;
+      const day = state.mlConsensus?.as_of || state.mlConsensusDate || state.selectedDate;
+      state.selectedModelSource = mid;
+      await refreshMeta({ keepSelection: true });
+      await handleDryRun({ modelSource: mid, asOfOverride: day });
+      return;
+    }
+    const startBtn = ev.target.closest?.("[data-ml-start-run]");
+    if (startBtn) {
+      ev.stopPropagation();
+      const mid = startBtn.dataset.mlStartRun;
+      const day = state.mlConsensus?.as_of || state.mlConsensusDate || state.selectedDate;
+      state.selectedModelSource = mid;
+      await refreshMeta({ keepSelection: true });
+      await handleStartRun({ modelSource: mid, asOfOverride: day });
+      return;
+    }
+    const stockEl = ev.target.closest?.("[data-ml-inspect-stock]");
+    if (stockEl) {
+      const code = stockEl.dataset.mlInspectStock;
+      const mid = stockEl.dataset.mlInspectModel || "xgb_F69";
+      const day = state.mlConsensus?.as_of || state.mlConsensusDate || state.selectedDate;
+      openMlStockExplainModal(day, code, mid);
+    }
+  });
+
+  dom.modelsContent.addEventListener("change", (ev) => {
+    if (ev.target?.id === "chk-nav-log") {
+      state.mlNavLog = Boolean(ev.target.checked);
+      renderModelsView();
+    } else if (ev.target?.id === "chk-consensus-outcome") {
+      loadMlConsensus({
+        asOf: state.mlConsensusDate || state.mlConsensus?.as_of,
+        withOutcome: Boolean(ev.target.checked),
+      });
+    } else if (ev.target?.id === "inp-consensus-date" && ev.target.value) {
+      loadMlConsensus({ asOf: ev.target.value, withOutcome: state.mlConsensusWithOutcome });
+    }
+  });
+
+  dom.modelsContent.addEventListener("input", (ev) => {
+    if (ev.target?.id === "inp-feat-catalog-search") {
+      state.mlCatalogQuery = ev.target.value || "";
+      patchFeatureCatalogTable();
+    }
+  });
+
+  // 弹窗中三模型归因 Tab 切换
+  dom.promptModalTabs.addEventListener("click", (ev) => {
+    const mlBtn = ev.target.closest?.("[data-ml-modal-model]");
+    if (!mlBtn) return;
+    state.promptModal.pane = mlBtn.dataset.mlModalModel;
+    renderMlExplainModalBody();
+  });
+}
+
 function toggleDemoFlow() {
   if (state.demoFlowTimer !== null) {
     clearInterval(state.demoFlowTimer);
@@ -2824,16 +5283,32 @@ async function boot() {
 
   try {
     await refreshMeta({ keepSelection: false });
-    // 若有正在运行的任务，优先定位到它；否则自动打开最新一次历史辩论回放
     const active = state.meta?.active;
-    if (active?.running && active.as_of && active.hash_prefix) {
-      await loadRunDetail(active.as_of, active.hash_prefix);
+    if (active?.running && active.model_source && active.model_source !== state.selectedModelSource) {
+      state.selectedModelSource = active.model_source;
+      await refreshMeta({ keepSelection: false });
+    }
+
+    if (state.meta?.ml_available) {
+      ensureMlOverview();
+    }
+
+    const curActive = state.meta?.active;
+    if (curActive?.running && curActive.as_of && curActive.hash_prefix) {
+      await loadRunDetail(curActive.as_of, curActive.hash_prefix, { modelSource: curActive.model_source });
     } else if (state.meta?.runs?.length > 0) {
       const latest = state.meta.runs[0];
       await loadRunDetail(latest.as_of, latest.hash_prefix);
     } else {
+      if (state.meta?.ml_available) {
+        state.activeTab = "models";
+        ensureMlViewLoaded();
+      }
       renderAll();
-      await refreshChatSessions({ preserveActive: false });
+      await Promise.all([
+        refreshChatSessions({ preserveActive: false }),
+        refreshPromptsData(),
+      ]);
     }
   } catch (err) {
     showToast(`初始化加载失败：${err.message}`, "error", 0);

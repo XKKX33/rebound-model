@@ -25,6 +25,10 @@
               <select id="sel-db" class="ctrl-select"></select>
             </label>
             <label class="ctrl-field">
+              <span class="ctrl-label">选股模型</span>
+              <select id="sel-model-source" class="ctrl-select"></select>
+            </label>
+            <label class="ctrl-field">
               <span class="ctrl-label">信号日</span>
               <select id="sel-date" class="ctrl-select mono"></select>
             </label>
@@ -173,6 +177,14 @@
                 <span>终选辩论结果</span>
                 <span class="tab-tag" id="tab-final-tag">待定稿</span>
               </button>
+              <button class="tab-btn" id="tab-models" data-tab="models" type="button">
+                <span>模型对比与净值</span>
+                <span class="tab-tag" id="tab-models-tag">3 模型</span>
+              </button>
+              <button class="tab-btn" id="tab-prompts" data-tab="prompts" type="button">
+                <span>提示词与角色</span>
+                <span class="tab-tag" id="tab-prompts-tag">7+1</span>
+              </button>
             </div>
             <div class="tabs-right">
               <button id="btn-copy-md" class="btn btn-ghost btn-sm" type="button">复制 Markdown</button>
@@ -193,6 +205,16 @@
           <div id="view-final" class="view-container" hidden>
             <div id="final-content"></div>
           </div>
+
+          <!-- 视图 D：多模型排行榜、交互净值曲线与同日三模型共识 -->
+          <div id="view-models" class="view-container" hidden>
+            <div id="models-content"></div>
+          </div>
+
+          <!-- 视图 C：提示词与角色设定（预置提示词 / 完整 System Prompt / 单股实际 User JSON） -->
+          <div id="view-prompts" class="view-container" hidden>
+            <div id="prompts-content"></div>
+          </div>
         </section>
 
         <!-- 右侧可折叠滑出栏：AI 投研复盘对话（档位 B · 工具调用 Agent） -->
@@ -203,7 +225,7 @@
                 <span class="chat-avatar-badge" aria-hidden="true">✦</span>
                 <div>
                   <h2 class="card-title">AI 投研对话</h2>
-                  <p class="card-subtitle" id="chat-subtitle">预置方法论 · 6 只读工具按需查全池</p>
+                  <p class="card-subtitle" id="chat-subtitle">预置方法论 · 9 只读工具查全池与三模型</p>
                 </div>
               </div>
               <div class="chat-head-actions">
@@ -237,6 +259,7 @@
 
             <div class="chat-controls-row">
               <select id="sel-chat-role" class="ctrl-select ctrl-mini chat-role-select" title="切换对话角色视角"></select>
+              <button id="btn-chat-prompt-info" class="chat-icon-btn" type="button" title="查看当前对话角色的系统提示词、预置身份与工具清单">提示词</button>
               <select id="sel-chat-session" class="ctrl-select ctrl-mini chat-session-select" title="切换历史持久化会话"></select>
               <button id="btn-chat-new" class="chat-icon-btn" type="button" title="开启新对话">+ 新对话</button>
               <button id="btn-chat-delete" class="chat-icon-btn chat-icon-danger" type="button" title="删除当前会话">删</button>
@@ -253,9 +276,9 @@
               <span
                 class="chat-tools-badge"
                 id="chat-tools-badge"
-                title="只读工具：单股完整辩论 / 跨股对比 / 20股筛选排序 / DuckDB日线 / 事后收益核验 / 历史运行列表"
+                title="只读工具：单股完整辩论 / 跨股对比 / 20股筛选排序 / DuckDB日线 / 事后收益核验 / 历史运行列表 / 三模型单股归因 / 同日三模型共识 / 排行榜与净值"
               >
-                ⚙ 6 工具
+                ⚙ 9 工具
               </span>
             </div>
           </div>
@@ -285,6 +308,35 @@
 
     <!-- 证据悬停气泡 -->
     <div id="citation-tooltip" class="citation-tooltip" hidden></div>
+
+    <!-- 快捷提示词与单股实际 User JSON 查看弹窗 -->
+    <div
+      id="prompt-modal"
+      class="prompt-modal-backdrop"
+      hidden
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="prompt-modal-title"
+    >
+      <div class="prompt-modal card">
+        <div class="prompt-modal-head">
+          <div class="prompt-modal-title-group">
+            <h2 class="card-title" id="prompt-modal-title">角色提示词与入参</h2>
+            <p class="card-subtitle" id="prompt-modal-subtitle"></p>
+          </div>
+          <div class="prompt-modal-actions">
+            <button id="btn-modal-open-tab" class="btn btn-ghost btn-sm" type="button">在「提示词与角色」页打开 →</button>
+            <button id="btn-modal-close" class="chat-icon-btn chat-close-btn" type="button" aria-label="关闭弹窗">×</button>
+          </div>
+        </div>
+        <div class="prompt-modal-tabs" id="prompt-modal-tabs">
+          <button class="chip active" data-modal-pane="preset" type="button">预置提示词（分块）</button>
+          <button class="chip" data-modal-pane="system" type="button">完整 System Prompt</button>
+          <button class="chip" data-modal-pane="payload" type="button">实际 User JSON</button>
+        </div>
+        <div class="prompt-modal-body" id="prompt-modal-body"></div>
+      </div>
+    </div>
 
     <script type="module" src="/static/app.js"></script>
   </body>

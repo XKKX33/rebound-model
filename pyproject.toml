@@ -30,7 +30,7 @@ build-backend = "setuptools.build_meta"
 packages = ["rebound", "rebound.data", "rebound.model", "rebound.backtest", "rebound.debate"]
 
 [tool.setuptools.package-data]
-"rebound.debate" = ["web_ui/*"]
+"rebound.debate" = ["web_ui/*", "prompt_rules.json"]
 
 [tool.pytest.ini_options]
 # 仓库根直接进 sys.path：不安装也能 `python -m rebound ...`、`pytest`。

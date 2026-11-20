@@ -1,0 +1,99 @@
+{
+  "output_schema": {
+    "model_analyst": "{\"stance\":\"bull、bear、neutral 三选一（只填一个词）\",\"conclusion\":\"一句话结论\",\"risks\":[\"风险1\",\"风险2\"],\"citations\":[\"引用的字段路径\"]}",
+    "chart_analyst": "{\"stance\":\"bull、bear、neutral 三选一（只填一个词）\",\"conclusion\":\"一句话结论\",\"risks\":[\"风险1\",\"风险2\"],\"citations\":[\"引用的字段路径\"]}",
+    "bull": "{\"argument\":\"看多理由\",\"citations\":[\"引用的字段路径\"]}",
+    "bear": "{\"argument\":\"先逐条回应多方，再给回避理由\",\"citations\":[\"引用的字段路径\"]}",
+    "bull_counter": "{\"argument\":\"对空方论点的逐条回应\",\"citations\":[\"引用的字段路径\"]}",
+    "risk_chair": "{\"verdict\":\"看多 或 看空（只填这两个词之一，不要带引号、不要写竖线）\",\"score\":0到100的整数,\"thesis\":\"不超过80字的核心判断\",\"risks\":[\"风险1\",\"风险2\"],\"action\":\"不超过40字的开盘前操作提示\",\"citations\":[\"引用的字段路径\"]}",
+    "final_pick": "{\"picks\":[{\"ts_code\":\"代码\",\"rank\":1,\"reason\":\"为什么选它\"}],\"reason\":\"整体取舍理由\"}"
+  },
+  "length_rules": {
+    "model_analyst": "conclusion 不超过 120 字，risks 最多 3 条、每条不超过 40 字，citations 最多 6 条。不要复述数据。",
+    "chart_analyst": "conclusion 不超过 120 字，risks 最多 3 条、每条不超过 40 字，citations 最多 6 条。只讲走势、量价和 MACD。",
+    "bull": "argument 必须少于 300 字。直接给理由，不要复述数据，不要写开场白。",
+    "bear": "argument 必须少于 350 字。先逐条回应多方，再补充理由，不要写开场白。",
+    "bull_counter": "argument 必须少于 300 字。只回应空方的具体论点，不要另起炉灶。",
+    "risk_chair": "thesis 不超过 80 字，action 不超过 40 字，risks 最多 3 条。",
+    "final_pick": "每只票的 reason 不超过 60 字，整体 reason 不超过 200 字。"
+  },
+  "role_constraints": {
+    "analyst": {
+      "title": "立场",
+      "body": "stance 只能填 bull、bear、neutral 三个词之一。选 neutral 时，conclusion 必须写清缺的是什么。"
+    },
+    "risk_chair": {
+      "title": "立场与打分",
+      "body": "verdict 只能填 看多 或 看空，不允许中性，不允许弃权。score 必须是 0 到 100 的整数。"
+    },
+    "final_pick": {
+      "title": "名额",
+      "body": "picks 的条数必须恰好等于 final_count；rank 从 1 开始连续编号；ts_code 必须来自 candidates，不许自创、不许重复；同一个 industry 的票不超过 max_per_industry 只。"
+    }
+  },
+  "common_rules": [
+    "你只能使用用户消息里给出的数字和事实。",
+    "绝对不要编造新闻、公告、业绩、盘口、研报或任何输入里没有的信息；输入里没有的不要提，需要说明「无法判断」时，直接写缺什么。",
+    "数值的单位和口径以方法论里的「字段说明」为准，不要自己推算新指标再当成事实；跨模型比较一律只看百分位 pct，不直接比较不同模型的原始 score，也不要宣称某个模型统计上显著更优。",
+    "引用证据时写字段路径，例如 features.r20、extra_features.turn_f、explain.top_factors[0]、peer_models.rf_F69.pct、bars[-1].close。",
+    "只输出一个 JSON 对象，不要输出 JSON 以外的任何文字，不要用 markdown 代码块包裹。"
+  ],
+  "role_meta": {
+    "model_analyst": {
+      "name": "模型解读员",
+      "phase": "analyst",
+      "phase_label": "独立分析（第 1 步）",
+      "input_summary": "单只候选完整档案（context + candidate，含 69 特征、Top-8 打分归因 explain 与三模型百分位 peer_models），与走势分析员互相不可见。",
+      "visible_fields": ["context", "candidate", "extra_features(41)", "explain(Top8)", "peer_models"],
+      "hidden_note": "看不到 chart_analyst、多空辩论及全批 roster。"
+    },
+    "chart_analyst": {
+      "name": "走势分析员",
+      "phase": "analyst",
+      "phase_label": "独立分析（第 1 步）",
+      "input_summary": "单只候选 20 日前复权 K 线、量价与 K 线微结构特征（屏蔽模型分数与名次），与模型解读员互相不可见。",
+      "visible_fields": ["context", "candidate.bars", "features", "extra_features(量价/K线微结构)"],
+      "hidden_note": "职责屏蔽模型分数/名次/归因，看不到 model_analyst、多空辩论及全批 roster。"
+    },
+    "bull": {
+      "name": "多方辩手",
+      "phase": "debate",
+      "phase_label": "三轮攻防（第 2 步）",
+      "input_summary": "单股完整档案 + 两位独立分析师结论（analyst_views）。",
+      "visible_fields": ["context", "candidate", "analyst_views"],
+      "hidden_note": "看不到全批 roster 及其他候选股。"
+    },
+    "bear": {
+      "name": "空方辩手",
+      "phase": "debate",
+      "phase_label": "三轮攻防（第 3 步）",
+      "input_summary": "单股完整档案 + 两位分析师结论 + 多方首轮发言（debate[0]）。",
+      "visible_fields": ["context", "candidate", "analyst_views", "debate[bull]"],
+      "hidden_note": "看不到全批 roster 及其他候选股。"
+    },
+    "bull_counter": {
+      "name": "多方反驳手",
+      "phase": "debate",
+      "phase_label": "三轮攻防（第 4 步）",
+      "input_summary": "单股完整档案 + 两位分析师结论 + 多方/空方前两轮发言（debate[0..1]）。",
+      "visible_fields": ["context", "candidate", "analyst_views", "debate[bull, bear]"],
+      "hidden_note": "看不到全批 roster 及其他候选股。"
+    },
+    "risk_chair": {
+      "name": "风控主席",
+      "phase": "verdict",
+      "phase_label": "个股拍板（第 5 步）",
+      "input_summary": "单股完整档案 + 全部两位分析师与三轮辩论 + 全部送辩候选简表（roster）。",
+      "visible_fields": ["context", "candidate", "analyst_views", "debate[3 轮]", "roster"],
+      "hidden_note": "唯一在个股阶段拥有全批横向参照（roster）的角色。"
+    },
+    "final_pick": {
+      "name": "终选人",
+      "phase": "final",
+      "phase_label": "全批终选（第 6 步）",
+      "input_summary": "全部辩完候选的风控裁决汇总（按 score 降序）+ 模型原名单（model_picks）+ 名额与行业上限。",
+      "visible_fields": ["context", "final_count", "max_per_industry", "model_picks", "candidates(verdicts)"],
+      "hidden_note": "不直接读逐日 K 线和辩论原文，只基于风控裁决与模型原名单做全局重排。"
+    }
+  }
+}

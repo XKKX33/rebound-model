@@ -29,7 +29,7 @@ from rebound import clock
 from rebound import config as app_config
 from rebound import params as model_params
 from rebound.data.errors import DataError
-from rebound.debate import chat, runs, service, snapshot
+from rebound.debate import chat, ml_bridge, prompts, runs, service, snapshot
 from rebound.debate.contracts import ContractError, Event
 from rebound.debate.sidecar import SidecarError, SidecarStopped, resolve_api_key
 
@@ -131,7 +131,7 @@ class DebateHub:
         self._live_streams: dict[str, dict[str, Any]] = {}
         self._active_roles: dict[str, dict[str, Any]] = {}
         self._chat_stores: dict[Path, chat.ChatStore] = {}
-        self._dry_run_cache: dict[tuple[str, str, str, str], dict[str, Any]] = {}
+        self._dry_run_cache: dict[tuple[str, str, str, str, str], dict[str, Any]] = {}
 
     def _pick_default_db(self, explicit: Path | None) -> Path:
         if explicit is not None:
@@ -190,11 +190,31 @@ class DebateHub:
             raise ValueError(f"不支持的重训频率：{c}")
         return v, c
 
-    def _run_key(self, db_path: Path, variant: str, cadence: str, as_of: str, hash_prefix: str) -> str:
-        return f"{str(db_path).lower()}|{variant}|{cadence}|{as_of}|{hash_prefix}"
+    def _resolve_model_source(self, raw: str | None) -> str:
+        return ml_bridge.validate_model_source(raw)
 
-    def list_all_runs(self, db_path: Path, *, variant: str, cadence: str) -> list[dict[str, Any]]:
-        series_dir = runs.debate_root(db_path) / f"{variant}-{cadence}"
+    def _run_key(
+        self,
+        db_path: Path,
+        variant: str,
+        cadence: str,
+        as_of: str,
+        hash_prefix: str,
+        model_source: str | None = None,
+    ) -> str:
+        series = runs.series_name(variant, cadence, model_source)
+        return f"{str(db_path).lower()}|{series}|{as_of}|{hash_prefix}"
+
+    def list_all_runs(
+        self,
+        db_path: Path,
+        *,
+        variant: str,
+        cadence: str,
+        model_source: str | None = None,
+    ) -> list[dict[str, Any]]:
+        ms = self._resolve_model_source(model_source)
+        series_dir = runs.debate_root(db_path) / runs.series_name(variant, cadence, ms)
         if not series_dir.is_dir():
             return []
         dates = sorted(
@@ -203,19 +223,25 @@ class DebateHub:
         )
         summaries: list[dict[str, Any]] = []
         for day_str in dates:
-            _, entries = runs.list_runs(db_path, variant=variant, cadence=cadence, as_of=date.fromisoformat(day_str))
+            _, entries = runs.list_runs(
+                db_path, variant=variant, cadence=cadence, as_of=date.fromisoformat(day_str), model_source=ms
+            )
             for entry in entries:
                 folder = Path(entry["run_dir"])
                 req = _read_json_file(folder / "request.json") or {}
                 usage = _read_json_file(folder / "usage.json") or {}
                 llm = req.get("llm") if isinstance(req.get("llm"), dict) else {}
                 limits = req.get("limits") if isinstance(req.get("limits"), dict) else {}
+                ctx = req.get("context") if isinstance(req.get("context"), dict) else {}
                 final = entry.get("final") if entry.get("completed") else None
                 summaries.append(
                     {
                         "as_of": day_str,
                         "variant": variant,
                         "cadence": cadence,
+                        "model_source": ms,
+                        "model_label": ctx.get("model_label") or ml_bridge.ML_MODEL_META.get(ms, {}).get("name", ""),
+                        "feature_set": ctx.get("feature_set") or ("F28" if ms == runs.LEGACY_MODEL_SOURCE else "F69"),
                         "hash_prefix": entry["hash_prefix"],
                         "run_id": (final or req).get("run_id", ""),
                         "completed": bool(entry["completed"]),
@@ -253,21 +279,35 @@ class DebateHub:
         db: str | None = None,
         variant: str | None = None,
         cadence: str | None = None,
+        model_source: str | None = None,
     ) -> dict[str, Any]:
         db_path = self.resolve_db(db)
         v, c = self._resolve_vc(variant, cadence)
+        ms = self._resolve_model_source(model_source)
         dbs = self.list_dbs()
-        run_list = self.list_all_runs(db_path, variant=v, cadence=c)
-        days = _list_trading_days(db_path)
+        run_list = self.list_all_runs(db_path, variant=v, cadence=c, model_source=ms)
+        if ml_bridge.is_ml_model(ms) and ml_bridge.is_ml_available():
+            days = ml_bridge.get_ml_dates(ms, limit=260)
+        else:
+            days = _list_trading_days(db_path)
         for item in run_list:
             if item["as_of"] not in days:
                 days.append(item["as_of"])
         days = sorted(set(days), reverse=True)
+
+        sources = ml_bridge.list_model_sources()
+        for src in sources:
+            sid = src["id"]
+            src["run_count"] = len(self.list_all_runs(db_path, variant=v, cadence=c, model_source=sid))
+
         return {
             "dbs": dbs,
             "selected_db": str(db_path),
             "variant": v,
             "cadence": c,
+            "model_source": ms,
+            "ml_available": ml_bridge.is_ml_available(),
+            "model_sources": sources,
             "variants": list(model_params.VARIANTS),
             "cadences": list(model_params.CADENCES),
             "config": {
@@ -299,12 +339,14 @@ class DebateHub:
         cadence: str | None,
         as_of: str,
         hash_prefix: str,
+        model_source: str | None = None,
     ) -> dict[str, Any]:
         if not _SAFE_DATE.fullmatch(as_of) or not _SAFE_HASH.fullmatch(hash_prefix):
             raise ValueError("非法的运行日期或哈希前缀")
         db_path = self.resolve_db(db)
         v, c = self._resolve_vc(variant, cadence)
-        folder = runs.debate_root(db_path) / f"{v}-{c}" / as_of / hash_prefix
+        ms = self._resolve_model_source(model_source)
+        folder = runs.debate_root(db_path) / runs.series_name(v, c, ms) / as_of / hash_prefix
         if not folder.is_dir():
             raise NotFoundError(f"运行目录不存在：{as_of}/{hash_prefix}")
 
@@ -332,10 +374,12 @@ class DebateHub:
                     stocks[file.stem] = loaded
 
         # 从同一天列表里核对是否为当日正式结果
-        _, day_entries = runs.list_runs(db_path, variant=v, cadence=c, as_of=date.fromisoformat(as_of))
+        _, day_entries = runs.list_runs(
+            db_path, variant=v, cadence=c, as_of=date.fromisoformat(as_of), model_source=ms
+        )
         official = any(e["hash_prefix"] == hash_prefix and e["official"] for e in day_entries)
 
-        run_key = self._run_key(db_path, v, c, as_of, hash_prefix)
+        run_key = self._run_key(db_path, v, c, as_of, hash_prefix, ms)
         with self._lock:
             is_running = bool(
                 self._active
@@ -358,6 +402,7 @@ class DebateHub:
             "as_of": as_of,
             "variant": v,
             "cadence": c,
+            "model_source": ms,
             "hash_prefix": hash_prefix,
             "completed": final_data is not None,
             "official": official,
@@ -379,26 +424,34 @@ class DebateHub:
         as_of: str,
         variant: str | None = None,
         cadence: str | None = None,
+        model_source: str | None = None,
         overrides: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
         if not _SAFE_DATE.fullmatch(as_of):
             raise ValueError(f"非法日期：{as_of}")
         db_path = self.resolve_db(db)
         v, c = self._resolve_vc(variant, cadence)
+        ms = self._resolve_model_source(model_source)
         eff = self._apply_overrides(overrides)
         snap = snapshot.build_request(
-            db_path, settings=eff, as_of=date.fromisoformat(as_of), variant=v, cadence=c
+            db_path,
+            settings=eff,
+            as_of=date.fromisoformat(as_of),
+            variant=v,
+            cadence=c,
+            model_source=ms,
         )
         out = {
             "db": str(db_path),
             "as_of": snap.request.as_of,
-            "variant": v,
+            "variant": snap.request.context.variant,
             "cadence": c,
+            "model_source": ms,
             "hash_prefix": snap.request.input_hash[:12],
             "request": snap.request.payload(),
         }
         with self._lock:
-            self._dry_run_cache[(str(db_path).lower(), v, c, snap.request.as_of)] = out
+            self._dry_run_cache[(str(db_path).lower(), snap.request.context.variant, c, ms, snap.request.as_of)] = out
         return out
 
     def _apply_overrides(self, overrides: Mapping[str, Any] | None) -> app_config.Settings:
@@ -432,12 +485,16 @@ class DebateHub:
         as_of: str,
         variant: str | None = None,
         cadence: str | None = None,
+        model_source: str | None = None,
         overrides: Mapping[str, Any] | None = None,
     ) -> dict[str, Any]:
         if not _SAFE_DATE.fullmatch(as_of):
             raise ValueError(f"非法日期：{as_of}")
         db_path = self.resolve_db(db)
         v, c = self._resolve_vc(variant, cadence)
+        ms = self._resolve_model_source(model_source)
+        if ml_bridge.is_ml_model(ms):
+            v = "nocap"
         eff = self._apply_overrides(overrides)
 
         stop_event = threading.Event()
@@ -453,6 +510,7 @@ class DebateHub:
                 "as_of": as_of,
                 "variant": v,
                 "cadence": c,
+                "model_source": ms,
                 "run_id": "",
                 "hash_prefix": "",
                 "started_at": started_at,
@@ -478,6 +536,7 @@ class DebateHub:
                     as_of=date.fromisoformat(as_of),
                     variant=v,
                     cadence=c,
+                    model_source=ms,
                     sidecar_client=client,
                     on_event=self._handle_service_event,
                     stop=stop_event,
@@ -553,6 +612,7 @@ class DebateHub:
                     self._active["cadence"],
                     self._active["as_of"],
                     hp,
+                    self._active.get("model_source"),
                 )
             elif etype == "role.started":
                 code = str(data.get("ts_code", "-"))
@@ -609,6 +669,7 @@ class DebateHub:
                 data.setdefault("as_of", self._active.get("as_of", ""))
                 data.setdefault("variant", self._active.get("variant", ""))
                 data.setdefault("cadence", self._active.get("cadence", ""))
+                data.setdefault("model_source", self._active.get("model_source", ""))
 
         self._publish(etype, data)
 
@@ -648,15 +709,18 @@ class DebateHub:
         cadence: str | None = None,
         as_of: str | None = None,
         hash_prefix: str | None = None,
+        model_source: str | None = None,
     ) -> chat.ChatStore:
         db_path = self.resolve_db(db)
         v, c = self._resolve_vc(variant, cadence)
+        ms = self._resolve_model_source(model_source)
         store = chat.ChatStore.for_run(
             db_path,
             variant=v,
             cadence=c,
             as_of=(as_of or "").strip(),
             hash_prefix=(hash_prefix or "").strip() or None,
+            model_source=ms,
         )
         key = store.path.resolve()
         with self._lock:
@@ -674,8 +738,11 @@ class DebateHub:
         cadence: str | None = None,
         as_of: str | None = None,
         hash_prefix: str | None = None,
+        model_source: str | None = None,
     ) -> dict[str, Any]:
-        store = self.chat_store(db=db, variant=variant, cadence=cadence, as_of=as_of, hash_prefix=hash_prefix)
+        store = self.chat_store(
+            db=db, variant=variant, cadence=cadence, as_of=as_of, hash_prefix=hash_prefix, model_source=model_source
+        )
         return {
             "roles": list(chat.CHAT_ROLE_PRESETS),
             "tools": [{"name": k, "label": v} for k, v in chat.TOOL_LABELS.items()],
@@ -691,10 +758,13 @@ class DebateHub:
         cadence: str | None = None,
         as_of: str | None = None,
         hash_prefix: str | None = None,
+        model_source: str | None = None,
         role_preset: str = "research_copilot",
         title: str = "新对话",
     ) -> dict[str, Any]:
-        store = self.chat_store(db=db, variant=variant, cadence=cadence, as_of=as_of, hash_prefix=hash_prefix)
+        store = self.chat_store(
+            db=db, variant=variant, cadence=cadence, as_of=as_of, hash_prefix=hash_prefix, model_source=model_source
+        )
         return store.create_session(role_preset=role_preset, title=title)
 
     def delete_chat_session(
@@ -705,12 +775,149 @@ class DebateHub:
         cadence: str | None = None,
         as_of: str | None = None,
         hash_prefix: str | None = None,
+        model_source: str | None = None,
         session_id: str,
     ) -> bool:
         if not session_id or not session_id.strip():
             raise ValueError("缺少 session_id")
-        store = self.chat_store(db=db, variant=variant, cadence=cadence, as_of=as_of, hash_prefix=hash_prefix)
+        store = self.chat_store(
+            db=db, variant=variant, cadence=cadence, as_of=as_of, hash_prefix=hash_prefix, model_source=model_source
+        )
         return store.delete_session(session_id.strip())
+
+    def _resolve_run_detail_optional(
+        self,
+        *,
+        db: str | None = None,
+        variant: str | None = None,
+        cadence: str | None = None,
+        as_of: str | None = None,
+        hash_prefix: str | None = None,
+        model_source: str | None = None,
+    ) -> tuple[Path, str, str, str, str, str, dict[str, Any] | None]:
+        db_path = self.resolve_db(db)
+        v, c = self._resolve_vc(variant, cadence)
+        ms = self._resolve_model_source(model_source)
+        if ml_bridge.is_ml_model(ms):
+            v = "nocap"
+        clean_date = (as_of or "").strip()
+        clean_hash = (hash_prefix or "").strip()
+        run_detail: dict[str, Any] | None = None
+
+        if _SAFE_DATE.fullmatch(clean_date) and _SAFE_HASH.fullmatch(clean_hash):
+            try:
+                run_detail = self.get_run_detail(
+                    db=str(db_path),
+                    variant=v,
+                    cadence=c,
+                    as_of=clean_date,
+                    hash_prefix=clean_hash,
+                    model_source=ms,
+                )
+            except NotFoundError:
+                run_detail = None
+
+        if run_detail is None and _SAFE_DATE.fullmatch(clean_date):
+            with self._lock:
+                cached_dry = self._dry_run_cache.get((str(db_path).lower(), v, c, ms, clean_date))
+            if cached_dry is not None:
+                run_detail = {
+                    "request": cached_dry.get("request"),
+                    "stocks": {},
+                    "result": None,
+                    "final": None,
+                }
+        return db_path, v, c, ms, clean_date, clean_hash, run_detail
+
+    def get_prompts(
+        self,
+        *,
+        db: str | None = None,
+        variant: str | None = None,
+        cadence: str | None = None,
+        as_of: str | None = None,
+        hash_prefix: str | None = None,
+        model_source: str | None = None,
+        source: str | None = None,
+    ) -> dict[str, Any]:
+        """返回 7 个辩论角色与对话角色的预置提示词及完整 System Prompt。"""
+        _db_path, v, c, ms, clean_date, clean_hash, run_detail = self._resolve_run_detail_optional(
+            db=db, variant=variant, cadence=cadence, as_of=as_of, hash_prefix=hash_prefix, model_source=model_source
+        )
+        frozen_request = run_detail.get("request") if isinstance(run_detail, dict) else None
+        out = prompts.inspect_prompts(
+            settings=self.settings,
+            frozen_request=frozen_request,
+            source_preference=(source or "auto"),
+        )
+        out["as_of"] = clean_date
+        out["hash_prefix"] = clean_hash
+        out["variant"] = v
+        out["cadence"] = c
+        out["model_source"] = ms
+        return out
+
+    def get_prompt_payload(
+        self,
+        *,
+        db: str | None = None,
+        variant: str | None = None,
+        cadence: str | None = None,
+        as_of: str | None = None,
+        hash_prefix: str | None = None,
+        model_source: str | None = None,
+        role: str,
+        ts_code: str | None = None,
+    ) -> dict[str, Any]:
+        """构造指定角色与个股实际送入大模型的 User JSON（以及对话常驻上下文预览）。"""
+        clean_role = (role or "").strip()
+        if not clean_role:
+            raise ValueError("缺少 role 参数")
+
+        if clean_role.startswith("chat:"):
+            preset = clean_role[len("chat:") :].strip() or "research_copilot"
+            toolbox = self.build_chat_toolbox(
+                db=db,
+                variant=variant,
+                cadence=cadence,
+                as_of=as_of,
+                hash_prefix=hash_prefix,
+                model_source=model_source,
+            )
+            attached = [ts_code.strip()] if (ts_code and ts_code.strip()) else []
+            ctx_snapshot = toolbox.global_context_snapshot(attached)
+            full_prompt = chat.build_chat_system_prompt(
+                self.settings, role_preset=preset, context_snapshot=ctx_snapshot
+            )
+            wire = json.dumps(ctx_snapshot, ensure_ascii=False, separators=(",", ":"))
+            return {
+                "role": clean_role,
+                "ts_code": attached[0] if attached else "",
+                "stock_name": "对话常驻上下文",
+                "ready": True,
+                "missing_deps": [],
+                "top_keys": list(ctx_snapshot.keys()),
+                "char_count": len(wire),
+                "est_tokens": prompts.estimate_tokens(wire),
+                "payload": ctx_snapshot,
+                "full_system_prompt": full_prompt,
+                "full_system_prompt_chars": len(full_prompt),
+                "full_system_prompt_est_tokens": prompts.estimate_tokens(full_prompt),
+            }
+
+        _db_path, _v, _c, _ms, _clean_date, _clean_hash, run_detail = self._resolve_run_detail_optional(
+            db=db, variant=variant, cadence=cadence, as_of=as_of, hash_prefix=hash_prefix, model_source=model_source
+        )
+        request_obj = run_detail.get("request") if isinstance(run_detail, dict) else None
+        if not isinstance(request_obj, Mapping):
+            raise NotFoundError("尚未加载任何运行快照或演练数据，无法生成单股实际 User JSON")
+        return prompts.build_role_user_payload(
+            clean_role,
+            request_obj,
+            ts_code=ts_code,
+            all_stocks=run_detail.get("stocks") if isinstance(run_detail, dict) else None,
+            result_data=run_detail.get("result") if isinstance(run_detail, dict) else None,
+        )
 
     def build_chat_toolbox(
         self,
@@ -720,31 +927,11 @@ class DebateHub:
         cadence: str | None = None,
         as_of: str | None = None,
         hash_prefix: str | None = None,
+        model_source: str | None = None,
     ) -> chat.ChatToolbox:
-        db_path = self.resolve_db(db)
-        v, c = self._resolve_vc(variant, cadence)
-        clean_date = (as_of or "").strip()
-        clean_hash = (hash_prefix or "").strip()
-        run_detail: dict[str, Any] | None = None
-
-        if _SAFE_DATE.fullmatch(clean_date) and _SAFE_HASH.fullmatch(clean_hash):
-            try:
-                run_detail = self.get_run_detail(
-                    db=str(db_path), variant=v, cadence=c, as_of=clean_date, hash_prefix=clean_hash
-                )
-            except NotFoundError:
-                run_detail = None
-
-        if run_detail is None and _SAFE_DATE.fullmatch(clean_date):
-            with self._lock:
-                cached_dry = self._dry_run_cache.get((str(db_path).lower(), v, c, clean_date))
-            if cached_dry is not None:
-                run_detail = {
-                    "request": cached_dry.get("request"),
-                    "stocks": {},
-                    "result": None,
-                    "final": None,
-                }
+        db_path, v, c, ms, clean_date, clean_hash, run_detail = self._resolve_run_detail_optional(
+            db=db, variant=variant, cadence=cadence, as_of=as_of, hash_prefix=hash_prefix, model_source=model_source
+        )
 
         return chat.ChatToolbox(
             db_path,
@@ -752,6 +939,7 @@ class DebateHub:
             cadence=c,
             as_of=clean_date,
             hash_prefix=clean_hash,
+            model_source=ms,
             run_detail=run_detail,
         )
 
@@ -763,6 +951,7 @@ class DebateHub:
         cadence: str | None = None,
         as_of: str | None = None,
         hash_prefix: str | None = None,
+        model_source: str | None = None,
         session_id: str | None = None,
         message: str,
         role_preset: str = "research_copilot",
@@ -775,8 +964,12 @@ class DebateHub:
         if not text_in:
             raise ValueError("消息内容不能为空")
         eff = self._apply_overrides({"reasoning_effort": reasoning_effort} if reasoning_effort else None)
-        store = self.chat_store(db=db, variant=variant, cadence=cadence, as_of=as_of, hash_prefix=hash_prefix)
-        toolbox = self.build_chat_toolbox(db=db, variant=variant, cadence=cadence, as_of=as_of, hash_prefix=hash_prefix)
+        store = self.chat_store(
+            db=db, variant=variant, cadence=cadence, as_of=as_of, hash_prefix=hash_prefix, model_source=model_source
+        )
+        toolbox = self.build_chat_toolbox(
+            db=db, variant=variant, cadence=cadence, as_of=as_of, hash_prefix=hash_prefix, model_source=model_source
+        )
         return chat.run_chat_turn(
             settings=eff,
             store=store,
@@ -787,6 +980,61 @@ class DebateHub:
             attached_codes=list(attached_codes or ()),
             stop_event=stop_event,
             stream_fn=self.chat_stream_fn,
+        )
+
+    # ------------------------------------------------------------------
+    # 多模型对比与归因只读查询（XGBoost F69 / 随机森林 F69 / LSTM S+F69）
+    # ------------------------------------------------------------------
+
+    def get_ml_overview(self) -> dict[str, Any]:
+        out = ml_bridge.get_leaderboard()
+        out["feature_catalog"] = ml_bridge.get_feature_catalog()
+        return out
+
+    def get_ml_nav(
+        self,
+        *,
+        rule: str | None = None,
+        period: str | None = None,
+        start_year: int | None = None,
+    ) -> dict[str, Any]:
+        return ml_bridge.get_nav_compare(
+            rule=(rule or ml_bridge.MAIN_BACKTEST_RULE).strip(),
+            period=(period or "test").strip(),
+            start_year=start_year,
+        )
+
+    def get_ml_consensus(
+        self,
+        *,
+        as_of: str | None = None,
+        top_n: int = 6,
+        with_outcome: bool = False,
+    ) -> dict[str, Any]:
+        return ml_bridge.get_day_consensus(
+            (as_of or "").strip(),
+            top_n=max(1, min(20, int(top_n))),
+            max_per_industry=self.settings.pick.max_per_industry,
+            with_outcome=with_outcome,
+        )
+
+    def get_ml_explain(
+        self,
+        *,
+        as_of: str,
+        ts_code: str,
+        model_id: str | None = None,
+        top: int = 8,
+    ) -> dict[str, Any]:
+        if not as_of or not ts_code:
+            raise ValueError("缺少 as_of 或 ts_code 参数")
+        return ml_bridge.get_stock_explain_all(
+            as_of.strip(),
+            ts_code.strip(),
+            model_id=(model_id or "").strip() or None,
+            top=max(1, min(8, int(top))),
+            top_n=self.settings.pick.top_n,
+            max_per_industry=self.settings.pick.max_per_industry,
         )
 
 
@@ -898,7 +1146,12 @@ def _make_handler(hub: DebateHub) -> type[BaseHTTPRequestHandler]:
                     return
                 if path == "/api/meta":
                     self._send_json(
-                        hub.meta(db=arg("db"), variant=arg("variant"), cadence=arg("cadence"))
+                        hub.meta(
+                            db=arg("db"),
+                            variant=arg("variant"),
+                            cadence=arg("cadence"),
+                            model_source=arg("model_source"),
+                        )
                     )
                     return
                 if path == "/api/run":
@@ -913,11 +1166,87 @@ def _make_handler(hub: DebateHub) -> type[BaseHTTPRequestHandler]:
                         cadence=arg("cadence"),
                         as_of=as_of,
                         hash_prefix=hash_prefix,
+                        model_source=arg("model_source"),
                     )
                     self._send_json(detail)
                     return
                 if path == "/api/stream":
                     self._handle_sse()
+                    return
+                if path == "/api/prompts":
+                    self._send_json(
+                        hub.get_prompts(
+                            db=arg("db"),
+                            variant=arg("variant"),
+                            cadence=arg("cadence"),
+                            as_of=arg("as_of"),
+                            hash_prefix=arg("hash"),
+                            model_source=arg("model_source"),
+                            source=arg("source"),
+                        )
+                    )
+                    return
+                if path == "/api/prompts/payload":
+                    role_arg = arg("role")
+                    if not role_arg:
+                        self._send_json({"error": "缺少 role 参数"}, HTTPStatus.BAD_REQUEST)
+                        return
+                    self._send_json(
+                        hub.get_prompt_payload(
+                            db=arg("db"),
+                            variant=arg("variant"),
+                            cadence=arg("cadence"),
+                            as_of=arg("as_of"),
+                            hash_prefix=arg("hash"),
+                            model_source=arg("model_source"),
+                            role=role_arg,
+                            ts_code=arg("ts_code"),
+                        )
+                    )
+                    return
+                if path == "/api/ml/overview":
+                    self._send_json(hub.get_ml_overview())
+                    return
+                if path == "/api/ml/nav":
+                    sy_raw = (arg("start_year") or "").strip()
+                    start_year_val: int | None = None
+                    if sy_raw:
+                        try:
+                            start_year_val = int(sy_raw)
+                        except ValueError as exc:
+                            raise ValueError(f"非法起步年份：{sy_raw}") from exc
+                    self._send_json(
+                        hub.get_ml_nav(
+                            rule=arg("rule"),
+                            period=arg("period"),
+                            start_year=start_year_val,
+                        )
+                    )
+                    return
+                if path == "/api/ml/consensus":
+                    top_raw = arg("top_n")
+                    top_n = int(top_raw) if top_raw and top_raw.isdigit() else 6
+                    with_out = (arg("with_outcome") or "").strip().lower() in ("1", "true", "yes")
+                    self._send_json(
+                        hub.get_ml_consensus(as_of=arg("as_of"), top_n=top_n, with_outcome=with_out)
+                    )
+                    return
+                if path == "/api/ml/explain":
+                    as_of_arg = arg("as_of") or ""
+                    code_arg = arg("ts_code") or ""
+                    if not as_of_arg or not code_arg:
+                        self._send_json({"error": "缺少 as_of 或 ts_code 参数"}, HTTPStatus.BAD_REQUEST)
+                        return
+                    top_raw = arg("top")
+                    top_k = int(top_raw) if top_raw and top_raw.isdigit() else 8
+                    self._send_json(
+                        hub.get_ml_explain(
+                            as_of=as_of_arg,
+                            ts_code=code_arg,
+                            model_id=arg("model_id"),
+                            top=top_k,
+                        )
+                    )
                     return
                 if path == "/api/chat/sessions":
                     self._send_json(
@@ -927,6 +1256,7 @@ def _make_handler(hub: DebateHub) -> type[BaseHTTPRequestHandler]:
                             cadence=arg("cadence"),
                             as_of=arg("as_of"),
                             hash_prefix=arg("hash"),
+                            model_source=arg("model_source"),
                         )
                     )
                     return
@@ -950,6 +1280,7 @@ def _make_handler(hub: DebateHub) -> type[BaseHTTPRequestHandler]:
                         as_of=as_of,
                         variant=body.get("variant"),
                         cadence=body.get("cadence"),
+                        model_source=body.get("model_source"),
                         overrides=body.get("overrides"),
                     )
                     self._send_json(result)
@@ -961,6 +1292,7 @@ def _make_handler(hub: DebateHub) -> type[BaseHTTPRequestHandler]:
                         as_of=as_of,
                         variant=body.get("variant"),
                         cadence=body.get("cadence"),
+                        model_source=body.get("model_source"),
                         overrides=body.get("overrides"),
                     )
                     self._send_json({"started": True, "active": active}, HTTPStatus.ACCEPTED)
@@ -975,6 +1307,7 @@ def _make_handler(hub: DebateHub) -> type[BaseHTTPRequestHandler]:
                         cadence=body.get("cadence"),
                         as_of=body.get("as_of"),
                         hash_prefix=body.get("hash"),
+                        model_source=body.get("model_source"),
                         role_preset=str(body.get("role_preset") or "research_copilot"),
                         title=str(body.get("title") or "新对话"),
                     )
@@ -991,6 +1324,7 @@ def _make_handler(hub: DebateHub) -> type[BaseHTTPRequestHandler]:
                         cadence=body.get("cadence"),
                         as_of=body.get("as_of"),
                         hash_prefix=body.get("hash"),
+                        model_source=body.get("model_source"),
                         session_id=body.get("session_id"),
                         message=str(body.get("message") or ""),
                         role_preset=str(body.get("role_preset") or "research_copilot"),
@@ -1037,6 +1371,7 @@ def _make_handler(hub: DebateHub) -> type[BaseHTTPRequestHandler]:
                         cadence=arg("cadence"),
                         as_of=arg("as_of"),
                         hash_prefix=arg("hash"),
+                        model_source=arg("model_source"),
                         session_id=sid,
                     )
                     self._send_json({"deleted": deleted, "session_id": sid})

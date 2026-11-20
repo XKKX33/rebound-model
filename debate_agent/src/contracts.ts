@@ -91,6 +91,8 @@ export interface RunContext {
   final: number;
   max_per_industry: number;
   pool: PoolSummary;
+  model_source?: string;
+  feature_set?: string;
 }
 
 export interface ModelPickItem {
@@ -135,6 +137,28 @@ export interface CandidateFlag {
   text: string;
 }
 
+export interface CandidateExplainFactor {
+  feature: string;
+  cn_name: string;
+  value: number | null;
+  contribution: number;
+  direction: string;
+}
+
+export interface CandidateExplain {
+  method: string;
+  base: number | null;
+  score: number | null;
+  top_factors: CandidateExplainFactor[];
+}
+
+export interface CandidatePeerModel {
+  name: string;
+  rank: number;
+  pct: number;
+  in_model_picks: boolean;
+}
+
 export interface Candidate {
   ts_code: string;
   name: string;
@@ -145,6 +169,10 @@ export interface Candidate {
   bars: CandidateBar[];
   industry_stats: IndustryStats;
   flags: CandidateFlag[];
+  extra_features?: Record<string, number>;
+  extra_feature_pct?: Record<string, number>;
+  explain?: CandidateExplain;
+  peer_models?: Record<string, CandidatePeerModel>;
 }
 
 export interface RosterItem {
@@ -375,7 +403,7 @@ function parseContext(raw: unknown, asOf: string): RunContext {
   }
   if (!isRecord(raw.pool)) throw new ContractError("context.pool 必须是对象");
   const candidates = requireInt(raw.candidates, "context.candidates", 1, MAX_CANDIDATES);
-  return {
+  const ctx: RunContext = {
     as_of: contextAsOf,
     model_label: requireText(raw.model_label, "context.model_label"),
     variant: requireText(raw.variant, "context.variant"),
@@ -394,6 +422,13 @@ function parseContext(raw: unknown, asOf: string): RunContext {
       up_ratio: requireBoundedNumber(raw.pool.up_ratio, "context.pool.up_ratio", 0, 100),
     },
   };
+  if (raw.model_source !== undefined) {
+    ctx.model_source = requireText(raw.model_source, "context.model_source");
+  }
+  if (raw.feature_set !== undefined) {
+    ctx.feature_set = requireText(raw.feature_set, "context.feature_set");
+  }
+  return ctx;
 }
 
 function parseModelPicks(raw: unknown): ModelPickItem[] {
@@ -487,7 +522,7 @@ function parseCandidate(raw: unknown, index: number, asOf: string): Candidate {
     throw new ContractError(`${path}.bars 最后一根日期(${lastBar?.date ?? "空"})必须等于 as_of(${asOf})`);
   }
 
-  return {
+  const cand: Candidate = {
     ts_code: requireText(raw.ts_code, `${path}.ts_code`),
     name: requireText(raw.name, `${path}.name`),
     industry: requireText(raw.industry, `${path}.industry`),
@@ -503,6 +538,53 @@ function parseCandidate(raw: unknown, index: number, asOf: string): Candidate {
     industry_stats: parseIndustryStats(raw.industry_stats, `${path}.industry_stats`),
     flags: parseFlags(raw.flags, `${path}.flags`),
   };
+  if (raw.extra_features !== undefined) {
+    cand.extra_features = requireNumberRecord(raw.extra_features, `${path}.extra_features`);
+  }
+  if (raw.extra_feature_pct !== undefined) {
+    cand.extra_feature_pct = requireNumberRecord(raw.extra_feature_pct, `${path}.extra_feature_pct`, {
+      min: 0,
+      max: 100,
+    });
+  }
+  if (raw.explain !== undefined) {
+    if (!isRecord(raw.explain)) throw new ContractError(`${path}.explain 必须是对象`);
+    const rawFactors = raw.explain.top_factors;
+    if (!Array.isArray(rawFactors)) throw new ContractError(`${path}.explain.top_factors 必须是数组`);
+    const topFactors: CandidateExplainFactor[] = rawFactors.map((entry, fIdx) => {
+      const fPath = `${path}.explain.top_factors[${fIdx}]`;
+      if (!isRecord(entry)) throw new ContractError(`${fPath} 必须是对象`);
+      return {
+        feature: requireText(entry.feature, `${fPath}.feature`),
+        cn_name: requireText(entry.cn_name, `${fPath}.cn_name`),
+        value: requireNullableNumber(entry.value ?? null, `${fPath}.value`),
+        contribution: requireNumber(entry.contribution, `${fPath}.contribution`),
+        direction: requireText(entry.direction, `${fPath}.direction`),
+      };
+    });
+    cand.explain = {
+      method: requireText(raw.explain.method, `${path}.explain.method`),
+      base: requireNullableNumber(raw.explain.base ?? null, `${path}.explain.base`),
+      score: requireNullableNumber(raw.explain.score ?? null, `${path}.explain.score`),
+      top_factors: topFactors,
+    };
+  }
+  if (raw.peer_models !== undefined) {
+    if (!isRecord(raw.peer_models)) throw new ContractError(`${path}.peer_models 必须是对象`);
+    const peers: Record<string, CandidatePeerModel> = {};
+    for (const [peerId, entry] of Object.entries(raw.peer_models)) {
+      const pPath = `${path}.peer_models.${peerId}`;
+      if (!isRecord(entry)) throw new ContractError(`${pPath} 必须是对象`);
+      peers[peerId] = {
+        name: requireText(entry.name, `${pPath}.name`),
+        rank: requireInt(entry.rank, `${pPath}.rank`, 1, 100_000),
+        pct: requireBoundedNumber(entry.pct, `${pPath}.pct`, 0, 100),
+        in_model_picks: requireBoolean(entry.in_model_picks, `${pPath}.in_model_picks`),
+      };
+    }
+    cand.peer_models = peers;
+  }
+  return cand;
 }
 
 function parseRoster(raw: unknown): RosterItem[] {

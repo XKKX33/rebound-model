@@ -197,7 +197,7 @@ def test_chat_http_tool_loop_streaming_persistence_and_immutability(
         _stop: threading.Event,
     ) -> Iterator[chat.StreamChunk]:
         captured_calls.append(json.loads(json.dumps(messages, ensure_ascii=False)))
-        assert len(tools) == 6
+        assert len(tools) == 9
         if len(captured_calls) == 1:
             # 第 1 轮：流式思考 + 分片 tool_calls（同时查两类只读工具）
             yield chat.StreamChunk(thinking="先调工具核查候选明细与量比排名。")
@@ -256,7 +256,7 @@ def test_chat_http_tool_loop_streaming_persistence_and_immutability(
         assert status == 200
         assert initial["sessions"] == []
         assert len(initial["roles"]) == 8
-        assert len(initial["tools"]) == 6
+        assert len(initial["tools"]) == 9
         assert secret not in json.dumps(initial, ensure_ascii=False)
 
         # 空消息在发流前直接返回 400

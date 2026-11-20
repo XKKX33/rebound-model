@@ -25,7 +25,7 @@ import duckdb
 
 from rebound import clock
 from rebound import config as app_config
-from rebound.debate import runs
+from rebound.debate import ml_bridge, runs
 from rebound.debate.methodology import load_methodology
 from rebound.debate.sidecar import resolve_api_key
 
@@ -34,6 +34,9 @@ __all__ = [
     "ChatStore",
     "ChatToolbox",
     "TOOL_DEFINITIONS",
+    "TOOL_LABELS",
+    "build_chat_role_identity",
+    "build_chat_system_prompt",
     "run_chat_turn",
 ]
 
@@ -48,12 +51,12 @@ CHAT_ROLE_PRESETS: tuple[dict[str, str], ...] = (
     {
         "id": "research_copilot",
         "name": "投研复盘助手",
-        "desc": "全局复盘视角：解读终选逻辑、跨股对比、排查风险、生成次日开盘清单",
+        "desc": "全局复盘视角：解读终选逻辑、三模型共识与归因对比、排查风险、生成次日开盘清单",
     },
     {
         "id": "risk_chair",
         "name": "风控主席 (risk_chair)",
-        "desc": "以风控拍板视角回应看多/看空与 0~100 打分依据",
+        "desc": "以风控拍板视角回应看多/看空、归因稳健性与 0~100 打分依据",
     },
     {
         "id": "final_pick",
@@ -63,12 +66,12 @@ CHAT_ROLE_PRESETS: tuple[dict[str, str], ...] = (
     {
         "id": "model_analyst",
         "name": "模型解读员 (model_analyst)",
-        "desc": "侧重 XGBoost 排名、特征分位与模型盲区拆解",
+        "desc": "侧重三套 F69 模型（XGBoost/随机森林/LSTM）排名、69 特征分位、Top-8 归因与跨模型分歧拆解",
     },
     {
         "id": "chart_analyst",
         "name": "走势分析员 (chart_analyst)",
-        "desc": "只看 20 日量价形态、均线支撑压力与 MACD 动能",
+        "desc": "只看 20 日量价形态、K 线微结构、换手资金与 MACD 动能",
     },
     {
         "id": "bull",
@@ -96,6 +99,9 @@ TOOL_LABELS: dict[str, str] = {
     "query_stock_history": "查询 DuckDB 历史日线",
     "check_post_signal_returns": "核验信号日事后 T+1→T+N 收益",
     "list_debate_runs": "查看历史辩论运行记录",
+    "get_model_explain": "查询三模型单股 Top-8 打分归因",
+    "compare_models_on_day": "对比三模型同日选股共识与分歧",
+    "get_ml_leaderboard_and_nav": "查询三模型排行榜与长期净值回撤",
 }
 
 TOOL_DEFINITIONS: list[dict[str, Any]] = [
@@ -219,6 +225,64 @@ TOOL_DEFINITIONS: list[dict[str, Any]] = [
             },
         },
     },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_model_explain",
+            "description": (
+                "查询 XGBoost F69（TreeSHAP）、随机森林 F69（Saabas 路径分解）、LSTM S+F69（积分梯度，含近 60 日 11 通道序列）"
+                "对某只股票在指定测试段交易日（2023-01-03 ~ 2026-10-16）的 Top 8 打分归因，以及三模型当日百分位对照（跨模型只比 pct，不比原始 score）。"
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "ts_code": {"type": "string", "description": "股票代码或简称（如 600926.SH 或 杭州银行）"},
+                    "as_of": {"type": "string", "description": "交易日 YYYY-MM-DD，缺省取当前运行信号日"},
+                    "model_id": {
+                        "type": "string",
+                        "description": "可选：xgb_F69 / rf_F69 / lstm_SF69；留空则一次返回三个模型的归因与百分位对照",
+                    },
+                    "top": {"type": "integer", "description": "返回前几大贡献因子（1~8，默认 8）"},
+                },
+                "required": ["ts_code"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "compare_models_on_day",
+            "description": (
+                "横向对比 xgb_F69、rf_F69、lstm_SF69 三个模型在指定交易日（2021-01-04 ~ 2026-10-16）的 Top N 选股名单、"
+                "两两重合度、三模型共识票与分歧票；支持开启 with_outcome=true 复盘事后 T+1→T+5 收益（仅供事后复盘，严禁当预测）。"
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "as_of": {"type": "string", "description": "交易日 YYYY-MM-DD，缺省取当前运行信号日"},
+                    "top_n": {"type": "integer", "description": "每个模型取前几只（默认 6）"},
+                    "with_outcome": {"type": "boolean", "description": "是否附带事后 T+1→T+5 收益用于复盘，默认 false"},
+                },
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_ml_leaderboard_and_nav",
+            "description": (
+                "查询 xgb_F69、rf_F69、lstm_SF69 三个模型的测试段排行榜（IC 含 95% 区间、逐年 IC、ICIR）"
+                "以及不同交易规则（DB-K30-b8 主规则 / FH-K6-h4 / DB-K3-b16）在测试段（2023~2026）或长期（2015~2026）的净值收益与最大回撤摘要。"
+            ),
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "rule": {"type": "string", "description": "规则：DB-K30-b8（默认）/ FH-K6-h4 / DB-K3-b16"},
+                    "period": {"type": "string", "description": "区间：test（正式测试段，默认）/ long（2015~2026 补充分析）"},
+                },
+            },
+        },
+    },
 ]
 
 
@@ -252,14 +316,16 @@ class ChatStore:
         cadence: str,
         as_of: str,
         hash_prefix: str | None = None,
+        model_source: str | None = None,
     ) -> "ChatStore":
         clean_date = as_of if _SAFE_DATE.fullmatch(as_of or "") else "general"
         clean_hash = hash_prefix if _SAFE_HASH.fullmatch(hash_prefix or "") else ""
+        series = runs.series_name(variant, cadence, model_source)
         if clean_hash and clean_date != "general":
-            run_folder = runs.debate_root(db_path) / f"{variant}-{cadence}" / clean_date / clean_hash
+            run_folder = runs.debate_root(db_path) / series / clean_date / clean_hash
             if (run_folder / "request.json").is_file():
                 return cls(run_folder / "chat_sessions.json")
-        target = runs.debate_root(db_path) / "_chats" / f"{variant}-{cadence}-{clean_date}.json"
+        target = runs.debate_root(db_path) / "_chats" / f"{series}-{clean_date}.json"
         return cls(target)
 
     def _load_unlocked(self) -> dict[str, Any]:
@@ -345,6 +411,7 @@ class ChatToolbox:
         cadence: str,
         as_of: str,
         hash_prefix: str | None = None,
+        model_source: str | None = None,
         run_detail: Mapping[str, Any] | None = None,
     ) -> None:
         self.db_path = Path(db_path)
@@ -352,6 +419,7 @@ class ChatToolbox:
         self.cadence = cadence
         self.as_of = as_of
         self.hash_prefix = hash_prefix or ""
+        self.model_source = model_source or ""
         self.run_detail = dict(run_detail) if run_detail is not None else {}
 
         req = self.run_detail.get("request") or {}
@@ -414,6 +482,14 @@ class ChatToolbox:
         if include_features:
             out["features"] = cand.get("features")
             out["feature_pct"] = cand.get("feature_pct")
+            if cand.get("extra_features") is not None:
+                out["extra_features"] = cand.get("extra_features")
+            if cand.get("extra_feature_pct") is not None:
+                out["extra_feature_pct"] = cand.get("extra_feature_pct")
+        if cand.get("explain") is not None:
+            out["explain"] = cand.get("explain")
+        if cand.get("peer_models") is not None:
+            out["peer_models"] = cand.get("peer_models")
         if include_bars:
             out["bars"] = cand.get("bars")
         out["analysts"] = bundle.get("analysts") or []
@@ -488,6 +564,12 @@ class ChatToolbox:
                 return self._tool_check_post_signal_returns(arguments)
             if name == "list_debate_runs":
                 return self._tool_list_debate_runs(arguments)
+            if name == "get_model_explain":
+                return self._tool_get_model_explain(arguments)
+            if name == "compare_models_on_day":
+                return self._tool_compare_models_on_day(arguments)
+            if name == "get_ml_leaderboard_and_nav":
+                return self._tool_get_ml_leaderboard_and_nav(arguments)
             return False, f"未知工具：{name}", {"error": f"未知工具：{name}"}
         except Exception as exc:
             return False, f"工具执行异常：{exc}", {"error": str(exc)}
@@ -754,7 +836,9 @@ class ChatToolbox:
 
     def _tool_list_debate_runs(self, args: Mapping[str, Any]) -> tuple[bool, str, Any]:
         limit = max(1, min(30, int(args.get("limit") or 10)))
-        series_dir = runs.debate_root(self.db_path) / f"{self.variant}-{self.cadence}"
+        series_dir = runs.debate_root(self.db_path) / runs.series_name(
+            self.variant, self.cadence, self.model_source or None
+        )
         if not series_dir.is_dir():
             return True, "当前数据库下暂无历史辩论运行", {"runs": []}
         days = sorted((d.name for d in series_dir.iterdir() if d.is_dir()), reverse=True)
@@ -766,7 +850,11 @@ class ChatToolbox:
                 from datetime import date as _date
 
                 _, entries = runs.list_runs(
-                    self.db_path, variant=self.variant, cadence=self.cadence, as_of=_date.fromisoformat(day_str)
+                    self.db_path,
+                    variant=self.variant,
+                    cadence=self.cadence,
+                    as_of=_date.fromisoformat(day_str),
+                    model_source=self.model_source or None,
                 )
             except Exception:
                 continue
@@ -786,35 +874,98 @@ class ChatToolbox:
         summary = f"找到 {len(items)} 条历史辩论记录"
         return True, summary, {"runs": items}
 
+    def _tool_get_model_explain(self, args: Mapping[str, Any]) -> tuple[bool, str, Any]:
+        if not ml_bridge.is_ml_available():
+            return False, "本地尚未就绪 data/ml/api_export 三模型数据包", {"error": "缺少 data/ml/api_export"}
+        raw_code = str(args.get("ts_code") or "").strip()
+        code = self.resolve_code(raw_code) or raw_code.upper()
+        if code and "." not in code and code.isdigit() and len(code) == 6:
+            code = f"{code}.SH" if code.startswith(("6", "9")) else f"{code}.SZ"
+        as_of = str(args.get("as_of") or self.as_of or "").strip()
+        if not as_of:
+            days = ml_bridge.get_ml_dates("xgb_F69", limit=1)
+            as_of = days[0] if days else ""
+        model_id = str(args.get("model_id") or "").strip() or None
+        top = max(1, min(8, int(args.get("top") or 8)))
+        res = ml_bridge.get_stock_explain_all(as_of, code, model_id=model_id, top=top)
+        avail_models = [m for m, d in (res.get("models") or {}).items() if d.get("explain_available")]
+        summary = f"{res.get('name', code)}({code}) 在 {as_of} 的归因已读取（可用模型：{len(avail_models)} 个）"
+        return True, summary, res
+
+    def _tool_compare_models_on_day(self, args: Mapping[str, Any]) -> tuple[bool, str, Any]:
+        if not ml_bridge.is_ml_available():
+            return False, "本地尚未就绪 data/ml/api_export 三模型数据包", {"error": "缺少 data/ml/api_export"}
+        as_of = str(args.get("as_of") or self.as_of or "").strip()
+        top_n = max(1, min(20, int(args.get("top_n") or 6)))
+        with_outcome = bool(args.get("with_outcome", False))
+        res = ml_bridge.get_day_consensus(as_of, top_n=top_n, with_outcome=with_outcome)
+        ov = res["pairwise_overlap"]
+        summary = (
+            f"{res['as_of']} 三模型 Top {top_n} 共识：三模型同选 {ov['all_three']} 只，"
+            f"XGB∩RF={ov['xgb_rf']}、XGB∩LSTM={ov['xgb_lstm']}、RF∩LSTM={ov['rf_lstm']}"
+        )
+        return True, summary, res
+
+    def _tool_get_ml_leaderboard_and_nav(self, args: Mapping[str, Any]) -> tuple[bool, str, Any]:
+        if not ml_bridge.is_ml_available():
+            return False, "本地尚未就绪 data/ml/api_export 三模型数据包", {"error": "缺少 data/ml/api_export"}
+        rule = str(args.get("rule") or "DB-K30-b8").strip()
+        period = str(args.get("period") or "test").strip()
+        lb = ml_bridge.get_leaderboard()
+        nav = ml_bridge.get_nav_compare(rule=rule, period=period)
+        nav_summary = {
+            k: {"label": v["label"], "stats": v["stats"]}
+            for k, v in (nav.get("series") or {}).items()
+        }
+        summary = f"已读取三模型排行榜与 {rule}（{period}：{nav['date_start']}~{nav['date_end']}）净值统计"
+        return True, summary, {
+            "leaderboard": lb["leaderboard"],
+            "discipline_notes": lb["discipline_notes"],
+            "rule": rule,
+            "period": period,
+            "date_start": nav["date_start"],
+            "date_end": nav["date_end"],
+            "nav_note": nav["note"],
+            "nav_summary": nav_summary,
+        }
+
+
+def build_chat_role_identity(
+    role_preset: str,
+    methodology: Any,
+) -> tuple[str, bool]:
+    """返回 `(对话角色身份提示词段落, 是否复用了辩论角色职责简报)`。"""
+    if role_preset == "research_copilot" or role_preset not in methodology.role_briefs:
+        return (
+            "## 你的对话身份：反弹模型投研复盘助手\n"
+            "你正在 Web UI 对话面板中协助研究员深度复核基于三套 F69 模型（XGBoost F69、随机森林 F69、LSTM S+F69）的 AI 多角色辩论选股结果。\n"
+            "1. 回答要直接、有条理、结论先行，善用简短清单和对照表，不要套话。\n"
+            "2. 你默认已看到当前运行的全景摘要（终选前 6、模型原前 6、全部 20 只风控简表）和当前聚焦个股的完整明细（含 69 特征、归因与同行模型百分位）。\n"
+            "3. 你拥有 9 个只读工具：当用户提到任意其他候选股、需要逐字核对某只票的 20 日 K 线或 6 轮辩论原文、需要查询三模型 Top-8 打分归因（`get_model_explain`）、对比同日三模型选股共识与分歧（`compare_models_on_day`）、查看三模型排行榜与长期净值回撤（`get_ml_leaderboard_and_nav`）、跨股筛选排序或核验事后收益时，**主动调用只读工具获取精确数据后再回答**，不要凭猜测作答。\n"
+            "4. 严格遵守方法论与统计纪律：只使用上下文和工具返回的数字与事实，绝对不要编造新闻、公告、业绩、盘口、研报或输入外信息；三个 F69 模型测试段差异在统计上均不显著，禁止宣称某个模型显著更优；跨模型比较一律用全池百分位 `pct`（不直接比原始 `score`）；事后收益仅限复盘不得当预测；引用指标时带上字段路径（例如 `features.r20`、`extra_features.turn_f`、`explain.top_factors[0]`、`peer_models.rf_F69.pct`、`bars[-1].close`、`flags.limit_down_recent`），方便用户在界面悬停核对原值。",
+            False,
+        )
+    role_brief = methodology.role_briefs[role_preset].strip()
+    return (
+        f"## 你的对话身份：{role_preset}\n"
+        "你正在 Web UI 对话面板中以该角色的视角接受研究员的追问与拷问。\n"
+        f"原角色职责如下：\n{role_brief}\n\n"
+        "注意：在对话模式下请用清晰自然的中文 Markdown 回答（不必强套单行 JSON 外壳），如需核查任意候选股完整 K 线、69 特征、三模型打分归因（`get_model_explain`）、同日三模型共识（`compare_models_on_day`）或前序辩论原文，请主动调用只读工具查证后再作答；严守跨模型统计纪律（不宣称某模型显著更优、只比 `pct`），绝不编造外部信息。",
+        True,
+    )
+
 
 def build_chat_system_prompt(
     settings: app_config.Settings,
     *,
     role_preset: str,
     context_snapshot: Mapping[str, Any],
+    methodology: Any | None = None,
 ) -> str:
     """组装对话 Agent 的完整 system prompt（唯一方法论底座 + 角色身份 + 实时常驻上下文）。"""
-    meth = load_methodology(root=settings.root)
-    parts: list[str] = [meth.text.strip()]
-
-    if role_preset == "research_copilot" or role_preset not in meth.role_briefs:
-        parts.append(
-            "## 你的对话身份：反弹模型投研复盘助手\n"
-            "你正在 Web UI 对话面板中协助研究员深度复核本次 AI 多角色辩论的选股结果。\n"
-            "1. 回答要直接、有条理、结论先行，善用简短清单和对照表，不要套话。\n"
-            "2. 你默认已看到当前运行的全景摘要（终选前 6、原模型前 6、全部 20 只风控简表）和当前聚焦个股的完整明细。\n"
-            "3. 当用户提到任意其他候选股、需要逐字核对某只票的 20 日 K 线或 6 轮辩论原文、需要跨股筛选排序或核验历史事后收益时，**主动调用只读工具获取精确数据后再回答**，不要凭猜测作答。\n"
-            "4. 严格遵守方法论纪律：只使用上下文和工具返回的数字与事实，绝对不要编造新闻、公告、业绩、资金流、盘口或输入外信息；引用指标时带上字段路径（例如 `features.r20`、`bars[-1].close`、`flags.limit_down_recent`），方便用户在界面悬停核对原值。"
-        )
-    else:
-        role_brief = meth.role_briefs[role_preset].strip()
-        parts.append(
-            f"## 你的对话身份：{role_preset}\n"
-            "你正在 Web UI 对话面板中以该角色的视角接受研究员的追问与拷问。\n"
-            f"原角色职责如下：\n{role_brief}\n\n"
-            "注意：在对话模式下请用清晰自然的中文 Markdown 回答（不必强套单行 JSON 外壳），如需核查任意候选股完整 K 线、特征或前序辩论原文，请主动调用只读工具查证后再作答，绝不编造外部信息。"
-        )
-
+    meth = methodology if methodology is not None else load_methodology(root=settings.root)
+    identity, _ = build_chat_role_identity(role_preset, meth)
+    parts: list[str] = [meth.text.strip(), identity]
     snapshot_json = json.dumps(context_snapshot, ensure_ascii=False, separators=(",", ":"))
     parts.append(f"## 当前页面常驻运行上下文（JSON）\n{snapshot_json}")
     return "\n\n".join(parts)

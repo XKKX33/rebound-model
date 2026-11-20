@@ -217,9 +217,29 @@ class RunContext:
     final: int
     max_per_industry: int
     pool: PoolSummary
+    model_source: str | None = None
+    feature_set: str | None = None
 
     def payload(self) -> dict[str, Any]:
-        return {**asdict(self), "pool": self.pool.payload()}
+        out: dict[str, Any] = {
+            "as_of": self.as_of,
+            "model_label": self.model_label,
+            "variant": self.variant,
+            "cadence": self.cadence,
+            "fit_date": self.fit_date,
+            "model_id": self.model_id,
+            "scores_stored": self.scores_stored,
+            "pool_size": self.pool_size,
+            "candidates": self.candidates,
+            "final": self.final,
+            "max_per_industry": self.max_per_industry,
+            "pool": self.pool.payload(),
+        }
+        if self.model_source is not None:
+            out["model_source"] = self.model_source
+        if self.feature_set is not None:
+            out["feature_set"] = self.feature_set
+        return out
 
 
 @dataclass(frozen=True, slots=True)
@@ -315,9 +335,13 @@ class Candidate:
     bars: tuple[CandidateBar, ...]
     industry_stats: IndustryStats
     flags: tuple[CandidateFlag, ...]
+    extra_features: Mapping[str, float] | None = None
+    extra_feature_pct: Mapping[str, float] | None = None
+    explain: Mapping[str, Any] | None = None
+    peer_models: Mapping[str, Mapping[str, Any]] | None = None
 
     def payload(self) -> dict[str, Any]:
-        return {
+        out: dict[str, Any] = {
             "ts_code": self.ts_code,
             "name": self.name,
             "industry": self.industry,
@@ -328,6 +352,15 @@ class Candidate:
             "industry_stats": self.industry_stats.payload(),
             "flags": [flag.payload() for flag in self.flags],
         }
+        if self.extra_features is not None:
+            out["extra_features"] = dict(self.extra_features)
+        if self.extra_feature_pct is not None:
+            out["extra_feature_pct"] = dict(self.extra_feature_pct)
+        if self.explain is not None:
+            out["explain"] = dict(self.explain)
+        if self.peer_models is not None:
+            out["peer_models"] = {k: dict(v) for k, v in self.peer_models.items()}
+        return out
 
 
 def build_roster(candidates: Sequence[Candidate]) -> tuple[dict[str, Any], ...]:

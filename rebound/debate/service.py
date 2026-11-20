@@ -51,11 +51,17 @@ def dry_run(
     as_of: date | None = None,
     variant: str | None = None,
     cadence: str | None = None,
+    model_source: str | None = None,
     sidecar_client: Any = None,
 ) -> tuple[snapshot.Snapshot, Mapping[str, Any]]:
     """只组装请求并调用侧车 `--validate`，不调模型、不写运行目录。"""
     snap = snapshot.build_request(
-        db_path, settings=settings, as_of=as_of, variant=variant, cadence=cadence
+        db_path,
+        settings=settings,
+        as_of=as_of,
+        variant=variant,
+        cadence=cadence,
+        model_source=model_source,
     )
     client = sidecar_client if sidecar_client is not None else Sidecar(settings)
     receipt = client.validate(snap.request)
@@ -219,6 +225,7 @@ def run_debate(
     as_of: date | None = None,
     variant: str | None = None,
     cadence: str | None = None,
+    model_source: str | None = None,
     sidecar_client: Any = None,
     log: Callable[[str], None] | None = None,
     on_event: Callable[[Event], None] | None = None,
@@ -227,7 +234,12 @@ def run_debate(
     """执行一次完整的 AI 辩论（命中已完成目录则直接返回冻结结果，中断后支持按票续跑）。"""
     say = log or (lambda _line: None)
     snap = snapshot.build_request(
-        db_path, settings=settings, as_of=as_of, variant=variant, cadence=cadence
+        db_path,
+        settings=settings,
+        as_of=as_of,
+        variant=variant,
+        cadence=cadence,
+        model_source=model_source,
     )
     req = snap.request
     rdir = runs.run_dir(
@@ -236,6 +248,7 @@ def run_debate(
         cadence=req.context.cadence,
         as_of=req.as_of,
         input_hash=req.input_hash,
+        model_source=req.context.model_source,
     )
     final_path = rdir / "final.json"
     if final_path.is_file():

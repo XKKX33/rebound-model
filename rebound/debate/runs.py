@@ -28,6 +28,7 @@ from rebound.debate.contracts import (
 )
 
 __all__ = [
+    "LEGACY_MODEL_SOURCE",
     "append_event",
     "debate_root",
     "freeze_final",
@@ -39,8 +40,10 @@ __all__ = [
     "run_dir",
     "save_stock_checkpoint",
     "save_usage",
+    "series_name",
 ]
 
+LEGACY_MODEL_SOURCE = "return_model"
 _SAFE_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _SAFE_CODE = re.compile(r"^[0-9A-Za-z._-]+$")
 _SAFE_HASH_PREFIX = re.compile(r"^[0-9a-f]{12}$")
@@ -51,15 +54,33 @@ def debate_root(db_path: Path) -> Path:
     return path.with_name(f"{path.stem}.debate")
 
 
-def run_dir(db_path: Path, *, variant: str, cadence: str, as_of: str, input_hash: str) -> Path:
+def series_name(variant: str, cadence: str, model_source: str | None = None) -> str:
+    """返回 `<db>.debate/` 下的系列目录名：原版模型保持 `<variant>-<cadence>`，新模型按 `<variant>-<cadence>-<model>` 分目录。"""
+    if not _SAFE_CODE.fullmatch(variant) or not _SAFE_CODE.fullmatch(cadence):
+        raise ContractError(f"非法的版本或频率：{variant!r}/{cadence!r}")
+    clean_model = (model_source or "").strip()
+    if not clean_model or clean_model == LEGACY_MODEL_SOURCE:
+        return f"{variant}-{cadence}"
+    if not _SAFE_CODE.fullmatch(clean_model):
+        raise ContractError(f"非法的模型名：{clean_model!r}")
+    return f"{variant}-{cadence}-{clean_model}"
+
+
+def run_dir(
+    db_path: Path,
+    *,
+    variant: str,
+    cadence: str,
+    as_of: str,
+    input_hash: str,
+    model_source: str | None = None,
+) -> Path:
     if not _SAFE_DATE.fullmatch(as_of):
         raise ContractError(f"非法的运行日期：{as_of!r}")
     prefix = input_hash[:12]
     if not _SAFE_HASH_PREFIX.fullmatch(prefix):
         raise ContractError(f"非法的 input_hash 前缀：{prefix!r}")
-    if not _SAFE_CODE.fullmatch(variant) or not _SAFE_CODE.fullmatch(cadence):
-        raise ContractError(f"非法的版本或频率：{variant!r}/{cadence!r}")
-    return debate_root(db_path) / f"{variant}-{cadence}" / as_of / prefix
+    return debate_root(db_path) / series_name(variant, cadence, model_source) / as_of / prefix
 
 
 def _dump_json(value: Any) -> str:
@@ -171,9 +192,10 @@ def list_runs(
     variant: str,
     cadence: str,
     as_of: date | None = None,
+    model_source: str | None = None,
 ) -> tuple[str | None, list[dict[str, Any]]]:
     """列出某一天的全部辩论运行；最早完成的一次标为 `official=True`（当日正式结果）。"""
-    series_dir = debate_root(db_path) / f"{variant}-{cadence}"
+    series_dir = debate_root(db_path) / series_name(variant, cadence, model_source)
     if not series_dir.is_dir():
         return None, []
     if as_of is not None:
