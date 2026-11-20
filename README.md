@@ -30,31 +30,93 @@ Python 负责流程，Tushare 提供行情，DuckDB 保存数据与每日分数�
 
 | 目录 | 内容 |
 |---|---|
-| `rebound/` | 正式程序与命令行 |
-| `config/settings.yaml` | 数据位置、同步参数、默认模型版本和选股数量 |
-| `tests/` | 正式程序的隔离测试 |
+| `rebound/` | 正式程序、命令行与 Web 工作台后端/前端（`rebound/debate/web_ui/`） |
+| `ml/` | 三套 F69 模型（XGBoost / 随机森林 / LSTM）的训练、回测、只读接口（`ml/api.py`）与交付报告 |
+| `debate_agent/` | TypeScript / Node.js 多角色 AI 辩论侧车（7 个角色流式输出与结构化校验） |
+| `config/settings.yaml` | 数据位置、同步参数、模型版本、选股数量与 AI 辩论网关配置 |
+| `tests/` | 正式程序与三模型/辩论/Web API 集成测试 |
 | `experiments/` | 历史实验、测试、报告及小型结果文件 |
-| `docs/` | 模型口径、评估方法和数据维护说明 |
+| `docs/` | 模型口径、评估方法、AI 辩论协议与数据维护说明 |
 
-## 本地运行
+## 快速上手：三模型 + AI 辩论 + Web 工作台
+
+仓库包含全部源码、测试与三模型静态交付报告；体积较大的行情库、三模型分数/归因数据包与 API 密钥均在 `.gitignore` 中不入库，克隆仓库后按以下 **4 步** 即可完整跑通。
+
+### 第 1 步：准备环境与安装依赖
+
+需要 **Python >= 3.11** 与 **Node.js >= 22.19.0**。在仓库根目录执行：
+
+```bash
+# 1) 安装 Python 依赖（已包含读取三模型 parquet 所需的 pyarrow 与 psutil，一步到位）
+pip install -e .
+
+# 2) 安装 AI 辩论侧车依赖
+cd debate_agent
+npm install
+cd ..
+```
+
+> 仅使用三模型对比面板、演练快照和 AI 辩论工作台**不需要**安装 PyTorch 或 scikit-learn（仅重训或给 `2026-10-16` 之后的新交易日用 `ml/predict.py` 推随机森林/LSTM 时才需额外安装）。如需运行单元测试或研究脚本，可安装 `pip install -e ".[dev,research]"`。
+
+### 第 2 步：放入两份离线数据到 `data/`
+
+将另外获取的两份数据放到仓库根目录的 `data/` 下：
+
+1. **行情研究库（约 1.2 GB）**：放到 `data/research-2013-2026.duckdb`（若拿到分卷目录 `share-research-2013-2026/`，运行其中的合并脚本后再移至该路径）。用于单股 K 线、69 特征补算与指数对照。
+2. **三模型数据包 `api_export.zip`（约 451 MB）**：解压到 `data/ml/`，确保目录结构如下：
+
+```text
+data/
+├─ research-2013-2026.duckdb       # 2013~2026 行情与指数研究库
+└─ ml/
+   ├─ api_export/                  # 三模型 2021~2026 分数、2023~2026 预计算归因、事后复盘收益
+   └─ deploy/                      # 训练好的三套模型文件（新日期推理用）
+```
+
+### 第 3 步：配置 `.env` 密钥（跑真 AI 辩论与对话时需要）
+
+复制模板文件为 `.env`：
+
+```bash
+cp .env.example .env    # Windows PowerShell: Copy-Item .env.example .env
+```
+
+在 `.env` 中填入大模型 API Key（默认键名 `WORKBENCH_AI_API_KEY`，对应 `config/settings.yaml` 的 `debate.llm` 配置；如需切换其他 OpenAI 兼容网关或模型，直接修改 `config/settings.yaml` 中的 `base_url` 与 `model` 即可）。
+
+> 若暂不发起大模型辩论/对话，**不填密钥**也可直接浏览三模型排行榜、换起点净值/年化曲线、F69 特征字典、单股归因与演练快照。
+
+### 第 4 步：启动工作台与环境自检
+
+```bash
+# 可选：检查 Python / Node 侧车 / 密钥是否就绪
+python -X utf8 -m rebound debate check
+
+# 启动本地 Web 工作台（自动识别 research-2013-2026.duckdb 与 data/ml/api_export/）
+python -X utf8 -m rebound debate ui
+```
+
+浏览器自动打开 `http://127.0.0.1:8765/` 后，即可使用：
+- **模型对比与净值**：三模型（XGBoost F69 / 随机森林 F69 / LSTM S+F69）测试段排行榜、主规则 `DB-K30-b8`（20 万本金、最多 30 只）换起点（`2015 ~ 2024` 与正式测试段）净值曲线 / 动态年化曲线 / 10 起点年化对比与逐年明细、同日 Top 6 共识与打分归因、69 特征 + 11 序列通道字典；
+- **单股详情与 AI 辩论**：支持切换三模型发起不花钱的「演练」或 7 角色流式 AI 辩论（含 TreeSHAP / Saabas / 积分梯度归因与断点续跑）；
+- **终选结果、提示词查看器与右侧 AI 投研对话栏**：支持查看角色系统提示词与实际 User JSON，并在右侧通过只读工具追问复盘。
+
+## 本地运行（命令行与行情同步）
 
 需要 Python 3.11 或以上。依赖版本固定在 `pyproject.toml`，模型文件的校验信息也记录训练版本。
-本机已经有版本匹配的 Anaconda 环境，可直接复用。
-
 在仓库根目录打开 PowerShell：
 
 ```powershell
-$reboundPython = 'C:\Users\xuan\anaconda3\python.exe'
+$reboundPython = 'python'   # 或指定本机 Python 路径，例如 'C:\Users\xuan\anaconda3\python.exe'
 & $reboundPython -X utf8 -m rebound --help
 ```
 
-已有的其他环境首次安装依赖时：
+开发或运行历史实验脚本时，可额外安装可选依赖：
 
 ```powershell
 & $reboundPython -m pip install -e '.[dev,research]'
 ```
 
-`dev` 是测试依赖，`research` 是实验脚本使用的额外依赖。只运行正式程序时可安装 `-e .`。
+`dev` 是测试依赖，`research` 是实验脚本使用的额外依赖（含 `scipy`）。只运行正式程序、三模型只读接口与工作台时直接 `pip install -e .` 即可。
 
 ### 首次准备真实数据
 
@@ -123,12 +185,13 @@ cd debate_agent; npm install; cd ..
 & $reboundPython -X utf8 -m rebound debate check
 ```
 
-常用命令（支持 `--as-of` 回放、不花钱的 `--dry-run` 演练与断点续跑）：
+常用命令（支持 `--model xgb_F69|rf_F69|lstm_SF69`、`--as-of` 回放、不花钱的 `--dry-run` 演练、断点续跑与本地工作台）：
 
 ```powershell
-& $reboundPython -X utf8 -m rebound debate run --dry-run
-& $reboundPython -X utf8 -m rebound debate run
-& $reboundPython -X utf8 -m rebound debate show
+& $reboundPython -X utf8 -m rebound debate ui
+& $reboundPython -X utf8 -m rebound debate run --model xgb_F69 --as-of 2026-10-16 --dry-run
+& $reboundPython -X utf8 -m rebound debate run --model xgb_F69 --as-of 2026-10-16
+& $reboundPython -X utf8 -m rebound debate show --model xgb_F69 --as-of 2026-10-16
 & $reboundPython -X utf8 -m rebound daily --debate
 ```
 

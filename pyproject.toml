@@ -12,11 +12,14 @@ dependencies = [
     "tushare==1.4.29",
     "pyyaml==6.0.3",
     "python-dotenv==1.1.0",
+    # 三模型只读接口（ml/api.py）读 parquet 与内存统计必需
+    "pyarrow",
+    "psutil",
 ]
 
 [project.optional-dependencies]
 dev = ["pytest==8.4.2"]
-# 跑 experiments/ 里的研究脚本要多装这几个
+# 跑 experiments/ 与 ml/ 重训研究脚本要多装这几个
 research = ["pyarrow", "scipy", "psutil"]
 
 [project.scripts]
