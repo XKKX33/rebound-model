@@ -1,0 +1,165 @@
+{
+ "chosen": "FH-K1-h14",
+ "valid_rank_of_refs": {
+  "DB-K30-b8": 26,
+  "FH-K6-h4": 55
+ },
+ "test_rank": {
+  "FH-K1-h14": 75,
+  "DB-K30-b8": 50,
+  "FH-K6-h4": 91
+ },
+ "n_rules": 150,
+ "test": {
+  "FH-K1-h14": {
+   "xgb_F69": {
+    "days": 910,
+    "total": 41.55,
+    "cagr": 9.68,
+    "excess": 14.02,
+    "excess_ci": [
+     -16.93,
+     41.94
+    ],
+    "beta": 0.652,
+    "alpha": 13.37,
+    "max_dd": -50.99,
+    "turnover": 15.3,
+    "cost_pct": 2.35,
+    "hold_days": 14.1
+   },
+   "rf_F69": {
+    "days": 910,
+    "total": 22.9,
+    "cagr": 5.64,
+    "excess": 9.81,
+    "excess_ci": [
+     -22.31,
+     38.62
+    ],
+    "beta": 0.589,
+    "alpha": 9.04,
+    "max_dd": -53.18,
+    "turnover": 15.2,
+    "cost_pct": 2.32,
+    "hold_days": 14.1
+   },
+   "lstm_SF69": {
+    "days": 910,
+    "total": 128.19,
+    "cagr": 24.53,
+    "excess": 25.91,
+    "excess_ci": [
+     8.79,
+     43.6
+    ],
+    "beta": 0.717,
+    "alpha": 25.38,
+    "max_dd": -21.21,
+    "turnover": 15.4,
+    "cost_pct": 2.35,
+    "hold_days": 14.0
+   }
+  },
+  "DB-K30-b8": {
+   "xgb_F69": {
+    "days": 910,
+    "total": 76.85,
+    "cagr": 16.37,
+    "excess": 19.33,
+    "excess_ci": [
+     1.25,
+     36.91
+    ],
+    "beta": 0.792,
+    "alpha": 18.94,
+    "max_dd": -31.72,
+    "turnover": 30.9,
+    "cost_pct": 5.06,
+    "hold_days": 6.9
+   },
+   "rf_F69": {
+    "days": 910,
+    "total": 71.59,
+    "cagr": 15.44,
+    "excess": 18.12,
+    "excess_ci": [
+     2.68,
+     34.1
+    ],
+    "beta": 0.708,
+    "alpha": 17.57,
+    "max_dd": -31.87,
+    "turnover": 26.2,
+    "cost_pct": 4.58,
+    "hold_days": 8.3
+   },
+   "lstm_SF69": {
+    "days": 910,
+    "total": 89.58,
+    "cagr": 18.54,
+    "excess": 21.05,
+    "excess_ci": [
+     6.24,
+     37.29
+    ],
+    "beta": 0.804,
+    "alpha": 20.68,
+    "max_dd": -31.99,
+    "turnover": 38.9,
+    "cost_pct": 6.54,
+    "hold_days": 5.4
+   }
+  },
+  "FH-K6-h4": {
+   "xgb_F69": {
+    "days": 910,
+    "total": 55.66,
+    "cagr": 12.49,
+    "excess": 15.74,
+    "excess_ci": [
+     -2.19,
+     33.65
+    ],
+    "beta": 0.654,
+    "alpha": 15.1,
+    "max_dd": -31.61,
+    "turnover": 44.2,
+    "cost_pct": 7.93,
+    "hold_days": 4.0
+   },
+   "rf_F69": {
+    "days": 910,
+    "total": 25.6,
+    "cagr": 6.25,
+    "excess": 9.64,
+    "excess_ci": [
+     -6.91,
+     26.13
+    ],
+    "beta": 0.585,
+    "alpha": 8.86,
+    "max_dd": -30.41,
+    "turnover": 43.8,
+    "cost_pct": 8.89,
+    "hold_days": 4.0
+   },
+   "lstm_SF69": {
+    "days": 910,
+    "total": 82.24,
+    "cagr": 17.3,
+    "excess": 19.74,
+    "excess_ci": [
+     5.18,
+     34.81
+    ],
+    "beta": 0.717,
+    "alpha": 19.21,
+    "max_dd": -27.84,
+    "turnover": 44.7,
+    "cost_pct": 7.98,
+    "hold_days": 4.0
+   }
+  }
+ }
+}

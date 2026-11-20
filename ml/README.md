@@ -62,6 +62,7 @@
 | 6.5 一键复现 | 完成 | `run.py` | 见下文“怎么重跑” | `python -m ml.run panel / features / train / evaluate / backtest / report / test / all` |
 | 6.6 测试 | 完成 | `tests/` | — | 全部通过；仓库原有测试见执行记录 |
 | P8 交付收窄为三个 F69 模型 | 完成 | `p7_history_lstm.py`、`p8_explain_rf.py`、`p8_explain_lstm.py`、`lstm_explain.py`、`p8_deploy.py`、`predict.py`、`lstm_predict.py`、`p8_delivery*.py` | [delivery](results/delivery/report.md) | 三个模型测试 IC 0.119 ~ 0.120，两两分不出；LSTM 长期回测、随机森林和 LSTM 解释、模型文件和打分脚本补齐；numexpr 偶发错误查明并关掉，LSTM S+F69 测试段重跑（0.117 → 0.120，判定不变） |
+| P9 交易规则检验（补充） | 完成 | `p9_rule_select.py`、`p9_rule_compare.py` | [p9_rule_select](results/p9_rule_select/report.md)、[两条规则对比](results/p9_rule_select/compare.md) | 只用验证段从 150 条规则选出 FH-K1-h14，测试段只排第 75、回撤翻倍；两段都靠前的 DB-K20-b16 在没用过的 2015 ~ 2020 年与作者规则打平；规则表现两段秩相关 0.20；不改规则 |
 
 ## 目录
 
@@ -119,6 +120,7 @@ ml/
 ├─ predict.py               P8：用交付模型给某一天打分、出名单（lstm_predict.py 是 LSTM 部分，dl-study 环境）
 ├─ p8_delivery.py           P8：交付版结果（三个模型的测试段、长期回测、换起点、图）；p8_delivery_report.py 写报告
 ├─ p8_starts_nav.py         P8：换起点的每条净值曲线和图（fig5、fig6）
+├─ p9_rule_select.py        P9：只用验证段选交易规则（150 条）；p9_rule_compare.py：DB-K20-b16 与作者规则的全部回测对比
 ├─ p6_figures.py            6.3 报告用图（统一放到 results/figures/）
 ├─ p6_export.py             交接：导出接口用的精简数据包 data/ml/api_export（+ zip）
 ├─ run.py                    6.5 一键复现：python -m ml.run <步骤>|all
@@ -207,6 +209,8 @@ dl-study 环境 `D:\Anaconda\envs\dl-study\python.exe`（torch + CUDA，8 GB 显
 & 'D:\Anaconda\python.exe' -X utf8 -m ml.predict --check         # 约 2 分钟
 & 'D:\Anaconda\python.exe' -X utf8 -m ml.p8_delivery             # 约 15 分钟
 & 'D:\Anaconda\python.exe' -X utf8 -m ml.p8_starts_nav           # 约 3 分钟：换起点净值曲线和图，之后运行 ml.p8_delivery --report 把图写进报告
+& 'D:\Anaconda\python.exe' -X utf8 -m ml.p9_rule_select          # 约 2 分钟：交易规则检验（验证段选规则，测试段只报告）
+& 'D:\Anaconda\python.exe' -X utf8 -m ml.p9_rule_compare         # 约 3 分钟：DB-K20-b16 与作者规则的全部回测对比
 & 'D:\Anaconda\python.exe' -X utf8 -m ml.p6_figures               # 约 1 分钟
 & 'D:\Anaconda\python.exe' -X utf8 -m ml.p6_export                # 约 2 分钟：交接用的数据包
 & 'D:\Anaconda\python.exe' -X utf8 -m pytest -p no:cacheprovider -o addopts="" -q ml/tests
