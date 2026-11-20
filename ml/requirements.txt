@@ -1,0 +1,29 @@
+# ml/ 目录需要的 Python 包（版本 = 实际跑出全部结果的环境，Anaconda 主环境，Python 3.13）。
+# 仓库根目录 pyproject.toml 只列了作者原有代码的依赖；下面是 ml/ 另外需要的。详见 ml/ENV.md。
+#
+# 只用接口（ml/api.py，智能体和看板）：装“接口”这一组即可。
+#   pip install -r ml/requirements.txt          # 全部
+# 版本不必完全一致；xgboost 版本不同只影响重新训练时分数的末几位，接口只读已算好的分数，不受影响。
+
+# ---- 接口（ml/api.py）----
+pandas==2.3.3
+numpy==2.4.3
+pyarrow==21.0.0          # 读 parquet（分数、数据包）
+duckdb==1.5.5            # ml/common.py 导入；有数据包时接口不读研究库
+PyYAML==6.0.3            # 读 ml/config.yaml
+psutil==7.0.0            # ml/common.py 导入（记录内存）
+xgboost==3.4.1           # 仓库 rebound 包的导入链需要（作者钉的是 3.2.0）
+scikit-learn==1.7.2
+scipy==1.16.3
+
+# ---- 完整复现（训练、评估、报告、作图）----
+matplotlib==3.10.6
+seaborn==0.13.2
+statsmodels==0.14.5      # 风格归因的回归（Newey-West 标准误）
+tabulate==0.9.0          # pandas.to_markdown 生成报告表格
+pytest==8.4.2
+
+# ---- LSTM（另一个环境 dl-study，Python 3.11；只依赖 numpy、torch、matplotlib）----
+# torch==2.10.0+cu128     # 按自己的 CUDA 版本装：https://pytorch.org/get-started/locally/
+# numpy==2.4.4
+# matplotlib==3.10.8

@@ -1,0 +1,28 @@
+14:40:56 [F28] 第 1/12 组 {'max_depth': 4, 'learning_rate': 0.03, 'colsample_bytree': 0.5}：早停 1986 棵，验证 IC 0.0964，训练 368s
+14:47:12 [F28] 第 2/12 组 {'max_depth': 4, 'learning_rate': 0.03, 'colsample_bytree': 0.8}：早停 1959 棵，验证 IC 0.0963，训练 373s
+14:50:20 [F28] 第 3/12 组 {'max_depth': 4, 'learning_rate': 0.1, 'colsample_bytree': 0.5}：早停 877 棵，验证 IC 0.0961，训练 186s
+14:52:28 [F28] 第 4/12 组 {'max_depth': 4, 'learning_rate': 0.1, 'colsample_bytree': 0.8}：早停 564 棵，验证 IC 0.0956，训练 126s
+14:56:00 [F28] 第 5/12 组 {'max_depth': 6, 'learning_rate': 0.03, 'colsample_bytree': 0.5}：早停 939 棵，验证 IC 0.0968，训练 209s
+14:59:37 [F28] 第 6/12 组 {'max_depth': 6, 'learning_rate': 0.03, 'colsample_bytree': 0.8}：早停 975 棵，验证 IC 0.0974，训练 214s
+15:01:29 [F28] 第 7/12 组 {'max_depth': 6, 'learning_rate': 0.1, 'colsample_bytree': 0.5}：早停 415 棵，验证 IC 0.0966，训练 109s
+15:02:39 [F28] 第 8/12 组 {'max_depth': 6, 'learning_rate': 0.1, 'colsample_bytree': 0.8}：早停 226 棵，验证 IC 0.0965，训练 67s
+15:05:22 [F28] 第 9/12 组 {'max_depth': 8, 'learning_rate': 0.03, 'colsample_bytree': 0.5}：早停 598 棵，验证 IC 0.0971，训练 160s
+15:08:12 [F28] 第 10/12 组 {'max_depth': 8, 'learning_rate': 0.03, 'colsample_bytree': 0.8}：早停 635 棵，验证 IC 0.0975，训练 168s
+15:08:59 [F28] 第 11/12 组 {'max_depth': 8, 'learning_rate': 0.1, 'colsample_bytree': 0.5}：早停 97 棵，验证 IC 0.0952，训练 44s
+15:09:53 [F28] 第 12/12 组 {'max_depth': 8, 'learning_rate': 0.1, 'colsample_bytree': 0.8}：早停 128 棵，验证 IC 0.0956，训练 51s
+15:09:53 [F28] 选定 {'组': 4, 'max_depth': 4, 'learning_rate': 0.1, 'colsample_bytree': 0.8, '早停树数（种子 0）': 564, '验证 IC（种子 0）': 0.09564850541834215, '最高验证 IC': 0.09748576391491513, '打平的组': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12]}
+15:17:19 [F28] 最终 3 种子：验证 IC 0.0967，各种子 [0.0956, 0.0964, 0.0962]，树数 [564, 718, 755]，训练 442s
+15:19:48 [F69] 第 1/12 组 {'max_depth': 4, 'learning_rate': 0.03, 'colsample_bytree': 0.5}：早停 344 棵，验证 IC 0.0980，训练 144s
+15:22:18 [F69] 第 2/12 组 {'max_depth': 4, 'learning_rate': 0.03, 'colsample_bytree': 0.8}：早停 353 棵，验证 IC 0.0971，训练 147s
+15:23:34 [F69] 第 3/12 组 {'max_depth': 4, 'learning_rate': 0.1, 'colsample_bytree': 0.5}：早停 121 棵，验证 IC 0.0980，训练 73s
+15:24:49 [F69] 第 4/12 组 {'max_depth': 4, 'learning_rate': 0.1, 'colsample_bytree': 0.8}：早停 116 棵，验证 IC 0.0961，训练 72s
+15:27:19 [F69] 第 5/12 组 {'max_depth': 6, 'learning_rate': 0.03, 'colsample_bytree': 0.5}：早停 312 棵，验证 IC 0.0984，训练 147s
+15:28:58 [F69] 第 6/12 组 {'max_depth': 6, 'learning_rate': 0.03, 'colsample_bytree': 0.8}：早停 162 棵，验证 IC 0.0971，训练 96s
+15:30:01 [F69] 第 7/12 组 {'max_depth': 6, 'learning_rate': 0.1, 'colsample_bytree': 0.5}：早停 59 棵，验证 IC 0.0970，训练 60s
+15:31:05 [F69] 第 8/12 组 {'max_depth': 6, 'learning_rate': 0.1, 'colsample_bytree': 0.8}：早停 65 棵，验证 IC 0.0962，训练 61s
+15:33:19 [F69] 第 9/12 组 {'max_depth': 8, 'learning_rate': 0.03, 'colsample_bytree': 0.5}：早停 219 棵，验证 IC 0.0972，训练 131s
+15:35:06 [F69] 第 10/12 组 {'max_depth': 8, 'learning_rate': 0.03, 'colsample_bytree': 0.8}：早停 148 棵，验证 IC 0.0974，训练 104s
+15:36:09 [F69] 第 11/12 组 {'max_depth': 8, 'learning_rate': 0.1, 'colsample_bytree': 0.5}：早停 43 棵，验证 IC 0.0964，训练 60s
+15:37:10 [F69] 第 12/12 组 {'max_depth': 8, 'learning_rate': 0.1, 'colsample_bytree': 0.8}：早停 37 棵，验证 IC 0.0962，训练 58s
+15:37:10 [F69] 选定 {'组': 3, 'max_depth': 4, 'learning_rate': 0.1, 'colsample_bytree': 0.5, '早停树数（种子 0）': 121, '验证 IC（种子 0）': 0.09795070945292862, '最高验证 IC': 0.09844173455714611, '打平的组': [1, 2, 3, 5, 6, 7, 9, 10]}
+15:41:21 [F69] 最终 3 种子：验证 IC 0.0987，各种子 [0.098, 0.098, 0.0973]，树数 [121, 142, 221]，训练 246s

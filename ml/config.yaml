@@ -1,0 +1,31 @@
+# 数据与模型部分的统一配置（读取：ml/common.py 的 load_config）。
+# 相对路径都相对于仓库根目录 rebound-model/。
+
+paths:
+  db: data/research-2013-2026.duckdb   # 研究库，只读打开
+  data_out: data/ml                    # 大产物（parquet、模型），不进 Git
+  results: ml/results                  # 小结果（md / csv / png），进 Git
+
+# 股票池版本：nocap = 不限价（仓库默认）
+variant: nocap
+
+# 时间划分（P2.1 主协议 A）；段与段之间清掉 gap_days 个交易日（标签期限 5 天）
+split:
+  train_start: "2013-01-04"
+  train_end: "2020-12-31"
+  valid_start: "2021-01-01"
+  valid_end: "2022-12-31"
+  test_start: "2023-01-01"
+  test_end: "2026-10-23"
+  gap_days: 5   # 实现方式：训练行的实际卖出日必须早于重训日（仓库 training_set 的规则，见 ml/evaluate.py fit_rows）
+  # 测试期分两段报告（作者挑特征和参数的时期是 2022-09 ~ 2024-06）
+  test_split_at: "2024-07-01"
+
+# 随机种子（树模型、MLP 各跑这几个）
+seeds: [0, 1, 2]
+
+# 市场基准指数（F 组特征：beta、特质波动率、市场状态）
+benchmark_index: "000852.SH"   # 中证 1000
+
+# 统一的随机数种子（抽样、bootstrap 等）
+random_state: 20261117
