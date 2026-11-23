@@ -265,3 +265,17 @@ cd debate_agent; npm test; npm run typecheck; cd ..
 - 已修正数据模块被 Git 忽略的问题，补齐安装后的显式配置入口。
 - 已补齐运行说明、架构、数据维护与验证记录。
 - 待使用者配置真实数据与凭据，并完成真实数据上的独立运行验收。
+
+## A 股量化选股与智能研判工作台
+
+[整合看板](work/dashboard/README.md) 将市场行情、特征工程、模型与策略、投资组合案和 AI 辩论台放在同一页面，复用本仓库的三模型数据接口与完整辩论后端。股票搜索、评分归因、预算配置和候选研判可以联动查看，模型与策略保留已有真实回测口径。
+
+准备好上文的行情库与 `data/ml/api_export/` 后，在仓库根目录安装看板依赖、生成一次观察截面并启动：
+
+```powershell
+python -m pip install -r work/dashboard/requirements.txt
+python -X utf8 work/dashboard/prepare_data.py --as-of 2026-10-23
+.\work\dashboard\start.ps1
+```
+
+统一入口为 `http://127.0.0.1:8875/`，AI 辩论通过同一个网址的 `/debate/` 访问。数据、模型文件、API 密钥和辩论记录仍单独准备，不随看板源码上传。共享启动、路径配置和技术路线见看板说明。

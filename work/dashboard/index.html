@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>A 股量化选股与智能研判</title>
+  <link rel="stylesheet" href="/assets/dashboard.css">
+  <script src="/assets/dashboard.js" defer></script>
+</head>
+<body>
+<div id="stock-dashboard">
+  <header class="sd-top">
+    <span class="sd-title">A 股量化选股与智能研判</span>
+    <nav class="sd-nav" aria-label="主导航">
+      <button type="button" data-page="market" aria-current="page">市场行情</button>
+      <button type="button" data-page="features">特征工程</button>
+      <button type="button" data-page="models">模型与策略</button>
+      <button type="button" data-page="portfolio">投资组合案</button>
+      <button type="button" data-page="agents">AI辩论台</button>
+    </nav>
+    <button type="button" data-action="source">数据说明</button>
+  </header>
+  <main>
+    <section data-view="market">
+      <div class="sd-module-head"><div class="sd-heading"><h1>市场行情</h1><span class="sd-module-description">全市场涨跌、个股走势与成交结构</span></div></div>
+      <div class="sd-toolbar">
+        <label class="sd-search"><span>股票搜索</span><input type="search" data-control="search" placeholder="代码 / 名称 / 行业" autocomplete="off" aria-label="搜索股票代码名称或行业"><div class="sd-search-results" data-slot="search-results" hidden></div></label>
+        <div class="sd-tools"><label><span data-slot="date-label">行情日期</span><input type="date" data-control="date" aria-label="行情日期"></label></div>
+      </div>
+      <div class="sd-recent-research sd-market-recent"><span>最近查看</span><div data-slot="market-recent"></div></div>
+      <div class="sd-index-strip" data-slot="indexes"></div>
+      <div class="sd-breadth" data-slot="breadth"></div>
+      <div class="sd-market-layout">
+        <section class="sd-list-pane" aria-label="股票行情列表">
+          <div class="sd-pane-tabs"><button type="button" data-list="all" aria-pressed="true">全部股票</button><button type="button" data-list="recent" aria-pressed="false">最近查看</button></div>
+          <div class="sd-list-tools"><select data-control="board" aria-label="筛选市场"><option value="all">全部市场</option><option value="main">沪深主板</option><option value="gem">创业板</option><option value="star">科创板</option><option value="bj">北交所</option></select><span data-slot="list-count"></span></div>
+          <div class="sd-table-wrap"><table class="sd-stock-table"><thead><tr><th><button type="button" data-sort="code">股票</button></th><th><button type="button" data-sort="price">收盘价</button></th><th><button type="button" data-sort="change">涨跌幅</button></th><th><button type="button" data-sort="amount">成交额</button></th></tr></thead><tbody data-slot="stocks"></tbody></table></div>
+          <div class="sd-pagination"><button type="button" data-action="previous" aria-label="上一页">←</button><span data-slot="pagination"></span><button type="button" data-action="next" aria-label="下一页">→</button></div>
+        </section>
+        <section class="sd-chart-pane" aria-label="个股行情">
+          <div class="sd-stock-header"><div><h1 data-slot="stock-name">载入行情</h1><span data-slot="stock-code"></span></div></div>
+          <div class="sd-quote"><strong data-slot="price"></strong><span data-slot="change"></span><span class="sd-quote-date" data-slot="quote-date"></span></div>
+          <dl class="sd-quote-grid" data-slot="quote-fields"></dl>
+          <div class="sd-chart-tools"><div class="sd-segment"><button type="button" data-period="day" aria-pressed="true">日K</button><button type="button" data-period="week" aria-pressed="false">周K</button><button type="button" data-period="month" aria-pressed="false">月K</button></div><label class="sd-adjust"><select data-control="adjustment" aria-label="复权方式"><option value="none">不复权</option><option value="qfq">前复权</option></select></label><div class="sd-segment sd-range"><button type="button" data-count="60">60根</button><button type="button" data-count="100" aria-pressed="true">100根</button></div></div>
+          <div class="sd-chart-readout" data-slot="chart-readout" aria-live="polite"></div>
+          <svg class="sd-price-chart" data-chart="price" role="img" aria-label="K线及5、10、20期均线"></svg>
+          <div class="sd-chart-tools sd-sub-tools"><div class="sd-segment"><button type="button" data-sub="amount" aria-pressed="true">成交额</button><button type="button" data-sub="volume" aria-pressed="false">成交量</button><button type="button" data-sub="money" aria-pressed="false">资金净流入</button></div><span data-slot="sub-unit">亿元</span></div>
+          <svg class="sd-sub-chart" data-chart="sub" role="img" aria-label="成交额、成交量或资金净流入"></svg>
+          <section class="sd-insight" aria-label="行情解读"><div class="sd-insight-head"><h3>行情解读</h3><button type="button" data-insight-ask="market" title="把当前行情与问题带到 AI 投研对话，确认后发送">向 AI 追问 ↗</button></div><p data-slot="market-insight" aria-live="polite">正在读取行情…</p></section>
+        </section>
+      </div>
+    </section>
+    <section data-view="features" hidden>
+      <div class="sd-module-head"><div class="sd-heading"><h1>特征工程</h1><span class="sd-module-description">从量价形态到模型输入</span></div><button type="button" data-research="feature-info">输入与计算口径</button></div>
+      <div class="sd-feature-research"><div class="sd-recent-research"><span>最近查看</span><div data-slot="research-recent"></div></div></div>
+      <div class="sd-feature-tabs" role="tablist" aria-label="特征工程视图"><button type="button" role="tab" data-feature-view="observations" aria-selected="true">量价观察 · 6 项</button><button type="button" role="tab" data-feature-view="catalog" aria-selected="false">模型特征 · 69 项</button><button type="button" role="tab" data-feature-view="sequence" aria-selected="false">日线序列 · 11 通道</button></div>
+      <div class="sd-feature-intro" data-slot="feature-intro"></div>
+      <div class="sd-research-layout" data-feature-panel="observations"><aside class="sd-feature-menu" data-slot="feature-menu"></aside><section class="sd-panel sd-feature-detail">
+        <div class="sd-panel-head"><h2 data-slot="feature-title">读取特征</h2><span data-slot="feature-date"></span></div>
+        <div class="sd-metric-strip" data-slot="feature-metrics"></div>
+        <div class="sd-two-charts"><div><h3>当日主板分布</h3><svg data-research-chart="distribution" class="sd-research-chart" role="img" aria-label="当日特征分布与个股位置"></svg></div><div><h3>个股特征走势</h3><svg data-research-chart="feature-line" class="sd-research-chart" role="img" aria-label="所选个股最近80根特征走势"></svg></div></div>
+        <div class="sd-feature-footer" data-slot="feature-formula"></div>
+        <section class="sd-insight" aria-label="特征解读"><div class="sd-insight-head"><h3>特征解读</h3><button type="button" data-insight-ask="features">向 AI 追问 ↗</button></div><p data-slot="feature-insight" aria-live="polite"></p></section>
+        <section class="sd-attribution"><div class="sd-panel-head"><h3>模型评分归因</h3><div class="sd-inline-controls"><label>归因模型<select data-research-control="model" title="只切换本股评分与归因；上方量价观察采用同一行情截面"><option value="xgb_F69">XGBoost · 69 项特征</option><option value="rf_F69">随机森林 · 69 项特征</option><option value="lstm_SF69">LSTM · 69 项特征 + 60×11 序列</option></select></label><label>信号日<input type="date" data-research-control="signal-date" aria-label="归因信号日" title="模型已完成评分的日期，独立于上方行情截面"></label></div></div><p class="sd-attribution-date" data-slot="attribution-method"></p><div class="sd-attribution-summary" data-slot="attribution-summary"></div><div class="sd-factor-list" data-slot="attribution-factors"></div><p class="sd-attribution-caption" data-slot="attribution-caption"></p></section>
+      </section></div>
+      <section class="sd-panel" data-feature-panel="catalog" hidden><div class="sd-panel-head"><h2 data-slot="catalog-title">模型特征</h2><span data-slot="catalog-count"></span></div><p class="sd-catalog-description" data-slot="catalog-description"></p><div class="sd-feature-overview"><div class="sd-feature-stats" data-slot="feature-stats"></div><div class="sd-feature-groups" data-slot="feature-groups" aria-label="特征分组数量"></div></div><div class="sd-catalog-controls"><input type="search" data-feature-search placeholder="搜索中文名称、定义或设计依据" aria-label="搜索模型特征"><select data-feature-group aria-label="特征分组"><option value="all">全部分组</option></select></div><div class="sd-table-wrap sd-feature-catalog"><table class="sd-research-table"><thead><tr><th>特征</th><th>分组</th><th>计算定义</th><th>设计依据</th></tr></thead><tbody data-slot="feature-catalog"></tbody></table></div><section class="sd-insight"><div class="sd-insight-head"><h3>输入设计</h3><button type="button" data-insight-ask="feature-catalog" title="把当前特征分组带入 AI 对话，不会自动发送">向 AI 追问 ↗</button></div><p data-slot="catalog-insight"></p></section></section>
+      <section class="sd-panel sd-sequence-panel" data-feature-panel="sequence" hidden><div class="sd-panel-head"><h2>近 60 个交易日的模型输入</h2><span data-slot="sequence-count"></span></div><p class="sd-sequence-description" data-slot="sequence-description"></p><div class="sd-sequence-summary" data-slot="sequence-summary"></div><div class="sd-sequence-table-wrap"><table class="sd-sequence-table"><thead data-slot="sequence-head"></thead><tbody data-slot="sequence-body"></tbody></table></div><details class="sd-sequence-definitions"><summary>查看通道计算口径</summary><div class="sd-table-wrap"><table class="sd-research-table"><thead><tr><th>通道</th><th>计算方式</th></tr></thead><tbody data-slot="sequence-definitions"></tbody></table></div></details></section>
+    </section>
+    <section data-view="models" hidden>
+      <div class="sd-module-head"><div class="sd-heading"><h1>模型与策略</h1><span class="sd-module-description" data-slot="model-provenance">比较统一策略下的模型净值与风险</span></div><div class="sd-model-controls"><label>策略<select data-research-control="rule" title="同时切换三模型的持仓与换仓规则，比较同一策略下的回测表现"><option value="DB-K30-b8">排名缓冲 · 30只</option><option value="DB-K3-b16">集中持仓 · 3只</option><option value="FH-K6-h4">分批持有 · 6只×4日</option></select></label><div class="sd-segment"><button type="button" data-model-period="test" aria-pressed="true" title="2023—2026 年测试段，模型按年使用此前数据重训">测试期</button><button type="button" data-model-period="long" title="2015—2026 年长期补充回测，早期区间不作独立验证">长期</button></div><button type="button" data-research="model-info">结果口径</button></div></div>
+      <div class="sd-model-layout"><section class="sd-panel"><div class="sd-panel-head"><h2>组合净值</h2><span data-slot="model-period"></span></div>
+        <div class="sd-chart-legend" data-slot="model-legend"></div><svg data-research-chart="models" class="sd-model-chart" role="img" aria-label="三个模型及对照指数净值曲线"></svg>
+        <section class="sd-insight" aria-label="策略解读"><div class="sd-insight-head"><h3>策略解读</h3><button type="button" data-insight-ask="models">向 AI 追问 ↗</button></div><p data-slot="model-insight" aria-live="polite"></p></section>
+        <div class="sd-metric-strip sd-model-metrics" data-slot="model-metrics" aria-live="polite"></div>
+        <div class="sd-table-wrap"><table class="sd-research-table"><thead><tr><th>模型</th><th>测试 Rank IC</th><th>年化收益</th><th>年化超额</th><th>最大回撤</th><th>换手</th><th>年化费用</th><th>训练耗时</th></tr></thead><tbody data-slot="model-table"></tbody></table></div>
+      </section><aside class="sd-panel sd-config"><h2 data-slot="strategy-title">排名缓冲</h2><p data-slot="strategy-description"></p><dl data-slot="strategy-facts"></dl><p class="sd-discipline-note" data-slot="model-discipline"></p></aside></div>
+    </section>
+    <section data-view="portfolio" hidden>
+      <div class="sd-module-head"><div class="sd-heading"><h1>投资组合案</h1><span class="sd-module-description">依据模型候选与资金约束生成持仓计划</span></div><button type="button" data-research="report">查看配置报告</button></div>
+      <div class="sd-portfolio-source"><label>候选模型<select data-research-control="model" title="使用该模型在信号日的前 20 名作为候选；按排名和当前约束生成持仓计划"><option value="xgb_F69">XGBoost · 69 项特征</option><option value="rf_F69">随机森林 · 69 项特征</option><option value="lstm_SF69">LSTM · 69 项特征 + 60×11 序列</option></select></label><label>信号日<input type="date" data-research-control="signal-date" aria-label="组合信号日" title="读取当日模型排名与收盘参考价"></label></div>
+      <div class="sd-portfolio-controls"><label>预算（元）<input type="number" value="200000" min="0" max="100000000" step="10000" data-research-control="budget"></label><label>现金留存（%）<input type="number" value="10" min="0" max="100" data-research-control="reserve"></label><label>计划持仓<select data-research-control="portfolio-count"><option value="3">3只</option><option value="5" selected>5只</option><option value="8">8只</option></select></label><label>单行业最多<select data-research-control="industry-cap"><option value="1">1只</option><option value="2" selected>2只</option><option value="3">3只</option></select></label><label>单边佣金（bps）<input type="number" value="8" min="0" max="100" step="0.1" data-research-control="fee"></label><button type="button" data-research="candidate-info">候选来源与成交假设</button></div>
+      <div class="sd-metric-strip sd-panel" data-slot="portfolio-metrics" aria-live="polite"></div>
+      <section class="sd-panel"><div class="sd-panel-head"><h2>持仓计划</h2><span data-slot="portfolio-context"></span></div><div class="sd-table-wrap"><table class="sd-research-table"><thead><tr><th>股票</th><th>参考价</th><th>模型名次</th><th title="模型评分在当日准入池的百分位，越高表示排名越靠前">全池分位</th><th>股数</th><th>金额</th><th>权重</th><th>入选依据</th></tr></thead><tbody data-slot="portfolio-table"></tbody></table></div><div data-slot="portfolio-exposure" class="sd-exposure"></div><section class="sd-insight" aria-label="配置解读"><div class="sd-insight-head"><h3>配置解读</h3><button type="button" data-insight-ask="portfolio">向 AI 追问 ↗</button></div><p data-slot="portfolio-insight" aria-live="polite"></p><details class="sd-selection-detail" data-slot="portfolio-decisions"><summary>查看筛选取舍</summary><div data-slot="portfolio-blocked"></div></details></section></section>
+    </section>
+    <section data-view="agents" hidden>
+      <div class="sd-module-head"><div class="sd-heading"><h1>AI辩论台</h1><span class="sd-module-description" data-slot="debate-state">模型候选、多角色交锋与终选复核</span></div></div>
+      <iframe class="sd-workbench-frame" data-slot="debate-frame" title="AI辩论台" loading="lazy"></iframe>
+    </section>
+  </main>
+  <footer class="sd-footer"><button type="button" data-action="source">数据来源：Tushare Pro</button><span data-slot="data-status">本地数据</span><span data-slot="app-status" role="status"></span></footer>
+  <dialog class="sd-dialog" data-dialog="source"><div class="sd-dialog-head"><h2>数据说明</h2><button type="button" data-action="close" aria-label="关闭数据说明">关闭 ×</button></div><div data-slot="source-content"></div></dialog>
+  <dialog class="sd-dialog sd-research-dialog" data-dialog="research"><div class="sd-dialog-head"><h2 data-slot="research-dialog-title"></h2><button type="button" data-research="close">关闭 ×</button></div><div data-slot="research-dialog-content"></div></dialog>
+</div>
+</body>
+</html>

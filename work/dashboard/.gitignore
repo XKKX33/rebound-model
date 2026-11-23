@@ -1,0 +1,17 @@
+# Local access, generated pages and diagnostics
+share_access.json
+service_state.json
+.restart.lock
+.env
+.env.*
+!.env.example
+feature_snapshot.json
+feature_snapshot.parquet
+rebound-debate-*/
+__pycache__/
+*.pyc
+*.log
+*.png
+*_checks.json
+release_check.json
+team_delivery_check.json
