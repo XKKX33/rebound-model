@@ -395,6 +395,39 @@
       if(page==='agents')status(error.message);
     }}}
   }
+  let debateLayoutDocument=null,debateLayoutObserver=null,debateLayoutPending=false;
+  function resizeDebateFrame(frame){
+    if(!frame.contentDocument||new URL(frame.src).origin!==location.origin)return;
+    const shell=frame.contentDocument.querySelector('.app-shell');
+    if(!shell?.offsetWidth)return;
+    const height=Math.max(560,Math.ceil(Math.max(shell.scrollHeight,shell.getBoundingClientRect().height)));
+    if(Math.abs(frame.getBoundingClientRect().height-height)>=1)frame.style.height=height+'px';
+  }
+  function installDebateLayout(frame){
+    if(!frame.getAttribute('src')||new URL(frame.src).origin!==location.origin)return;
+    const doc=frame.contentDocument,shell=doc?.querySelector('.app-shell');
+    if(!shell||doc===debateLayoutDocument)return;
+    debateLayoutObserver?.disconnect();
+    debateLayoutDocument=doc;
+    const scheduleResize=()=>{
+      if(debateLayoutPending)return;
+      debateLayoutPending=true;
+      requestAnimationFrame(()=>{debateLayoutPending=false;resizeDebateFrame(frame);});
+    };
+    let sheet=doc.getElementById('dashboard-debate-layout');
+    if(!sheet){
+      sheet=doc.createElement('link');
+      sheet.id='dashboard-debate-layout';
+      sheet.rel='stylesheet';
+      sheet.href='/assets/debate_layout.css';
+      sheet.addEventListener('load',scheduleResize,{once:true});
+      doc.head.append(sheet);
+    }
+    debateLayoutObserver=new ResizeObserver(scheduleResize);
+    debateLayoutObserver.observe(shell);
+    scheduleResize();
+  }
+  root.querySelector('[data-slot="debate-frame"]').addEventListener('load',event=>installDebateLayout(event.target));
   async function syncDebateWorkbench(){
     if(state.pageName!=='agents')return;
     const request=++debateSyncRequest;
@@ -433,9 +466,10 @@
     if(event.source!==frame.contentWindow||event.origin!==debateOrigin)return;
     if(event.data?.type==='debate-ready'){
       debateReady=true;
+      installDebateLayout(frame);
       syncDebateWorkbench();
     }else if(event.data?.type==='debate-resize'&&Number.isFinite(event.data.height)){
-      frame.style.height=Math.max(560,Math.min(12000,event.data.height))+'px';
+      resizeDebateFrame(frame);
     }else if(event.data?.type==='debate-tab'&&['stock','final','models','prompts'].includes(event.data.tab)){
       debateTab=event.data.tab;
     }

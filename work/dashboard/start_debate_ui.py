@@ -78,139 +78,7 @@ def prepare_embedded_ui(destination: Path) -> Path:
         ("rgba(59, 130, 246, 0.1)", "rgba(86, 97, 105, 0.08)"),
     ):
         styles = styles.replace(old, new)
-    styles += '''
-
-@media (max-width: 1120px) {
-  .topbar { position: static; align-items: stretch; flex-direction: column; gap: 8px; }
-  .topbar-left, .topbar-right { width: 100%; min-width: 0; flex-wrap: wrap; }
-  .brand, .brand-copy { min-width: 0; max-width: 100%; }
-  .brand-title, .brand-sub { white-space: normal; overflow-wrap: anywhere; }
-  .controls-group { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .ctrl-field, .ctrl-select { min-width: 0; width: 100%; max-width: 100%; }
-  .topbar-right { justify-content: space-between; }
-  .action-buttons, .kpi-strip { flex-wrap: wrap; max-width: 100%; }
-  .workspace, .left-pane, .right-pane, .view-container { min-width: 0; max-width: 100%; }
-  .explain-row { grid-template-columns: minmax(0, 1fr) 56px; gap: 5px; min-width: 0; }
-  .explain-bar-cell { grid-column: 1; grid-row: 2; }
-  .explain-contrib { grid-column: 2; grid-row: 2; }
-  .explain-val { grid-column: 2; grid-row: 1; text-align: right; }
-}
-@media (max-width: 520px) {
-  .topbar { padding: 8px 10px; }
-  .workspace { padding: 10px; }
-  .topbar-right { gap: 6px; }
-  .action-buttons { gap: 5px; }
-  .action-buttons .btn { height: auto; min-height: 32px; padding: 5px 8px; white-space: normal; }
-  .kpi-strip, .controls-group { gap: 6px; }
-  .stock-hero { padding: 12px; }
-  .right-tabs-bar, .tabs-left, .tabs-right { width: 100%; }
-  .tabs-left .tab-btn { flex: 1; white-space: normal; }
-  .chat-drawer { right: 6px; width: calc(100vw - 12px) !important; }
-}
-.app-shell { max-width: 100%; min-height: 0; overflow-x: clip; }
-html, body { height: auto !important; min-height: 0 !important; overflow: visible !important; }
-.workspace { flex: 0 0 auto; align-items: start; }
-
-.workspace, .workspace.chat-open, .workspace.chat-open.chat-wide {
-  grid-template-columns: minmax(340px, 0.42fr) minmax(0, 1fr);
-  gap: 18px;
-}
-.workspace.left-collapsed { grid-template-columns: minmax(340px, 0.42fr) minmax(0, 1fr); }
-.left-pane { position: static; max-height: none; overflow: visible; }
-.roster-card { flex: 0 0 auto; min-height: 0; }
-.roster-list { flex: 0 1 auto; max-height: 400px; min-height: 0; overflow-y: auto; }
-.ctrl-label { color: var(--ink-muted); font-size: 12px; font-weight: 500; letter-spacing: 0; text-transform: none; }
-.ctrl-select, .ctrl-select.ctrl-mini {
-  min-height: 34px; height: 34px; padding: 7px 9px;
-  border: 1px solid var(--border-hairline); border-radius: 4px;
-  background: var(--bg-subtle); color: var(--ink-primary);
-  font: inherit; font-size: 12px; box-shadow: none;
-}
-.ctrl-select:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); box-shadow: none; }
-.filter-pills { gap: 3px; }
-.filter-pills .chip { border-radius: 3px; border-color: transparent; background: transparent; padding: 5px 9px; font-size: 12px; }
-.filter-pills .chip:hover { background: var(--bg-subtle); border-color: var(--border-hairline); }
-.filter-pills .chip.active { background: var(--accent-soft); border-color: var(--accent-border); color: var(--accent); }
-input[type="search"] {
-  min-height: 36px; padding: 9px 12px; border: 0; border-radius: 4px;
-  background: var(--bg-subtle); color: var(--ink-primary); font: inherit;
-}
-.chat-drawer {
-  position: static;
-  width: 100%;
-  height: auto;
-  min-height: 0;
-  max-height: none;
-  margin-top: 2px;
-  animation: none;
-  box-shadow: none;
-}
-.btn-chat-toggle, .chat-head-actions, .chat-tools-badge,
-.chat-persist-hint, .chat-empty-caps { display: none !important; }
-.chat-head { background: #fff; }
-.chat-messages { flex: 0 1 auto; height: auto; min-height: 150px; max-height: 240px; background: #fff; }
-.chat-empty { margin: 0; width: 100%; border: 0; padding: 8px 0; background: transparent; }
-.chat-empty-title { font-size: 13px; }
-.chat-empty-desc { line-height: 1.55; }
-.chat-head .card-subtitle { white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
-.brand-sub, .brand-mark, .chat-avatar-badge, #kpi-tokens, .kpi-sep { display: none !important; }
-.embedded-workbench .brand { display: none !important; }
-.brand-title { font-size: 15px; letter-spacing: 0; }
-.chat-context-strip { background: #fff; }
-.chat-ctx-pill { border-radius: 3px; font-weight: 500; }
-.chat-ctx-pill.ctx-global { background: #f1f1f1; border-color: #d9d9d9; color: #555555; }
-.chat-ctx-pill.ctx-stock { border-radius: 3px; }
-.role-code, .explain-code, .citation-tooltip .ct-path { display: none !important; }
-.citation-chip { font-family: inherit; }
-.workflow-card, .roster-card, .chat-drawer { border-radius: 6px; }
-@media (max-width: 1120px) {
-  .workspace, .workspace.chat-open, .workspace.chat-open.chat-wide,
-  .workspace.left-collapsed, .workspace.left-collapsed.chat-open,
-  .workspace.left-collapsed.chat-open.chat-wide { grid-template-columns: minmax(0, 1fr); }
-  .left-pane { max-height: none; overflow: visible; }
-  .chat-drawer { height: auto; min-height: 0; }
-}
-@media (max-width: 520px) {
-  .chat-drawer { height: auto; min-height: 0; }
-}
-:root {
-  --bg-canvas: #f5f5f5;
-  --bg-subtle: #f1f1f1;
-  --border-hairline: #e1e1e1;
-  --border-strong: #cecece;
-  --ink-primary: #242424;
-  --ink-secondary: #4d4d4d;
-  --ink-muted: #666666;
-  --accent: #a83135;
-  --accent-mid: #cf3f42;
-  --accent-light: #dd8386;
-  --accent-soft: #fcf1f1;
-  --accent-border: #ebc4c5;
-  --bull: #cf3f42;
-  --bull-bg: #fdf0ef;
-  --bull-border: #f0c9c4;
-  --bear: #128365;
-  --bear-bg: #eaf5f1;
-  --bear-border: #c7ded7;
-  --neutral: #555555;
-  --neutral-bg: #f1f1f1;
-  --neutral-border: #d9d9d9;
-  --warn: #a83135;
-  --warn-bg: #fcf1f1;
-  --warn-border: #ebc4c5;
-}
-.workflow-svg .wf-node-done rect, .wf-node-done .wf-node-box { fill: #fcf1f1; stroke: #ebc4c5; }
-.chat-ctx-pill.ctx-stock { color: #a83135; background: #fcf1f1; border-color: #ebc4c5; }
-.stock-kpi-value { color: var(--ink-primary); }
-.nav-legend { color: var(--ink-primary); }
-.wf-node-done .wf-node-bg { fill: #fcf1f1; stroke: #ebc4c5; }
-.wf-node-active .wf-node-bg { fill: #fcf1f1; stroke: #cf3f42; }
-.wf-node-active .wf-node-halo { stroke: #cf3f42; }
-.wf-node-active .wf-node-title,.wf-node-badge { fill: #a83135; }
-.btn-primary,.btn-chat-send { background: #a83135; color: #fff; }
-.btn-primary:hover:not(:disabled),.btn-chat-send:hover:not(:disabled) { background: #8d252e; }
-.progress-fill { background: linear-gradient(90deg,#a83135,#dd8386); }
-'''
+    # Dashboard layout is defined once in assets/debate_layout.css.
     style_path.write_text(styles, encoding="utf-8")
     app_path = ui_dir / "app.js"
     app = app_path.read_text(encoding="utf-8")
@@ -756,10 +624,22 @@ window.addEventListener("message", (event) => {
   }
 });
 
+let __dashboardSizePending = false;
+let __dashboardLastHeight = 0;
 function __reportDashboardSize() {
-  const body = document.body;
-  const height = Math.max(body.scrollHeight, body.offsetHeight, body.getBoundingClientRect().bottom);
-  __postDashboardMessage({ type: "debate-resize", height });
+  if (__dashboardSizePending) return;
+  __dashboardSizePending = true;
+  requestAnimationFrame(() => {
+    __dashboardSizePending = false;
+    const shell = document.querySelector(".app-shell");
+    if (!shell || !shell.offsetWidth) return;
+    // Read content height rather than the iframe viewport, so shorter tabs shrink.
+    const height = Math.ceil(Math.max(shell.scrollHeight, shell.getBoundingClientRect().height));
+    if (height > 0 && height !== __dashboardLastHeight) {
+      __dashboardLastHeight = height;
+      __postDashboardMessage({ type: "debate-resize", height });
+    }
+  });
 }
 
 async function __startDashboardBridge() {
@@ -778,8 +658,7 @@ async function __startDashboardBridge() {
   }
   __postDashboardMessage({ type: "debate-ready" });
   const observer = new ResizeObserver(__reportDashboardSize);
-  observer.observe(document.documentElement);
-  observer.observe(document.body);
+  observer.observe(document.querySelector(".app-shell"));
   const mutations = new MutationObserver(() => requestAnimationFrame(__reportDashboardSize));
   mutations.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["hidden", "class"] });
   window.addEventListener("load", __reportDashboardSize, { once: true });
@@ -796,6 +675,12 @@ __startDashboardBridge();
 
     index_path = ui_dir / "index.html"
     html = index_path.read_text(encoding="utf-8")
+    html = html.replace(
+        '<link rel="stylesheet" href="/static/styles.css" />',
+        '<link rel="stylesheet" href="/static/styles.css" />\n'
+        '    <link id="dashboard-debate-layout" rel="stylesheet" href="/assets/debate_layout.css" />',
+        1,
+    )
     html = html.replace("反弹模型 · AI 多角色辩论复核台", "AI辩论台", 1)
     html = html.replace("反弹模型 · AI 辩论复核台", "AI辩论台", 1)
     html = html.replace(
