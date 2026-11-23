@@ -1,0 +1,5 @@
+# Local dashboard data and runtime
+/ui_data_profile.json
+/sharing/
+/runtime/
+/.venv/
